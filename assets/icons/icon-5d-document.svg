@@ -1,0 +1,5 @@
+<svg viewBox="0 0 48 48" fill="none" stroke="var(--icon-color, #8B7BA8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon-5d icon-5d--document">
+  <path d="M14 8 H30 L38 16 V40 H14 Z"/>
+  <path d="M30 8 V16 H38"/>
+  <path d="M20 24 H32 M20 30 H32 M20 36 H27"/>
+</svg>

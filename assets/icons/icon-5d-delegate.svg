@@ -1,0 +1,5 @@
+<svg viewBox="0 0 48 48" fill="none" stroke="var(--icon-color, #7A8B7F)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon-5d icon-5d--delegate">
+  <circle cx="34" cy="15" r="5"/>
+  <path d="M26 34 C26 27 29.5 24 34 24 C38.5 24 42 27 42 34"/>
+  <path d="M6 30 H20 M20 30 L15 25 M20 30 L15 35"/>
+</svg>
