@@ -1,4 +1,4 @@
-<svg viewBox="0 0 48 48" fill="none" stroke="var(--icon-color, #9B8B7A)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon-5d icon-5d--delay">
+<svg viewBox="0 0 48 48" fill="none" stroke="var(--icon-color, #796A5B)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" class="icon-5d icon-5d--delay">
   <circle cx="24" cy="24" r="15"/>
   <path d="M24 24 V14 M24 24 L31 28"/>
 </svg>
