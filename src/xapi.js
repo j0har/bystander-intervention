@@ -109,6 +109,10 @@ async function flushQueue() {
       });
       if (!res.ok) throw new Error(`xAPI send failed: ${res.status}`);
       queue.shift();
+      // Single-glance confirmation a statement actually reached the LRS —
+      // added 2026-08-10 after repeated rounds of "did it work?" that
+      // needed a Network-tab inspection to answer.
+      console.info("[xapi:sent]", item.statement.verb.id.split("/").pop(), item.statement.object.id);
     } catch (err) {
       item.attempts += 1;
       if (item.attempts >= 3) {
@@ -149,6 +153,14 @@ function baseStatement(verbId, verbDisplay, objectId, objectType, objectName) {
 export function trackInitialized() {
   registrationId = uuidv4();
   launchContext = readLaunchParams();
+  // Single-glance confirmation of which mode this launch is running in —
+  // added 2026-08-10. Read this first before checking anything else: if it
+  // says "NOT found", the bug is in readLaunchParams()/the launch URL, not
+  // in the send logic below.
+  console.info(
+    "[xapi] launch context",
+    launchContext ? "FOUND — sending to " + launchContext.endpoint : "NOT found — local-only mode, nothing will be sent to an LRS"
+  );
   const stmt = baseStatement(
     "http://adlnet.gov/expapi/verbs/initialized",
     "initialized",
