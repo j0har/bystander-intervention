@@ -2,8 +2,8 @@
 // advance, tracking-init-before-first-render, owns app-level state.
 // Per Component Architecture Spec v1.3 §AppShell (renumbered for 11 screens).
 
-import { screens, totalScreens, dPathwayMap } from "./data.js";
-import { renderScreen } from "./render.js";
+import { screens, totalScreens, dPathwayMap } from "./data.js?v=20260810c";
+import { renderScreen } from "./render.js?v=20260810c";
 import {
   trackInitialized,
   trackAnswered,
@@ -11,8 +11,8 @@ import {
   trackHintOpened,
   trackReferenceOpened,
   trackModuleCompleted,
-} from "./xapi.js";
-import { scormInit, scormSetIncomplete, scormSetCompleted, scormTerminate } from "./scorm.js";
+} from "./xapi.js?v=20260810c";
+import { scormInit, scormSetIncomplete, scormSetCompleted, scormTerminate } from "./scorm.js?v=20260810c";
 
 // Dev navigation shortcut — gated at runtime, never shippable by default.
 // Structurally absent on the deployed GitHub Pages domain; no build step
