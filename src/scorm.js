@@ -32,6 +32,10 @@ let handle = null;
 export function scormInit() {
   const found = findAPI(window);
   if (!found) {
+    // Single-glance confirmation of which mode this launch is running in —
+    // mirrors xapi.js's launch-context log (added 2026-08-12, same
+    // rationale: read this first before checking anything else).
+    console.info("[scorm] no SCORM API found — xAPI-only path, nothing will be mirrored to a SCORM runtime");
     handle = null;
     return false;
   }
@@ -46,6 +50,7 @@ export function scormInit() {
       handle = null;
       return false;
     }
+    console.info(`[scorm] SCORM ${handle.version} API found and initialized`);
     return true;
   } catch (err) {
     console.warn("[scorm] Initialize threw", err);
@@ -64,6 +69,11 @@ function setValue(name12, name2004, value) {
       handle.api.SetValue(name2004, value);
       handle.api.Commit("");
     }
+    // Single-glance confirmation a value actually reached the SCORM API —
+    // added 2026-08-12, same rationale as xapi.js's [xapi:sent] log (the
+    // prior version only logged failures, so success and untested looked
+    // identical from the console).
+    console.info("[scorm:sent]", handle.version === "1.2" ? name12 : name2004, "=", value);
   } catch (err) {
     console.warn("[scorm] SetValue failed", name12, err);
   }
