@@ -13,7 +13,7 @@
 const BASE_IRI = "https://joharsingh.com/xapi/dbi/";
 
 let registrationId = null;
-let launchContext = null; // { endpoint, authToken, actor } | null when unlaunched
+let launchContext = null; // { endpoint, authToken, actor, registration } | null when unlaunched
 let hintOpened = false; // F4 fires once per registration, first open only
 
 function uuidv4() {
@@ -54,14 +54,22 @@ function normalizeActor(raw) {
   return out;
 }
 
-/** Read launch parameters (endpoint + auth) from the URL query string, the
- * shape SCORM Cloud's xAPI launch typically uses. Returns null if absent —
- * that's the expected local-dev / unlaunched case, not an error. */
+/** Read launch parameters (endpoint + auth + registration) from the URL
+ * query string, the shape SCORM Cloud's xAPI launch typically uses. Returns
+ * null if endpoint/auth are absent — that's the expected local-dev /
+ * unlaunched case, not an error. */
 function readLaunchParams() {
   const params = new URLSearchParams(window.location.search);
   const endpoint = params.get("endpoint");
   const auth = params.get("auth");
   const actorParam = params.get("actor");
+  // SCORM Cloud's own registration ID for this launch. Statements must be
+  // sent under this exact registration — the LRS endpoint/auth pair is
+  // registration-scoped, and a mismatched context.registration is rejected
+  // with 403. Confirmed live, 2026-08-11 (see DBI SCORM Cloud account setup
+  // task): every statement POST failed with 403 because registrationId was
+  // previously always a locally-generated random UUID, never this value.
+  const registration = params.get("registration");
   if (!endpoint || !auth) return null;
   let actor;
   try {
@@ -73,7 +81,7 @@ function readLaunchParams() {
   // ".../lrs/<key>/") — strip it so the '/statements' join below never
   // produces a double slash. Confirmed against a real launch, 2026-08-10;
   // the double slash was silently breaking every statement POST.
-  return { endpoint: endpoint.replace(/\/+$/, ""), authToken: auth, actor };
+  return { endpoint: endpoint.replace(/\/+$/, ""), authToken: auth, actor, registration };
 }
 
 /** Queue with capped exponential backoff. In-memory only — a reload loses
@@ -151,8 +159,12 @@ function baseStatement(verbId, verbDisplay, objectId, objectType, objectName) {
 
 /** F1 — module load, before first screen renders. Fires once per registration. */
 export function trackInitialized() {
-  registrationId = uuidv4();
   launchContext = readLaunchParams();
+  // Use SCORM Cloud's own registration ID when we have one (the normal
+  // launched case) so statements land under the registration the LRS auth
+  // token is actually scoped to. Only fall back to a random UUID when
+  // there's no launch context at all (local dev / unlaunched).
+  registrationId = launchContext?.registration ?? uuidv4();
   // Single-glance confirmation of which mode this launch is running in —
   // added 2026-08-10. Read this first before checking anything else: if it
   // says "NOT found", the bug is in readLaunchParams()/the launch URL, not
