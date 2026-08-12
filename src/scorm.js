@@ -8,7 +8,9 @@
 
 const VERSIONS = ["1.2", "2004"];
 
-function findAPI(win, triesLeft = 500) {
+// Walk a window's parent chain looking for a SCORM API object. Stops when
+// it finds one, runs out of parents, or hits the trip limit.
+function climbParents(win, triesLeft) {
   while (
     !win.API &&
     !win.API_1484_11 &&
@@ -19,8 +21,24 @@ function findAPI(win, triesLeft = 500) {
     triesLeft -= 1;
     win = win.parent;
   }
-  return win.API_1484_11 ? { api: win.API_1484_11, version: "2004" }
-    : win.API ? { api: win.API, version: "1.2" }
+  return win;
+}
+
+function findAPI(win, triesLeft = 500) {
+  let found = climbParents(win, triesLeft);
+  if (!found.API && !found.API_1484_11 && found.opener && found.opener !== found) {
+    // ADL SCORM 1.2/2004 RTE API-discovery fallback: an LMS may launch the
+    // SCO in a new browser window instead of an iframe — SCORM Cloud does
+    // exactly this. In that case window.parent is just the SCO's own
+    // window (nothing to climb), and the API instead lives somewhere in
+    // window.opener's parent chain. Confirmed required live against
+    // SCORM Cloud 2026-08-12 — without this, findAPI always returned null
+    // on that platform, regardless of whether the LMS actually exposed an
+    // API.
+    found = climbParents(found.opener, triesLeft);
+  }
+  return found.API_1484_11 ? { api: found.API_1484_11, version: "2004" }
+    : found.API ? { api: found.API, version: "1.2" }
     : null;
 }
 
