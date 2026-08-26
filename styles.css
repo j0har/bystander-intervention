@@ -250,6 +250,19 @@ textarea:focus-visible {
   margin-bottom: var(--space-3);
 }
 
+/* DBI Row 14, 2026-08-26: decorative illustration on the five scored
+   scenario screens (4, 5, 7, 8, 10). Same box treatment as .hero-graphic
+   (Screen 1's still-unproduced hero asset) so the two illustration
+   surfaces in the module read as one family, not two. */
+.scenario-illustration {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  margin-bottom: var(--space-4);
+  background: var(--color-bg-weighted);
+}
+
 .stem {
   background: var(--color-surface);
   border-radius: var(--radius);
