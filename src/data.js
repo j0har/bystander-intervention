@@ -160,6 +160,7 @@ export const screens = [
       options: [
         {
           id: "A",
+          correct: true,
           text: "Reply in the channel with a brief comment addressing the stereotype.",
           feedback:
             "Yes — answering in the same space where it happened is what resets the norm. Your colleague already said something and got nothing back; everyone still in that channel read the silence as agreement. Match the visibility of your response to the visibility of the harm.",
@@ -200,6 +201,7 @@ export const screens = [
         },
         {
           id: "B",
+          correct: true,
           text: "Use the chat, or speak up, to suggest the facilitator come back to your colleague.",
           feedback:
             "Yes — the facilitator has the standing to redirect the floor, and a nudge costs your colleague nothing. It gets them back into the conversation while their idea can still land, without putting you in direct conflict with a peer. Worth noticing: why do you think this one felt like it didn’t need a response?",
@@ -236,6 +238,7 @@ export const screens = [
         },
         {
           id: "B",
+          correct: true,
           text: "Add a comment flagging the discrepancy and suggesting you discuss it.",
           feedback:
             "Yes — flagging it and inviting the conversation keeps your colleague in a decision that affects their work. Bystander intervention isn’t only about responding to what others do; it’s also about not being the person who quietly overrides someone.",
@@ -279,6 +282,7 @@ export const screens = [
         },
         {
           id: "C",
+          correct: true,
           text: "Send a private message to the junior staff member offering support and asking if they want you to route this to their leader or HR.",
           feedback:
             "Yes — asking first leaves the decision with the person it’s actually about. They’re the one who has to keep working with this manager, and they’re the only one who knows what they can afford. Where someone has power over the person being harmed, start by finding out what they want, not by deciding for them.",
@@ -325,6 +329,7 @@ export const screens = [
         },
         {
           id: "C",
+          correct: true,
           text: "Send your colleague a private message checking in and asking if there’s anything they’d want you to do.",
           feedback:
             "Yes — this doesn’t put you in front of someone who outranks you, and it doesn’t decide anything on your colleague’s behalf. It opens the door without asking them to carry the cost of your exposure, and leaves what happens next with the person it actually affects.",
@@ -356,6 +361,7 @@ export const screens = [
       options: [
         {
           id: "A",
+          correct: true,
           text: "“That’s completely understandable — I’m here if you need anything later. What happened wasn’t okay.”",
           feedback:
             "Yes — you took them at their word and still made it clear you didn’t think what happened was fine. They asked for space, not for you to disagree with them about whether it mattered. The door’s open on their timing.",
@@ -397,6 +403,7 @@ export const screens = [
       options: [
         {
           id: "A",
+          correct: true,
           text: "Address the comment briefly in the meeting and send a private message afterward.",
           feedback:
             "Yes — a brief acknowledgment in the call resets the norm for everyone who saw it, and the private message reaches the person it actually happened to. Public harm and personal impact are two different problems; this answers both. Option B could also work — the difference is whether the team needs to hear that a peer thought the comment wasn’t okay, not just that the conversation moved on.",

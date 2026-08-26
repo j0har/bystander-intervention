@@ -213,11 +213,39 @@ export function renderScenarioScreen(screen, ctx) {
 
     ctx.onSubmit(id, scenarioNumber, optionId);
 
+    // Lock the answer after first submit (DBI Row 14 decision, 2026-08-25):
+    // simpler than attempt-numbering, and removes the duplicate xAPI
+    // `answered` statement problem by construction — trackAnswered() can
+    // now only ever fire once per screen, since the form can't submit
+    // again. Disabling every radio (not just the chosen one) prevents the
+    // learner from silently changing their answer post-feedback, and
+    // hiding the submit button (rather than just disabling it) removes the
+    // two-buttons-close-together ambiguity the build brief flagged —
+    // once feedback is showing, Continue is the only live control.
+    fieldset.querySelectorAll('input[type="radio"]').forEach((input) => {
+      input.disabled = true;
+    });
+    submitBtn.hidden = true;
+
+    // Correctness signal (DBI Row 14 fix, 2026-08-26): previously the only
+    // indication of fit was the word "Yes —" opening the best-fit option's
+    // own feedback text, with no visible label/color at all — flagged as
+    // the likely source of "can't tell if I got it right." `option.correct`
+    // is new data.js metadata (added the same session, exactly the option
+    // whose feedback already started with "Yes —" for each of the 7
+    // scenario screens — no feedback text changed). The label is the
+    // primary signal, not the border color alone, so this doesn't depend
+    // on color perception.
+    feedbackPanel.className = "feedback" + (option.correct ? " feedback--correct" : " feedback--reconsider");
+    feedbackPanel.innerHTML = "";
+    feedbackPanel.appendChild(
+      el("p", { class: "feedback__signal" }, option.correct ? "Best-fit response" : "Worth a second look")
+    );
+    feedbackPanel.appendChild(el("p", {}, option.feedback));
+
     // Populate content first, then unhide on next frame — a `hidden`
     // element with content already in place may never announce; binding
     // order matters for the aria-live region to fire reliably.
-    feedbackPanel.innerHTML = "";
-    feedbackPanel.appendChild(el("p", {}, option.feedback));
     requestAnimationFrame(() => {
       feedbackPanel.hidden = false;
     });
@@ -249,8 +277,10 @@ export function renderScenarioScreen(screen, ctx) {
     children
   );
 
-  // Continue control appears the moment feedback renders (not gated on the
-  // keyed option — retries are unlimited, module is formative).
+  // Continue control appears the moment feedback renders — not gated on the
+  // keyed option. The module is formative and non-punitive: seeing which
+  // response fit best doesn't require getting it right, and (as of the
+  // submit-lock above) there's no retry loop to gate against either.
   const continueHolder = section.querySelector(".continue-holder");
   ctx.continueShown = false;
   ctx.showContinue = () => {
