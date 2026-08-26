@@ -229,6 +229,20 @@ export function renderScenarioScreen(screen, ctx) {
 
   const children = [
     backButton(ctx.canGoBack ? ctx.onBack : null),
+    // DBI Row 14, 2026-08-26: decorative scenario illustration — Streamline
+    // Brooklyn family, scored screens only (4, 5, 7, 8, 10; not 6/9, which
+    // fold into the 5D reference material instead). Never carries unique
+    // information — the stem text is always the source of truth — so it's
+    // alt="" + aria-hidden, same convention as CardGridScreen's icon-5d and
+    // StatementScreen's icon-risk.
+    data.illustration
+      ? el("img", {
+          src: `assets/illustrations/${data.illustration}`,
+          alt: "",
+          "aria-hidden": "true",
+          class: "scenario-illustration",
+        })
+      : null,
     el("h1", { id: `s${id}-title`, class: "visually-hidden-optional" }, `Scenario ${scenarioNumber}`),
     scored === false ? el("p", { class: "unscored-label" }, "Not scored") : null,
     data.framingLine ? el("p", {}, [el("strong", {}, data.framingLine)]) : null,
