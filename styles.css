@@ -251,16 +251,20 @@ textarea:focus-visible {
 }
 
 /* DBI Row 14, 2026-08-26: decorative illustration on the five scored
-   scenario screens (4, 5, 7, 8, 10). Same box treatment as .hero-graphic
-   (Screen 1's still-unproduced hero asset) so the two illustration
-   surfaces in the module read as one family, not two. */
+   scenario screens (4, 5, 7, 8, 10).
+   REVISION 2026-08-27 (DBI Row 14 display fix): the .hero-graphic box
+   treatment (200px cap + object-fit: cover + filled rounded box) was built
+   for a single wide banner photo and wrong for these portrait/multi-panel
+   Brooklyn compositions — it cropped heads/lower frame and read as a
+   floating card rather than art that's part of the scene. Per Johar's
+   2026-08-27 direction: show the illustration in full (no crop), drop the
+   card-style background/border-radius, sit flush directly above .stem so
+   the two feel like one surface rather than a boxed element on top of it. */
 .scenario-illustration {
+  display: block;
   width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  border-radius: var(--radius);
-  margin-bottom: var(--space-4);
-  background: var(--color-bg-weighted);
+  height: auto;
+  margin: 0;
 }
 
 .stem {
