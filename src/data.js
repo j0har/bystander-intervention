@@ -154,6 +154,11 @@ export const screens = [
     // hardFailFlags regardless so the data exists if/when that's resolved.
     hardFailOptions: ["C"],
     data: {
+      // DBI Row 14, 2026-08-26: illustration added — Streamline Brooklyn
+      // family, mapped by Johar against this scenario's Slack-channel /
+      // busy-thread setting. Placeholder geometry ships in this PR pending
+      // the real recolored Brooklyn export (see PR description).
+      illustration: "scenario-4-slack-stereotype.svg",
       stem:
         "Your team has a busy Slack channel — usually pretty active, lots of quick back-and-forth. A colleague posts a meme with a regional stereotype. Another colleague — who’s usually very active in this channel — replies ‘not sure that one lands’ and gets no response. The thread moves on. They haven’t posted since.",
       question: "What’s the most appropriate way to respond?",
@@ -188,6 +193,7 @@ export const screens = [
     scenarioNumber: 2,
     scored: true,
     data: {
+      illustration: "scenario-5-meeting-interruption.svg",
       stem:
         "In a team meeting, a colleague tries to share an idea but is interrupted. They try again a few minutes later — interrupted again. The facilitator doesn’t notice. Your colleague goes quiet for the rest of the meeting.",
       question: "What’s the best way to respond?",
@@ -261,6 +267,7 @@ export const screens = [
     // higher severity ("the most serious error here" per feedback copy).
     hardFailOptions: ["D"],
     data: {
+      illustration: "scenario-7-reply-all.svg",
       stem:
         "A senior manager sends a reply-all email correcting a junior staff member’s work. The tone is sharp, the email is CC’d to directors, and the junior staff member stops responding in the thread.",
       question: "Given what’s safe for you to do here, what’s the best action?",
@@ -307,6 +314,7 @@ export const screens = [
     scenarioNumber: 5,
     scored: true,
     data: {
+      illustration: "scenario-8-responder-risk.svg",
       stem:
         "In a cross-department Slack channel, mid-workday, a department head posts a dismissive message about a colleague’s work — two levels above you, and in your reporting line. Your colleague replies briefly, then goes quiet. Nobody else responds. You have the DM panel open.",
       question: "Direct is genuinely unsafe for you here. The target isn’t asking you to stay quiet. What do you do?",
@@ -390,6 +398,7 @@ export const screens = [
     scenarioNumber: 7,
     scored: true,
     data: {
+      illustration: "scenario-10-appearance-comment.svg",
       stem:
         "During a video call, someone makes a comment about a teammate’s appearance. Your teammate laughs it off with a visibly uncomfortable expression, turns their camera off, and stays quiet for the rest of the call — unusual for them. The call moves on without anyone addressing it.",
       question: "Which combination would be most effective?",
