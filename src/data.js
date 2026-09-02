@@ -80,19 +80,31 @@ export const dPathwayMap = {
 // screens[] — the single ordered source of truth AppShell iterates over.
 // component: 'StatementScreen' | 'CardGridScreen' | 'ScenarioScreen'
 export const screens = [
-  // ---- Screen 1 — Introduction ---------------------------------------
+  // ---- Screen 1 — Splash / title screen --------------------------------
+  // DBI Row 14, 2026-09-01: Johar's call — Screen 1 is the module's start
+  // splash, not a content screen: title, subtitle, hero illustration
+  // ("Diverse Team", Streamline Brooklyn — DBI intro hero graphic, closed
+  // 2026-08-31), Start button. Replaces the prior "Notice. Choose. Support."
+  // headline + 3-paragraph body, which carried the now-retracted booster/
+  // full-day-session backstory (see prototype-build-note.md 2026-08-29) and,
+  // per instructional-copywriting's Principle 5 finding logged on
+  // "DBI and Bad News learner-copy voice rewrite", stated the framework as
+  // its own opener instead of a real title. This closes that Screen 1 title
+  // question directly.
   {
     id: 1,
     component: "StatementScreen",
+    variant: "splash",
     weighted: false,
     data: {
-      headline: "Notice. Choose. Support.",
-      body: [
-        "You’ve already worked through digital bystander intervention in a full-day session. This is a short refresher — a chance to use the 5Ds again on situations that look like your actual week. Most collaboration now happens in chat threads, email, shared files and video calls. These tools create moments where someone gets sidelined, a comment lands wrong, or a message reads sharper than it was meant to.",
-        "Over the next few minutes you’ll work through familiar situations and choose how to respond — without formal authority, without escalating harm, using tools you already have. The 5Ds stay open beside you the whole way.",
-        "This takes about 13 minutes. If you reload or navigate away you’ll start over — there’s no save.",
-      ],
-      advanceLabel: "Continue",
+      illustration: "Diverse-Team--Streamline-Brooklyn.svg",
+      headline: "Online Bystander Intervention",
+      subtitle: "Practicing the 5Ds Framework",
+      // Kept from the retired body copy rather than dropped silently — real,
+      // decided expectation-setting content (module length, no save on
+      // reload). Flagged to Johar as an assumption at handover.
+      noSaveNote: "About 13 minutes. If you reload or navigate away, you’ll start over — there’s no save.",
+      advanceLabel: "Start",
     },
   },
 
