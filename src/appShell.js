@@ -2,8 +2,8 @@
 // advance, tracking-init-before-first-render, owns app-level state.
 // Per Component Architecture Spec v1.3 §AppShell (renumbered for 11 screens).
 
-import { screens, totalScreens, dPathwayMap } from "./data.js?v=20260826a";
-import { renderScreen } from "./render.js?v=20260826a";
+import { screens, totalScreens, dPathwayMap } from "./data.js?v=20260901a";
+import { renderScreen } from "./render.js?v=20260901a";
 import {
   trackInitialized,
   trackAnswered,
@@ -11,8 +11,8 @@ import {
   trackHintOpened,
   trackReferenceOpened,
   trackModuleCompleted,
-} from "./xapi.js?v=20260826a";
-import { scormInit, scormSetIncomplete, scormSetCompleted, scormTerminate } from "./scorm.js?v=20260826a";
+} from "./xapi.js?v=20260901a";
+import { scormInit, scormSetIncomplete, scormSetCompleted, scormTerminate } from "./scorm.js?v=20260901a";
 
 // Dev navigation shortcut — gated at runtime, never shippable by default.
 // Structurally absent on the deployed GitHub Pages domain; no build step
@@ -36,6 +36,12 @@ const appEl = document.getElementById("app");
 const progressEl = document.getElementById("progress");
 
 function updateProgress() {
+  // DBI Row 14, 2026-09-01: the splash screen shows no progress indicator —
+  // "Screen 1 of 11" reads wrong above a title/Start screen.
+  if (screens[state.currentScreenIndex].variant === "splash") {
+    progressEl.textContent = "";
+    return;
+  }
   const n = state.currentScreenIndex + 1;
   progressEl.textContent = `Screen ${n} of ${totalScreens}`;
 }

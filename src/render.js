@@ -48,6 +48,37 @@ function referenceDisclosure(screenId, onOpen) {
 export function renderStatementScreen(screen, ctx) {
   const { data, weighted, id } = screen;
 
+  // DBI Row 14, 2026-09-01: Screen 1 as a true splash — title, subtitle,
+  // hero illustration, Start button. No back button (first screen; ctx.canGoBack
+  // is always false here anyway), no body paragraphs — the module-length /
+  // no-save notice that used to live in Screen 1's body is kept as a small
+  // caption under the Start button rather than dropped silently.
+  if (screen.variant === "splash") {
+    const section = el(
+      "section",
+      {
+        class: "screen screen--statement screen--splash",
+        "aria-labelledby": `s${id}-title`,
+        tabindex: "-1",
+      },
+      [
+        data.illustration
+          ? el("img", {
+              src: `assets/illustrations/${data.illustration}`,
+              alt: "",
+              "aria-hidden": "true",
+              class: "splash-graphic",
+            })
+          : null,
+        el("h1", { id: `s${id}-title` }, data.headline),
+        data.subtitle ? el("p", { class: "splash-subtitle" }, data.subtitle) : null,
+        el("button", { type: "button", class: "btn-continue", onclick: ctx.onAdvance }, data.advanceLabel),
+        data.noSaveNote ? el("p", { class: "no-save-note" }, data.noSaveNote) : null,
+      ]
+    );
+    return section;
+  }
+
   if (screen.variant === "debrief") {
     const section = el(
       "section",
