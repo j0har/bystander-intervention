@@ -316,6 +316,15 @@ textarea:focus-visible {
   height: 1.1em;
 }
 
+.scenario-form input[type="radio"]:disabled {
+  cursor: default;
+}
+
+.scenario-form label:has(input[type="radio"]:disabled) {
+  cursor: default;
+  opacity: 0.7;
+}
+
 .validation-message {
   color: var(--color-accent);
   font-weight: 500;
@@ -347,6 +356,31 @@ textarea:focus-visible {
 .feedback[hidden] { display: none; }
 
 .feedback p:last-child { margin-bottom: 0; }
+
+/* Correctness signal (DBI Row 14 fix, 2026-08-26). The text label is the
+   real signal — color is a reinforcing accent only, never load-bearing on
+   its own, so this reads fine under any color-vision profile. */
+.feedback__signal {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.feedback--correct {
+  border-left-color: var(--color-d-delegate);
+}
+
+.feedback--correct .feedback__signal {
+  color: var(--color-d-delegate);
+}
+
+.feedback--reconsider {
+  border-left-color: var(--color-text-secondary);
+}
 
 /* Reference disclosure — persistent 5Ds */
 .reference {
