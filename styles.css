@@ -108,6 +108,44 @@ p { margin: 0 0 var(--space-3); }
 
 .screen__body p { margin-bottom: var(--space-3); }
 
+/* Splash screen (Screen 1) — DBI Row 14, 2026-09-01. Kept deliberately
+   modest: a hero image sized like an icon, not a banner, since oversized
+   illustrations on mobile are the exact problem flagged elsewhere in this
+   pass (scenario-illustration sizing, still open). */
+.screen--splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-5);
+}
+
+.splash-graphic {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  margin-bottom: var(--space-4);
+}
+
+.screen--splash h1 {
+  margin-bottom: var(--space-2);
+}
+
+.splash-subtitle {
+  color: var(--color-text-secondary);
+  font-size: 1.0625rem;
+  margin: 0 0 var(--space-5);
+}
+
+.screen--splash .btn-continue {
+  margin-top: 0;
+}
+
+.screen--splash .no-save-note {
+  margin-top: var(--space-4);
+}
+
 .screen__body strong { font-weight: 500; color: var(--color-text); }
 
 .hero-graphic {
