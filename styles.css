@@ -142,10 +142,6 @@ p { margin: 0 0 var(--space-3); }
   margin-top: 0;
 }
 
-.screen--splash .no-save-note {
-  margin-top: var(--space-4);
-}
-
 .screen__body strong { font-weight: 500; color: var(--color-text); }
 
 .hero-graphic {
@@ -182,8 +178,7 @@ p { margin: 0 0 var(--space-3); }
 .btn-submit:focus-visible,
 a:focus-visible,
 input:focus-visible,
-summary:focus-visible,
-textarea:focus-visible {
+summary:focus-visible {
   outline: 3px solid var(--color-text);
   outline-offset: 2px;
 }
@@ -473,7 +468,7 @@ textarea:focus-visible {
 
 .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
-.no-save-note {
+.exit-note {
   font-size: 0.8125rem;
   color: var(--color-text-secondary);
   margin-top: var(--space-1);

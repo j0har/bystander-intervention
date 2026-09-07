@@ -117,7 +117,7 @@ export function renderStatementScreen(screen, ctx) {
     const actions = section.querySelector(".debrief-actions");
     ctx.onExit = () => {
       actions.innerHTML = "";
-      actions.appendChild(el("p", { class: "no-save-note" }, data.exitNote));
+      actions.appendChild(el("p", { class: "exit-note" }, data.exitNote));
     };
     return section;
   }

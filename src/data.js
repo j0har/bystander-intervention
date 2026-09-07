@@ -188,12 +188,11 @@ export const screens = [
       illustration: "Diverse-Team--Streamline-Brooklyn.svg",
       headline: "Online Bystander Intervention",
       subtitle: "Practicing the 5Ds Framework",
-      // No caption — Johar's call, 2026-09-05: duration/no-save info moves
-      // to Screen 2 instead of restating it here. FLAG: Screen 2's final
-      // copy (below) states duration ("this 10-minute learning experience")
-      // but does not carry an explicit no-save/no-reload warning the way
-      // the old Screen 1 body did. Not invented here — surfaced as an open
-      // gap for Johar, not silently dropped or silently kept.
+      // No caption. There is no "your progress isn't saved" warning anywhere
+      // in this module, on any screen — Johar's standing preference,
+      // reaffirmed 2026-09-07 (not an open gap, not deferred to Screen 2 or
+      // anywhere else; an earlier draft of this rebuild framed it as a gap
+      // to resolve, which was a misreading).
       advanceLabel: "Start",
     },
   },
@@ -467,10 +466,10 @@ export const screens = [
   // state.selections + debriefBaselines above — not static here. The old
   // reflection-prompt/implementation-intention/textarea block is DROPPED,
   // not carried forward: DBI-Learner-Copy-FINAL-2026-09-05.md's own Screen
-  // 14 content doesn't include it, and its survival is explicitly flagged
-  // there as unresolved (word-ceiling concern once 5 comparison lines are
-  // added). This is a build-time call, easily reversed — flagged plainly,
-  // not smuggled in.
+  // 14 content doesn't include it, and its survival was explicitly flagged
+  // there as unresolved until this rebuild — Johar confirmed 2026-09-07 the
+  // drop is permanent, not pending, and the copy doc has been updated to
+  // match (no more "open" framing there).
   {
     id: 14,
     component: "StatementScreen",
