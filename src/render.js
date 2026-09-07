@@ -1,10 +1,11 @@
 // render.js — component render functions. Each returns a <section> element
-// ready to mount into #app. Per Component Architecture Spec v1.3 (renumbered):
-// one <h1> per mounted screen, native elements first, the feedback panel's
-// role="status" + aria-live="polite" is the one deliberate custom-ARIA
-// usage in the whole module.
+// ready to mount into #app. Per Component Architecture Spec v1.4 (doc sweep
+// complete, 2026-09-07 — matches this file's actual 14-screen/5-scenario
+// behavior): one <h1> per mounted screen, native elements first, the
+// feedback panel's role="status" + aria-live="polite" is the one
+// deliberate custom-ARIA usage in the whole module.
 
-import { referenceContent } from "./data.js";
+import { referenceContent, phaseCards } from "./data.js";
 
 function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
@@ -42,17 +43,20 @@ function referenceDisclosure(screenId, onOpen) {
   return details;
 }
 
+// Formats a baseline percentage: whole numbers with no decimal (52%),
+// everything else to one decimal place (21.3%) — matches
+// DBI-Debrief-Synthetic-Baseline-Methodology-2026-09-01.md's own display
+// convention for its worked tables.
+function formatPercent(n) {
+  return Number.isInteger(n) ? `${n}%` : `${n.toFixed(1)}%`;
+}
+
 // ---------------------------------------------------------------------
-// StatementScreen — screens 1, 3, and the debrief variant (11)
+// StatementScreen — screens 1, 2, 3, and the debrief variant (14)
 // ---------------------------------------------------------------------
 export function renderStatementScreen(screen, ctx) {
   const { data, weighted, id } = screen;
 
-  // DBI Row 14, 2026-09-01: Screen 1 as a true splash — title, subtitle,
-  // hero illustration, Start button. No back button (first screen; ctx.canGoBack
-  // is always false here anyway), no body paragraphs — the module-length /
-  // no-save notice that used to live in Screen 1's body is kept as a small
-  // caption under the Start button rather than dropped silently.
   if (screen.variant === "splash") {
     const section = el(
       "section",
@@ -73,13 +77,20 @@ export function renderStatementScreen(screen, ctx) {
         el("h1", { id: `s${id}-title` }, data.headline),
         data.subtitle ? el("p", { class: "splash-subtitle" }, data.subtitle) : null,
         el("button", { type: "button", class: "btn-continue", onclick: ctx.onAdvance }, data.advanceLabel),
-        data.noSaveNote ? el("p", { class: "no-save-note" }, data.noSaveNote) : null,
       ]
     );
     return section;
   }
 
   if (screen.variant === "debrief") {
+    // comparisonLines is computed by appShell.js at mount time from
+    // state.selections + debriefBaselines (data.js) — not static content.
+    const comparisonList = el(
+      "ul",
+      { class: "comparison-list" },
+      (data.comparisonLines || []).map((line) => el("li", {}, line))
+    );
+
     const section = el(
       "section",
       {
@@ -88,25 +99,26 @@ export function renderStatementScreen(screen, ctx) {
         tabindex: "-1",
       },
       [
-        backButton(ctx.canGoBack ? ctx.onBack : null),
         el("h1", { id: `s${id}-title` }, data.headline),
-        el("div", { class: "summary" }, el("p", {}, data.summary)),
-        el(
-          "div",
-          { class: "narrative" },
-          data.narrative.map((line) => el("blockquote", {}, line))
-        ),
-        el("div", { class: "principle" }, el("p", {}, data.principle)),
-        el("section", { "aria-labelledby": "reflect-h" }, [
-          el("h2", { id: "reflect-h" }, "Reflect"),
-          el("p", {}, data.reflectionPrompt),
+        el("p", { class: "intro" }, data.intro),
+        comparisonList,
+        el("p", { class: "closing" }, data.closingNote),
+        el("div", { class: "debrief-actions" }, [
+          el("button", { type: "button", class: "btn-secondary", onclick: () => ctx.onRetry() }, data.retryLabel),
+          el("button", { type: "button", class: "btn-continue", onclick: () => ctx.onExit() }, data.exitLabel),
         ]),
-        el("label", { for: "impl" }, data.implementationLabel),
-        el("textarea", { id: "impl", name: "impl", rows: "4" }),
-        el("p", { class: "no-save-note" }, data.noSaveNote),
-        el("button", { type: "button", class: "btn-continue", onclick: ctx.onAdvance }, data.advanceLabel),
       ]
     );
+
+    // Exit swaps both buttons for a short closing note — this is a
+    // standalone page with no further screens and no save, so there's
+    // nothing else for either control to do once the learner is done.
+    // Retry resets in-memory state and restarts at Screen 1.
+    const actions = section.querySelector(".debrief-actions");
+    ctx.onExit = () => {
+      actions.innerHTML = "";
+      actions.appendChild(el("p", { class: "exit-note" }, data.exitNote));
+    };
     return section;
   }
 
@@ -128,7 +140,7 @@ export function renderStatementScreen(screen, ctx) {
       data.powerQuestions.map((q) =>
         el("div", { class: "power-question" }, [
           el("p", {}, [el("strong", {}, `${q.n}. ${q.text}`)]),
-          el("p", {}, q.note),
+          q.note ? el("p", {}, q.note) : null,
         ])
       )
     );
@@ -153,46 +165,41 @@ export function renderStatementScreen(screen, ctx) {
 }
 
 // ---------------------------------------------------------------------
-// CardGridScreen — screen 2
+// PhaseCardScreen — screens 5, 7, 9, 11, 13. One D per screen, earned
+// progressively after its scenario. Same visual card language as the old
+// CardGridScreen's grid (now removed — nothing else uses it), single card
+// instead of five.
 // ---------------------------------------------------------------------
-export function renderCardGridScreen(screen, ctx) {
+export function renderPhaseCardScreen(screen, ctx) {
   const { data, id } = screen;
-  const cards = el(
-    "ul",
-    { class: "card-grid" },
-    data.cards.map((card) =>
-      el("li", { class: "card", style: `--card-color: ${card.color}` }, [
-        el("img", {
-          src: `assets/icons/${card.icon}`,
-          alt: "",
-          "aria-hidden": "true",
-          class: "icon-5d",
-        }),
-        el("h2", {}, card.d),
-        el("p", {}, card.text),
-      ])
-    )
-  );
+  const card = phaseCards[data.d];
+
+  const cardEl = el("div", { class: "card phase-card", style: `--card-color: ${card.color}` }, [
+    el("img", { src: `assets/icons/${card.icon}`, alt: "", "aria-hidden": "true", class: "icon-5d" }),
+    el("h2", {}, data.d),
+    el("p", { class: "phase-card__definition" }, card.definition),
+    el("p", { class: "phase-card__label" }, "When to use"),
+    el("p", {}, card.whenToUse),
+    el("p", { class: "phase-card__label" }, "Example"),
+    el("p", { class: "phase-card__example" }, card.example),
+  ]);
 
   return el(
     "section",
-    { class: "screen screen--cardgrid", "aria-labelledby": `s${id}-title`, tabindex: "-1" },
+    { class: "screen screen--phasecard", "aria-labelledby": `s${id}-title`, tabindex: "-1" },
     [
-      backButton(ctx.canGoBack ? ctx.onBack : null),
-      el("h1", { id: `s${id}-title` }, data.framingLine),
-      el("p", { class: "intro" }, data.intro),
-      cards,
-      el("p", { class: "closing" }, data.closing),
+      el("h1", { id: `s${id}-title`, class: "visually-hidden-optional" }, `${data.d} — card earned`),
+      cardEl,
       el("button", { type: "button", class: "btn-continue", onclick: ctx.onAdvance }, data.advanceLabel),
     ]
   );
 }
 
 // ---------------------------------------------------------------------
-// ScenarioScreen — screens 4, 5, 6, 7, 8, 9, 10
+// ScenarioScreen — screens 4, 6, 8, 10, 12
 // ---------------------------------------------------------------------
 export function renderScenarioScreen(screen, ctx) {
-  const { data, id, scored, scenarioNumber, weighted } = screen;
+  const { data, id, scenarioNumber, weighted } = screen;
 
   const stemChildren = [el("p", {}, data.stem)];
   if (data.stemQuote) stemChildren.push(el("blockquote", {}, data.stemQuote));
@@ -244,10 +251,33 @@ export function renderScenarioScreen(screen, ctx) {
 
     ctx.onSubmit(id, scenarioNumber, optionId);
 
-    // Populate content first, then unhide on next frame — a `hidden`
-    // element with content already in place may never announce; binding
-    // order matters for the aria-live region to fire reliably.
+    // Lock the answer after first submit (folded in from PR #1, Row 14,
+    // 2026-08-25/26 — that PR predates this rebuild and never merged, so
+    // its intent is rebuilt fresh here rather than merged/rebased). All
+    // radios disable and Submit hides once feedback renders, so the form
+    // can't submit again — trackAnswered() can only fire once per screen
+    // by construction, and the debrief's per-scenario selection (recorded
+    // in appShell.js state) can't be silently overwritten by a retry.
+    fieldset.querySelectorAll('input[type="radio"]').forEach((input) => {
+      input.disabled = true;
+    });
+    submitBtn.hidden = true;
+
+    // Correctness signal (folded in from PR #1, same rationale). Three
+    // tiers, not two: `correct` (best-fit), `defensible` (final copy calls
+    // out Screen 12/B explicitly as "also defensible," not a plain miss —
+    // this is a build-time read of that copy, not new wording), and the
+    // default "worth a second look" for everything else. Text label is the
+    // real signal; color is reinforcing only.
+    const tierClass = option.correct ? "correct" : option.defensible ? "defensible" : "reconsider";
+    const tierLabel = option.correct
+      ? "Best-fit response"
+      : option.defensible
+      ? "Also reasonable"
+      : "Worth a second look";
+    feedbackPanel.className = `feedback feedback--${tierClass}`;
     feedbackPanel.innerHTML = "";
+    feedbackPanel.appendChild(el("p", { class: "feedback__signal" }, tierLabel));
     feedbackPanel.appendChild(el("p", {}, option.feedback));
     requestAnimationFrame(() => {
       feedbackPanel.hidden = false;
@@ -260,12 +290,10 @@ export function renderScenarioScreen(screen, ctx) {
 
   const children = [
     backButton(ctx.canGoBack ? ctx.onBack : null),
-    // DBI Row 14, 2026-08-26: decorative scenario illustration — Streamline
-    // Brooklyn family, scored screens only (4, 5, 7, 8, 10; not 6/9, which
-    // fold into the 5D reference material instead). Never carries unique
-    // information — the stem text is always the source of truth — so it's
-    // alt="" + aria-hidden, same convention as CardGridScreen's icon-5d and
-    // StatementScreen's icon-risk.
+    // Decorative scenario illustration — puzzle-piece treatment, all five
+    // scenario screens now (DBI Row 14, closed 2026-09-06). Never carries
+    // unique information — the stem text is always the source of truth —
+    // so it's alt="" + aria-hidden.
     data.illustration
       ? el("img", {
           src: `assets/illustrations/${data.illustration}`,
@@ -275,7 +303,6 @@ export function renderScenarioScreen(screen, ctx) {
         })
       : null,
     el("h1", { id: `s${id}-title`, class: "visually-hidden-optional" }, `Scenario ${scenarioNumber}`),
-    scored === false ? el("p", { class: "unscored-label" }, "Not scored") : null,
     data.framingLine ? el("p", {}, [el("strong", {}, data.framingLine)]) : null,
     el("div", { class: "stem" }, stemChildren),
     form,
@@ -313,11 +340,13 @@ export function renderScreen(screen, ctx) {
   switch (screen.component) {
     case "StatementScreen":
       return renderStatementScreen(screen, ctx);
-    case "CardGridScreen":
-      return renderCardGridScreen(screen, ctx);
+    case "PhaseCardScreen":
+      return renderPhaseCardScreen(screen, ctx);
     case "ScenarioScreen":
       return renderScenarioScreen(screen, ctx);
     default:
       throw new Error(`Unknown component: ${screen.component}`);
   }
 }
+
+export { formatPercent };

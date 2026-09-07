@@ -1,7 +1,10 @@
-// xapi.js — tracking module, per DBI-xAPI-Integration-Spec-v1.1.md §4–6
-// (renumbered screen scheme). Design driver is cohort-level trend analysis
-// over time, never per-attempt scoring: no `result.score` appears anywhere
-// in this module, by design, on any statement.
+// xapi.js — tracking module, per DBI-xAPI-Integration-Spec-v1.2.md §1–3
+// (doc sweep complete, 2026-09-07 — that spec now matches this file's
+// actual 14-screen/5-scenario behavior, including the live SCORM Cloud
+// account details and the actor-normalization fix below). Design driver is
+// cohort-level trend analysis over time, never per-attempt scoring: no
+// `result.score` appears anywhere in this module, by design, on any
+// statement.
 //
 // Actor identity and the LRS endpoint/auth pair are supplied externally by
 // whatever launches the module (SCORM Cloud / an LMS) at launch time. This
@@ -183,7 +186,7 @@ export function trackInitialized() {
   sendStatement(stmt);
 }
 
-/** F2 — every scenario Submit (scored and unscored alike, every retry). */
+/** F2 — every scenario Submit (every scenario screen, every retry). */
 export function trackAnswered(screenId, scenarioInstance, selectedOptionId) {
   const stmt = baseStatement(
     "http://adlnet.gov/expapi/verbs/answered",
@@ -216,14 +219,20 @@ export function trackScreenCompleted(screenId, scenarioInstance, dPathway) {
   sendStatement(stmt);
 }
 
-/** F4 — hint <details> toggled open, Screen 10 only. Fires once, first open only. */
+/** F4 — hint <details> toggled open, capstone only. Fires once, first open
+ * only. DEAD as of the 2026-09-07 rebuild: DBI-Learner-Copy-FINAL-2026-09-05
+ * .md's capstone (Screen 12) carries no hint copy, and none is invented here
+ * (not Claude's to author) — so no screen sets `data.hint` any more and
+ * this never fires. Kept, not deleted: cheap to restore if a hint comes
+ * back for that screen, and removing an exported tracking function is a
+ * bigger, separate call. Flagged, not silently left unexplained. */
 export function trackHintOpened() {
   if (hintOpened) return;
   hintOpened = true;
   const stmt = baseStatement(
     "http://adlnet.gov/expapi/verbs/interacted",
     "interacted",
-    "module/screen/10/hint",
+    "module/screen/12/hint",
     "interaction",
     "Capstone hint"
   );
@@ -231,7 +240,7 @@ export function trackHintOpened() {
 }
 
 /** F5 — reference <details> toggled open, every open (not close), any of the
- * 7 scenario screens. One activity ID — content is identical everywhere. */
+ * 5 scenario screens. One activity ID — content is identical everywhere. */
 export function trackReferenceOpened(fromScreenId) {
   const stmt = baseStatement(
     "http://adlnet.gov/expapi/verbs/experienced",
