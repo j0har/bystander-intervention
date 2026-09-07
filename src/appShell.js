@@ -1,7 +1,7 @@
 // appShell.js — AppShell (C0). Single-screen-visible container, linear
 // advance, tracking-init-before-first-render, owns app-level state.
-// Per Component Architecture Spec v1.3 §AppShell (still describes the old
-// 11-screen scheme as of this rebuild — sweep pending).
+// Per Component Architecture Spec v1.4 §C0 (doc sweep complete, 2026-09-07 —
+// matches this file's actual 14-screen/5-scenario behavior).
 
 import { screens, totalScreens, dPathwayMap, debriefBaselines } from "./data.js?v=20260907a";
 import { renderScreen, formatPercent } from "./render.js?v=20260907a";

@@ -1,7 +1,7 @@
-// xapi.js — tracking module, per DBI-xAPI-Integration-Spec-v1.1.md §4–6
-// (that doc still describes the OLD 11-screen/7-scenario scheme as of the
-// 2026-09-07 rebuild — sweep pending; this file's own behavior below is
-// current against the 14-screen/5-scenario structure). Design driver is
+// xapi.js — tracking module, per DBI-xAPI-Integration-Spec-v1.2.md §1–3
+// (doc sweep complete, 2026-09-07 — that spec now matches this file's
+// actual 14-screen/5-scenario behavior, including the live SCORM Cloud
+// account details and the actor-normalization fix below). Design driver is
 // cohort-level trend analysis over time, never per-attempt scoring: no
 // `result.score` appears anywhere in this module, by design, on any
 // statement.

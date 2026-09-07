@@ -1,9 +1,9 @@
 // render.js — component render functions. Each returns a <section> element
-// ready to mount into #app. Per Component Architecture Spec v1.3 (still
-// describes the old 11-screen scheme as of this rebuild — sweep pending):
-// one <h1> per mounted screen, native elements first, the feedback panel's
-// role="status" + aria-live="polite" is the one deliberate custom-ARIA
-// usage in the whole module.
+// ready to mount into #app. Per Component Architecture Spec v1.4 (doc sweep
+// complete, 2026-09-07 — matches this file's actual 14-screen/5-scenario
+// behavior): one <h1> per mounted screen, native elements first, the
+// feedback panel's role="status" + aria-live="polite" is the one
+// deliberate custom-ARIA usage in the whole module.
 
 import { referenceContent, phaseCards } from "./data.js";
 
