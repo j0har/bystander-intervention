@@ -203,22 +203,10 @@ textarea:focus-visible {
 /* Card grid (Screen 2) */
 .intro { color: var(--color-text-secondary); }
 
-.card-grid {
-  list-style: none;
-  margin: var(--space-4) 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-3);
-}
-
-@media (min-width: 480px) {
-  .card-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (min-width: 760px) {
-  .card-grid { grid-template-columns: repeat(3, 1fr); }
-}
+/* CardGridScreen (old Screen 2, five-up grid) removed 2026-09-07 — the
+   progressive phase-transition cards replaced it, nothing else used
+   .card-grid. .card itself is kept: PhaseCardScreen reuses it below for a
+   single card instead of a grid of five. */
 
 .card {
   background: var(--color-surface);
@@ -244,7 +232,27 @@ textarea:focus-visible {
   margin-bottom: var(--space-1);
 }
 
-.card p { margin: 0; font-size: 0.9375rem; color: var(--color-text-secondary); }
+.card p { margin: 0 0 var(--space-2); font-size: 0.9375rem; color: var(--color-text-secondary); }
+
+.card p:last-child { margin-bottom: 0; }
+
+/* PhaseCardScreen (screens 5, 7, 9, 11, 13) — one .card, not a grid. */
+.screen--phasecard { display: flex; flex-direction: column; align-items: center; }
+
+.phase-card { max-width: var(--max-width); width: 100%; }
+
+.phase-card__definition { color: var(--color-text); font-size: 1.0625rem; }
+
+.phase-card__label {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--card-color, var(--color-accent));
+  margin-bottom: 0.25em;
+}
+
+.phase-card__example { font-style: italic; }
 
 .closing { font-style: italic; color: var(--color-text-secondary); }
 
@@ -274,22 +282,12 @@ textarea:focus-visible {
   margin-bottom: var(--space-2);
 }
 
-/* Scenario screens */
-.unscored-label {
-  display: inline-block;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-text-secondary);
-  background: var(--color-bg-weighted);
-  padding: 0.2em 0.6em;
-  border-radius: 999px;
-  margin-bottom: var(--space-3);
-}
+/* Scenario screens. .unscored-label (old "taught, not scored" pill)
+   removed 2026-09-07 — no screen carries that state any more, all five
+   remaining scenarios are uniformly diagnostic. */
 
-/* DBI Row 14, 2026-08-26: decorative illustration on the five scored
-   scenario screens (4, 5, 7, 8, 10).
+/* DBI Row 14, 2026-08-26: decorative illustration on the scenario screens
+   (all five, as of the 2026-09-07 restructure — 4, 6, 8, 10, 12).
    REVISION 2026-08-27 (DBI Row 14 display fix): the .hero-graphic box
    treatment (200px cap + object-fit: cover + filled rounded box) was built
    for a single wide banner photo and wrong for these portrait/multi-panel
@@ -354,6 +352,15 @@ textarea:focus-visible {
   height: 1.1em;
 }
 
+/* Answer-lock after first submit (folded in from PR #1's intent, rebuilt
+   fresh 2026-09-07 — see appShell.js/render.js). */
+.scenario-form input[type="radio"]:disabled { cursor: default; }
+
+.scenario-form label:has(input[type="radio"]:disabled) {
+  cursor: default;
+  opacity: 0.7;
+}
+
 .validation-message {
   color: var(--color-accent);
   font-weight: 500;
@@ -386,6 +393,28 @@ textarea:focus-visible {
 
 .feedback p:last-child { margin-bottom: 0; }
 
+/* Correctness signal (folded in from PR #1's intent, rebuilt fresh
+   2026-09-07 with a third tier — see render.js's comment on why Screen
+   12/B needs "also reasonable" distinct from a plain miss). Text label is
+   the real signal; color is reinforcing only, never load-bearing alone. */
+.feedback__signal {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.feedback--correct { border-left-color: var(--color-d-delegate); }
+.feedback--correct .feedback__signal { color: var(--color-d-delegate); }
+
+.feedback--defensible { border-left-color: var(--color-d-delay); }
+.feedback--defensible .feedback__signal { color: var(--color-d-delay); }
+
+.feedback--reconsider { border-left-color: var(--color-text-secondary); }
+
 /* Reference disclosure — persistent 5Ds */
 .reference {
   position: sticky;
@@ -409,39 +438,40 @@ textarea:focus-visible {
 .reference dt:first-child { margin-top: 0; }
 .reference dd { margin: 0.15em 0 0; color: var(--color-text-secondary); }
 
-/* Debrief screen */
-.screen--debrief .summary,
-.screen--debrief .narrative,
-.screen--debrief .principle {
+/* Debrief screen (rebuilt 2026-09-07 — real per-scenario percentages,
+   choice-distribution comparison only; no reflection prompt/textarea, see
+   data.js's comment on why that block was dropped rather than carried
+   forward unchanged). */
+.comparison-list {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+}
+
+.comparison-list li {
   background: var(--color-surface);
   border-radius: var(--radius);
-  padding: var(--space-4);
-  margin-bottom: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-2);
 }
 
-.screen--debrief .narrative blockquote {
-  margin: var(--space-2) 0;
-  padding-left: var(--space-3);
-  border-left: 3px solid var(--color-accent);
-  font-style: italic;
+.debrief-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
 }
 
-.screen--debrief label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: var(--space-1);
-}
-
-.screen--debrief textarea {
-  width: 100%;
-  min-height: 6rem;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  padding: var(--space-2);
-  border: 1px solid #E0D6C8;
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--color-text-secondary);
+  color: var(--color-text);
   border-radius: var(--radius);
-  resize: vertical;
+  padding: var(--space-2) var(--space-4);
+  font-size: 1rem;
+  cursor: pointer;
 }
+
+.btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
 .no-save-note {
   font-size: 0.8125rem;
