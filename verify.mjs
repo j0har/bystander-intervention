@@ -117,7 +117,7 @@ submitScenario(4, "A");
 checkPhaseCard(5, "Direct");
 
 // Screen 6 — pick a NON-best-fit option (Distract) — exercises the
-// "Worth a second look" tier and confirms the debrief still reflects
+// "A missed opportunity" tier and confirms the debrief still reflects
 // whatever was actually picked, not always the key.
 submitScenario(6, "A");
 checkPhaseCard(7, "Distract");
@@ -139,7 +139,7 @@ checkPhaseCard(11, "Document");
   section.querySelector("form").dispatchEvent(new dom.window.Event("submit", { bubbles: true, cancelable: true }));
   walkedChoices[12] = "B";
   const signal = section.querySelector(".feedback__signal");
-  assert(signal.textContent === "Also reasonable", `screen 12/B shows the "Also reasonable" tier, got "${signal.textContent}"`);
+  assert(signal.textContent === "A reasonable trade-off", `screen 12/B shows the "A reasonable trade-off" tier, got "${signal.textContent}"`);
   clickButton(".continue-holder .btn-continue");
 }
 checkPhaseCard(13, "Delay");
