@@ -255,7 +255,7 @@ export const screens = [
     flagOptions: ["C"],
     data: {
       illustration: "scenario-1-puzzle-piece.svg",
-      shortTitle: "A joke, then silence",
+      shortTitle: "Stereotype in the chat",
       stem:
         "Your team has a busy Slack channel that's usually pretty active, with lots of quick back-and-forth. A colleague posts a meme with a regional stereotype. Another colleague, who's usually very active in this channel, doesn't respond. The thread moves on. They haven't posted since.",
       question: "What's the most appropriate way to respond?",
@@ -382,7 +382,7 @@ export const screens = [
     flagOptions: ["A"],
     data: {
       illustration: "scenario-4-puzzle-piece.svg",
-      shortTitle: "Mocked for their accent",
+      shortTitle: "Mimicking an accent",
       stem:
         "At the end of a virtual 1:1 video call, your colleague discloses that someone else on the team has been subtly mocking and mimicking their pronunciation of certain terminology because of their accent. It's occurred on a few occasions, but you haven't witnessed it yet yourself.",
       question: "What's the most useful way to respond?",
@@ -427,7 +427,7 @@ export const screens = [
     scenarioNumber: 5,
     data: {
       illustration: "scenario-5-puzzle-piece.svg",
-      shortTitle: "Camera off after a comment",
+      shortTitle: "Comment about appearance",
       stem:
         "During a video call, someone makes a comment about a teammate's appearance. Your teammate laughs it off with a visibly uncomfortable expression, turns their camera off, and stays quiet for the rest of the call. The call proceeds without anyone addressing it.",
       question: "Which combined response would be most effective?",
