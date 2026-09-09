@@ -7,7 +7,7 @@
 
 import { referenceContent, phaseCards } from "./data.js";
 
-function el(tag, attrs = {}, children = []) {
+export function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
     if (k === "class") node.className = v;
@@ -85,10 +85,30 @@ export function renderStatementScreen(screen, ctx) {
   if (screen.variant === "debrief") {
     // comparisonLines is computed by appShell.js at mount time from
     // state.selections + debriefBaselines (data.js) — not static content.
+    // Each entry is {percent, choice, situation, color, illustration} (DBI
+    // Row 14 Design pass, 2026-09-09) — the puzzle-piece art anchors each
+    // line back to the scenario it came from, and the left-edge color ties
+    // it to whichever D the pick actually mapped to (var(--color-text-
+    // secondary) for an off-framework pick, since no D token applies).
     const comparisonList = el(
       "ul",
       { class: "comparison-list" },
-      (data.comparisonLines || []).map((line) => el("li", {}, line))
+      (data.comparisonLines || []).map((line) =>
+        el("li", { style: `--line-color: ${line.color}` }, [
+          line.illustration
+            ? el("div", {
+                class: "comparison-illustration",
+                style: `background-image:url('assets/illustrations/${line.illustration}')`,
+                "aria-hidden": "true",
+              })
+            : null,
+          el("p", {}, [
+            "You and ",
+            el("strong", { class: "comparison-percent" }, line.percent),
+            ` of people chose to ${line.choice} when ${line.situation}.`,
+          ]),
+        ])
+      )
     );
 
     const section = el(
@@ -104,8 +124,8 @@ export function renderStatementScreen(screen, ctx) {
         comparisonList,
         el("p", { class: "closing" }, data.closingNote),
         el("div", { class: "debrief-actions" }, [
-          el("button", { type: "button", class: "btn-secondary", onclick: () => ctx.onRetry() }, data.retryLabel),
-          el("button", { type: "button", class: "btn-continue", onclick: () => ctx.onExit() }, data.exitLabel),
+          el("button", { type: "button", class: "btn-continue debrief-retry", onclick: () => ctx.onRetry() }, data.retryLabel),
+          el("button", { type: "button", class: "btn-secondary debrief-exit", onclick: () => ctx.onExit() }, data.exitLabel),
         ]),
       ]
     );
@@ -166,17 +186,24 @@ export function renderStatementScreen(screen, ctx) {
 
 // ---------------------------------------------------------------------
 // PhaseCardScreen — screens 5, 7, 9, 11, 13. One D per screen, earned
-// progressively after its scenario. Same visual card language as the old
-// CardGridScreen's grid (now removed — nothing else uses it), single card
-// instead of five.
+// progressively after its scenario. Real typographic hierarchy (DBI Row 14
+// Design pass, 2026-09-09): icon promoted into a tinted disc, an eyebrow
+// ties the card back to the scenario just completed, D name set large in
+// Fraunces over a colour rule, "When to use"/"Example" demoted to
+// small-caps labels with the example in a tinted quote block. Colour comes
+// only from the D token (--card-color), same as before.
 // ---------------------------------------------------------------------
 export function renderPhaseCardScreen(screen, ctx) {
   const { data, id } = screen;
   const card = phaseCards[data.d];
 
   const cardEl = el("div", { class: "card phase-card", style: `--card-color: ${card.color}` }, [
-    el("img", { src: `assets/icons/${card.icon}`, alt: "", "aria-hidden": "true", class: "icon-5d" }),
+    el("div", { class: "phase-card__icon-wrap" }, [
+      el("img", { src: `assets/icons/${card.icon}`, alt: "", "aria-hidden": "true", class: "icon-5d" }),
+    ]),
+    el("p", { class: "phase-card__eyebrow" }, "The approach you just practised"),
     el("h2", {}, data.d),
+    el("div", { class: "phase-card__rule" }),
     el("p", { class: "phase-card__definition" }, card.definition),
     el("p", { class: "phase-card__label" }, "When to use"),
     el("p", {}, card.whenToUse),
@@ -288,12 +315,13 @@ export function renderScenarioScreen(screen, ctx) {
     }
   });
 
-  const children = [
-    backButton(ctx.canGoBack ? ctx.onBack : null),
-    // Decorative scenario illustration — puzzle-piece treatment, all five
-    // scenario screens now (DBI Row 14, closed 2026-09-06). Never carries
-    // unique information — the stem text is always the source of truth —
-    // so it's alt="" + aria-hidden.
+  // Illustration + eyebrow sit side by side (DBI Row 14 Design pass,
+  // 2026-09-09): a fixed 88px/104px square instead of the old full-width
+  // stacked treatment, which forced a scroll before the question on every
+  // scenario screen. The eyebrow is the same "Scenario N of 5" text the
+  // hidden <h1> always carried — now visible, doing double duty as the
+  // screen's accessible name (no separate hidden heading needed).
+  const scenarioMeta = el("div", { class: "scenario-meta" }, [
     data.illustration
       ? el("img", {
           src: `assets/illustrations/${data.illustration}`,
@@ -302,7 +330,12 @@ export function renderScenarioScreen(screen, ctx) {
           class: "scenario-illustration",
         })
       : null,
-    el("h1", { id: `s${id}-title`, class: "visually-hidden-optional" }, `Scenario ${scenarioNumber}`),
+    el("h1", { id: `s${id}-title`, class: "scenario-eyebrow" }, `Scenario ${scenarioNumber} of 5`),
+  ]);
+
+  const children = [
+    backButton(ctx.canGoBack ? ctx.onBack : null),
+    scenarioMeta,
     data.framingLine ? el("p", {}, [el("strong", {}, data.framingLine)]) : null,
     el("div", { class: "stem" }, stemChildren),
     form,

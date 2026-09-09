@@ -160,7 +160,7 @@ checkPhaseCard(13, "Delay");
   lines.forEach((l) => console.log("   - " + l));
 
   // Retry resets and goes back to Screen 1
-  clickButton(".debrief-actions .btn-secondary");
+  clickButton(".debrief-actions .debrief-retry");
   assert(currentSection().className.includes("screen--splash"), "Retry returns to Screen 1 splash");
   assert(document.getElementById("progress").textContent === "", "progress indicator clears again after Retry");
 }
