@@ -80,17 +80,81 @@ p { margin: 0 0 var(--space-3); }
   left: 0;
 }
 
-/* Persistent header (#progress) — a static module title plus the
-   five-part practice track (DBI Row 14 Design pass, 2026-09-09, direction
-   2a). Stays decorative/aria-hidden on the container, same posture the
-   plain "Screen N of 14" text had before it — see appShell.js's
-   updateProgress() comment on why a screen-reader-facing progress
-   affordance is a deliberate follow-up, not bundled in here. Cleared to
-   empty on the splash screen, same as before. */
+/* Persistent header (#progress) — a back arrow (when there's somewhere to
+   go back to) sharing a row with a static module title, plus the
+   five-part practice track below (DBI Row 14 Design pass, 2026-09-09,
+   direction 2a). A subtly weighted background band (--color-bg-weighted,
+   same token .screen--weighted uses) separates the header from the white
+   screen card beneath it — this was in Design's mockup but missed in the
+   first implementation pass; bugfix 2026-09-09. Stays decorative/
+   aria-hidden on the container, same posture the plain "Screen N of 14"
+   text had before it — see appShell.js's updateProgress() comment on why a
+   screen-reader-facing progress affordance is a deliberate follow-up, not
+   bundled in here. Cleared to empty on the splash screen, same as before. */
 .progress-indicator {
   max-width: var(--max-width);
-  margin: 0 auto;
-  padding: var(--space-2) var(--space-3) 0;
+  margin: 0 auto var(--space-3);
+  background: var(--color-bg-weighted);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3) var(--space-3);
+}
+
+/* appShell.js sets textContent = "" (no children at all) on the splash
+   screen, same as before this pass — but the background/padding above are
+   new, so without this the empty container now shows as an orphan shaded
+   bar above the splash screen instead of disappearing the way the old
+   plain-text version did. */
+.progress-indicator:empty {
+  background: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+/* Back arrow + title row. The arrow is absolutely positioned within this
+   row (not a flex sibling) so the title stays visually centered whether or
+   not a back arrow is present — matches the Design mockup, where the title
+   sits centered above the track regardless of screen. Bugfix 2026-09-09:
+   previously there was no header back control at all — "← Back" was a
+   plain text link buried in some screens' own scrolling content (and
+   missing entirely from phase-card screens); see appShell.js. */
+.app-header__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.75rem;
+  margin-bottom: var(--space-2);
+}
+
+/* Bugfix 2026-09-09 (found from Johar's own follow-up screenshot): the
+   negative margin below was meant as the usual "bigger tap target without
+   shifting visual position" trick, but that trick only cancels out for a
+   statically-positioned element. On an absolutely positioned one, `top`
+   locates the MARGIN edge, so a negative margin pulls the actual visible
+   box up and to the left of where `left: 0; top: 50%` put it — measured
+   8px off in both axes, which is exactly why the arrow read as not lined
+   up with the title. Dropped the margin; the padding alone still gives a
+   comfortably larger hit area, and now the button's own center genuinely
+   lands on the row's center the way top: 50% + translateY(-50%) intends. */
+.app-header__back {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: var(--space-1);
+  font-size: 1.125rem;
+  line-height: 1;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.app-header__back:hover { color: var(--color-accent); }
+
+.app-header__back:focus-visible {
+  outline: 3px solid var(--color-text);
+  outline-offset: 2px;
 }
 
 .app-header__title {
@@ -98,7 +162,6 @@ p { margin: 0 0 var(--space-3); }
   font-size: 0.71875rem;
   letter-spacing: 0.04em;
   color: var(--color-text-secondary);
-  margin-bottom: var(--space-2);
 }
 
 .app-header__track {
@@ -234,18 +297,6 @@ summary:focus-visible {
   outline-offset: 2px;
 }
 
-.btn-back {
-  font-family: var(--font-body);
-  font-size: 0.9375rem;
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  text-decoration: underline;
-  cursor: pointer;
-  padding: var(--space-1) 0;
-  margin-bottom: var(--space-3);
-}
-
 /* Card grid (Screen 2) */
 .intro { color: var(--color-text-secondary); }
 
@@ -340,6 +391,12 @@ summary:focus-visible {
   margin: 0;
 }
 
+/* Bugfix 2026-09-09: this grid used to auto-place nine flat .phase-card
+   children (icon-wrap, eyebrow, h2, rule, definition, two labels, two
+   text blocks) two-per-row, scattering the eyebrow/labels into column 2
+   on rows of their own instead of grouping all the text under the icon.
+   render.js now wraps everything but the icon in one .phase-card__content
+   div, so the grid has exactly the two cells it was meant to have. */
 @media (min-width: 900px) {
   .phase-card {
     display: grid;
@@ -411,6 +468,15 @@ summary:focus-visible {
   .scenario-illustration { width: 104px; height: 104px; }
 }
 
+/* Eyebrow + short title stack together next to the illustration (DBI Row
+   14, 2026-09-09 follow-up — see render.js's comment on scenarioMeta). */
+.scenario-meta__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
 .scenario-eyebrow {
   font-family: var(--font-body);
   font-weight: 500;
@@ -418,6 +484,15 @@ summary:focus-visible {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-accent);
+  margin: 0;
+}
+
+.scenario-title {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 1.25;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -608,7 +683,16 @@ summary:focus-visible {
 }
 
 @media (min-width: 640px) {
-  .debrief-actions { flex-direction: row; }
+  .debrief-actions { flex-direction: row; align-items: center; }
+}
+
+/* Bugfix 2026-09-09: .btn-continue's own margin-top (meant for its usual
+   standalone/after-a-form placement) was leaking into this row, pushing
+   Retry down against Exit — and with the row's default flex
+   align-items: stretch, Exit was then stretching to match Retry's
+   inflated (margin + height) footprint, making it visibly taller too. */
+.debrief-retry {
+  margin-top: 0;
 }
 
 .btn-secondary {
@@ -619,6 +703,17 @@ summary:focus-visible {
   padding: var(--space-2) var(--space-4);
   font-size: 1rem;
   cursor: pointer;
+}
+
+/* Follow-up bugfix 2026-09-09 (Johar caught this on a zoomed look at the
+   previous fix): with the margin/stretch bug above gone, Retry and Exit
+   were still 3px apart in height (47px vs 44px) — .btn-continue's 2px
+   border vs .btn-secondary's 1px, with identical padding otherwise.
+   Bumping Exit's border to match makes the pair genuinely the same
+   height, not just close. Placed after .btn-secondary deliberately: same
+   specificity, so source order decides, and this needs to win. */
+.debrief-exit {
+  border-width: 2px;
 }
 
 .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }

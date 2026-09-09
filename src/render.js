@@ -22,11 +22,6 @@ export function el(tag, attrs = {}, children = []) {
   return node;
 }
 
-function backButton(onBack) {
-  if (!onBack) return null;
-  return el("button", { type: "button", class: "btn-back", onclick: onBack }, "← Back");
-}
-
 function referenceDisclosure(screenId, onOpen) {
   const dl = el(
     "dl",
@@ -145,7 +140,6 @@ export function renderStatementScreen(screen, ctx) {
   const bodyChildren = (data.body || []).map((p) => el("p", {}, p));
 
   const children = [
-    backButton(ctx.canGoBack ? ctx.onBack : null),
     data.icon
       ? el("img", { src: `assets/icons/${data.icon}`, alt: "", "aria-hidden": "true", class: "icon-risk" })
       : null,
@@ -192,6 +186,14 @@ export function renderStatementScreen(screen, ctx) {
 // Fraunces over a colour rule, "When to use"/"Example" demoted to
 // small-caps labels with the example in a tinted quote block. Colour comes
 // only from the D token (--card-color), same as before.
+//
+// The icon and the text block are two explicit grid children (DBI Row 14
+// bugfix, 2026-09-09) — not nine flat siblings. The desktop 2-column grid
+// (styles.css, .phase-card @900px) auto-places direct children into
+// alternating columns; with nine flat children that scattered the eyebrow/
+// rule/labels into column 2 on their own rows instead of grouping all the
+// text under the icon. Wrapping everything but the icon in one
+// .phase-card__content div gives the grid exactly two cells to place.
 // ---------------------------------------------------------------------
 export function renderPhaseCardScreen(screen, ctx) {
   const { data, id } = screen;
@@ -201,14 +203,16 @@ export function renderPhaseCardScreen(screen, ctx) {
     el("div", { class: "phase-card__icon-wrap" }, [
       el("img", { src: `assets/icons/${card.icon}`, alt: "", "aria-hidden": "true", class: "icon-5d" }),
     ]),
-    el("p", { class: "phase-card__eyebrow" }, "The approach you just practised"),
-    el("h2", {}, data.d),
-    el("div", { class: "phase-card__rule" }),
-    el("p", { class: "phase-card__definition" }, card.definition),
-    el("p", { class: "phase-card__label" }, "When to use"),
-    el("p", {}, card.whenToUse),
-    el("p", { class: "phase-card__label" }, "Example"),
-    el("p", { class: "phase-card__example" }, card.example),
+    el("div", { class: "phase-card__content" }, [
+      el("p", { class: "phase-card__eyebrow" }, "The approach you just practised"),
+      el("h2", {}, data.d),
+      el("div", { class: "phase-card__rule" }),
+      el("p", { class: "phase-card__definition" }, card.definition),
+      el("p", { class: "phase-card__label" }, "When to use"),
+      el("p", {}, card.whenToUse),
+      el("p", { class: "phase-card__label" }, "Example"),
+      el("p", { class: "phase-card__example" }, card.example),
+    ]),
   ]);
 
   return el(
@@ -321,6 +325,16 @@ export function renderScenarioScreen(screen, ctx) {
   // scenario screen. The eyebrow is the same "Scenario N of 5" text the
   // hidden <h1> always carried — now visible, doing double duty as the
   // screen's accessible name (no separate hidden heading needed).
+  //
+  // Follow-up 2026-09-09: Design's mockup also carried a short per-scenario
+  // title under the eyebrow ("Interrupted in a meeting"). PR #5 shipped
+  // without it — new learner-facing copy, not Claude's to invent unasked.
+  // Titles agreed with Johar directly (not re-fetched from Design, whose
+  // mockup covered only scenario 2) and added here as data.shortTitle.
+  // Eyebrow and title are wrapped together so they stack under one flex
+  // item next to the illustration; the section's aria-labelledby below
+  // points at both ids so the accessible name reads "Scenario N of 5,
+  // <title>" rather than dropping the title for AT users.
   const scenarioMeta = el("div", { class: "scenario-meta" }, [
     data.illustration
       ? el("img", {
@@ -330,11 +344,15 @@ export function renderScenarioScreen(screen, ctx) {
           class: "scenario-illustration",
         })
       : null,
-    el("h1", { id: `s${id}-title`, class: "scenario-eyebrow" }, `Scenario ${scenarioNumber} of 5`),
+    el("div", { class: "scenario-meta__text" }, [
+      el("h1", { id: `s${id}-title`, class: "scenario-eyebrow" }, `Scenario ${scenarioNumber} of 5`),
+      data.shortTitle
+        ? el("p", { id: `s${id}-shorttitle`, class: "scenario-title" }, data.shortTitle)
+        : null,
+    ]),
   ]);
 
   const children = [
-    backButton(ctx.canGoBack ? ctx.onBack : null),
     scenarioMeta,
     data.framingLine ? el("p", {}, [el("strong", {}, data.framingLine)]) : null,
     el("div", { class: "stem" }, stemChildren),
@@ -348,7 +366,7 @@ export function renderScenarioScreen(screen, ctx) {
     "section",
     {
       class: "screen screen--scenario" + (weighted ? " screen--weighted" : ""),
-      "aria-labelledby": `s${id}-title`,
+      "aria-labelledby": data.shortTitle ? `s${id}-title s${id}-shorttitle` : `s${id}-title`,
       tabindex: "-1",
     },
     children

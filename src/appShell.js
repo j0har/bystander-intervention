@@ -68,14 +68,24 @@ function currentDIndex(screen) {
   return null;
 }
 
-// Persistent header content — a static module title (DBI Row 14 Design
+// Persistent header content — a back arrow (when there's somewhere to go
+// back to) sharing a row with a static module title (DBI Row 14 Design
 // pass, 2026-09-09: the bar read bare once the old per-section labels were
-// dropped) plus the five-part practice track. Stays decorative/aria-hidden
-// on the outer #progress container, same posture the plain "Screen N of
-// 14" text had before — a screen-reader-facing progress affordance would
-// be a deliberate follow-up, not something to fold in silently here. Real
-// navigation context for AT users still comes from each screen's own
-// heading (focus moves there on every mount, per mountScreen below).
+// dropped), plus the five-part practice track below. Stays decorative/
+// aria-hidden on the outer #progress container, same posture the plain
+// "Screen N of 14" text had before — a screen-reader-facing progress
+// affordance would be a deliberate follow-up, not something to fold in
+// silently here. Real navigation context for AT users still comes from
+// each screen's own heading (focus moves there on every mount, per
+// mountScreen below).
+//
+// Back-arrow bugfix (2026-09-09): this used to be a per-screen "← Back"
+// text link rendered inside two of render.js's own screen bodies (statement
+// and scenario screens only — PhaseCardScreen never had one), duplicating
+// the canGoBack/onBack logic mountScreen already computed for ctx. Moved
+// here so there's exactly one back control, consistently placed above the
+// track on every non-splash screen per the Design mockup, rather than
+// buried in scrolling content on some screens and absent on others.
 function updateProgress() {
   const screen = screens[state.currentScreenIndex];
   // The splash screen shows no progress indicator — "Screen 1 of 14" reads
@@ -86,7 +96,35 @@ function updateProgress() {
   }
 
   progressEl.innerHTML = "";
-  progressEl.appendChild(el("div", { class: "app-header__title" }, screens[0].data.headline));
+
+  const canGoBack =
+    state.currentScreenIndex > 0 &&
+    state.completedScreens.has(screens[state.currentScreenIndex - 1]?.id);
+  const headerRow = el("div", { class: "app-header__row" }, [
+    // aria-hidden="false" here deliberately overrides #progress's own
+    // aria-hidden="true" (index.html) — supported by all major browser/AT
+    // combinations for exactly this "one real control inside an otherwise
+    // decorative container" case. Needed because this button is a genuine
+    // navigation control, unlike the title/track around it: the previous
+    // per-screen "← Back" link this replaces (bugfix, 2026-09-09) lived in
+    // ordinary screen content and was never hidden, so this override is
+    // what keeps its accessibility unchanged by the move into the header.
+    canGoBack
+      ? el(
+          "button",
+          {
+            type: "button",
+            class: "app-header__back",
+            "aria-label": "Back",
+            "aria-hidden": "false",
+            onclick: () => goTo(state.currentScreenIndex - 1),
+          },
+          "←"
+        )
+      : null,
+    el("div", { class: "app-header__title" }, screens[0].data.headline),
+  ]);
+  progressEl.appendChild(headerRow);
 
   const allComplete = screen.variant === "debrief";
   const curIdx = currentDIndex(screen);
@@ -167,8 +205,6 @@ function mountScreen(index) {
       : screen;
 
   const ctx = {
-    canGoBack: index > 0 && state.completedScreens.has(screens[index - 1]?.id),
-    onBack: () => goTo(index - 1),
     onAdvance: () => {
       state.completedScreens.add(screen.id);
       goTo(index + 1);
