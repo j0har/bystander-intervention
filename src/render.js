@@ -5,7 +5,7 @@
 // feedback panel's role="status" + aria-live="polite" is the one
 // deliberate custom-ARIA usage in the whole module.
 
-import { referenceContent, phaseCards } from "./data.js";
+import { phaseCards } from "./data.js";
 
 export function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
@@ -20,22 +20,6 @@ export function el(tag, attrs = {}, children = []) {
     node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
   }
   return node;
-}
-
-function referenceDisclosure(screenId, onOpen) {
-  const dl = el(
-    "dl",
-    {},
-    referenceContent.flatMap((r) => [el("dt", {}, r.d), el("dd", {}, r.text)])
-  );
-  const details = el("details", { class: "reference" }, [
-    el("summary", {}, "The 5Ds"),
-    dl,
-  ]);
-  details.addEventListener("toggle", () => {
-    if (details.open) onOpen(screenId);
-  });
-  return details;
 }
 
 // Formats a baseline percentage: whole numbers with no decimal (52%),
@@ -359,7 +343,6 @@ export function renderScenarioScreen(screen, ctx) {
     form,
     feedbackPanel,
     el("div", { class: "continue-holder" }),
-    referenceDisclosure(id, ctx.onReferenceOpen),
   ];
 
   const section = el(

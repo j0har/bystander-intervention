@@ -17,29 +17,6 @@
 // affected person's consent, per the FDD's A6 error patterns) is kept,
 // internal/xAPI-only, never learner-visible — Johar's call, 2026-09-07.
 
-export const referenceContent = [
-  {
-    d: "Direct",
-    text: "Full 4-question gate, conjunctive: physically safe for you? · target physically safe? · escalation unlikely? · can you tell the target wants someone to speak up?",
-  },
-  {
-    d: "Delegate",
-    text: "Only at the target’s request — except credible threat of imminent harm or a legal mandatory-reporting duty. In those cases the duty governs; tell the target what you’re required to do rather than asking permission.",
-  },
-  {
-    d: "Document",
-    text: "Always ask what they want done with it; never use it without permission. Check first whether anyone is already helping — if so, consider another D.",
-  },
-  {
-    d: "Delay",
-    text: "Check in privately, afterward. The moment passing doesn’t mean the option is gone.",
-  },
-  {
-    d: "Distract",
-    text: "Interrupt the dynamic — a clarifying question, a subject change.",
-  },
-];
-
 // Phase-transition card content — one card per D, revealed progressively as
 // the learner completes each scenario. Wording is verbatim from
 // DBI-Learner-Copy-FINAL-2026-09-05.md / DBI-5Ds-Content-Reconciliation-
