@@ -302,10 +302,10 @@ export function renderScenarioScreen(screen, ctx) {
     // real signal; color is reinforcing only.
     const tierClass = option.correct ? "correct" : option.defensible ? "defensible" : "reconsider";
     const tierLabel = option.correct
-      ? "Best-fit response"
+      ? "What worked well"
       : option.defensible
-      ? "Also reasonable"
-      : "Worth a second look";
+      ? "A reasonable trade-off"
+      : "A missed opportunity";
     feedbackPanel.className = `feedback feedback--${tierClass}`;
     feedbackPanel.innerHTML = "";
     feedbackPanel.appendChild(el("p", { class: "feedback__signal" }, tierLabel));
