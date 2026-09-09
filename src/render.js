@@ -204,7 +204,7 @@ export function renderPhaseCardScreen(screen, ctx) {
       el("img", { src: `assets/icons/${card.icon}`, alt: "", "aria-hidden": "true", class: "icon-5d" }),
     ]),
     el("div", { class: "phase-card__content" }, [
-      el("p", { class: "phase-card__eyebrow" }, "The approach you just practised"),
+      el("p", { class: "phase-card__eyebrow" }, "The 5Ds"),
       el("h2", {}, data.d),
       el("div", { class: "phase-card__rule" }),
       el("p", { class: "phase-card__definition" }, card.definition),
