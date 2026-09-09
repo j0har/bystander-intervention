@@ -325,6 +325,16 @@ export function renderScenarioScreen(screen, ctx) {
   // scenario screen. The eyebrow is the same "Scenario N of 5" text the
   // hidden <h1> always carried — now visible, doing double duty as the
   // screen's accessible name (no separate hidden heading needed).
+  //
+  // Follow-up 2026-09-09: Design's mockup also carried a short per-scenario
+  // title under the eyebrow ("Interrupted in a meeting"). PR #5 shipped
+  // without it — new learner-facing copy, not Claude's to invent unasked.
+  // Titles agreed with Johar directly (not re-fetched from Design, whose
+  // mockup covered only scenario 2) and added here as data.shortTitle.
+  // Eyebrow and title are wrapped together so they stack under one flex
+  // item next to the illustration; the section's aria-labelledby below
+  // points at both ids so the accessible name reads "Scenario N of 5,
+  // <title>" rather than dropping the title for AT users.
   const scenarioMeta = el("div", { class: "scenario-meta" }, [
     data.illustration
       ? el("img", {
@@ -334,7 +344,12 @@ export function renderScenarioScreen(screen, ctx) {
           class: "scenario-illustration",
         })
       : null,
-    el("h1", { id: `s${id}-title`, class: "scenario-eyebrow" }, `Scenario ${scenarioNumber} of 5`),
+    el("div", { class: "scenario-meta__text" }, [
+      el("h1", { id: `s${id}-title`, class: "scenario-eyebrow" }, `Scenario ${scenarioNumber} of 5`),
+      data.shortTitle
+        ? el("p", { id: `s${id}-shorttitle`, class: "scenario-title" }, data.shortTitle)
+        : null,
+    ]),
   ]);
 
   const children = [
@@ -351,7 +366,7 @@ export function renderScenarioScreen(screen, ctx) {
     "section",
     {
       class: "screen screen--scenario" + (weighted ? " screen--weighted" : ""),
-      "aria-labelledby": `s${id}-title`,
+      "aria-labelledby": data.shortTitle ? `s${id}-title s${id}-shorttitle` : `s${id}-title`,
       tabindex: "-1",
     },
     children

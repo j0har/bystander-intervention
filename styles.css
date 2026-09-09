@@ -468,6 +468,15 @@ summary:focus-visible {
   .scenario-illustration { width: 104px; height: 104px; }
 }
 
+/* Eyebrow + short title stack together next to the illustration (DBI Row
+   14, 2026-09-09 follow-up — see render.js's comment on scenarioMeta). */
+.scenario-meta__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
 .scenario-eyebrow {
   font-family: var(--font-body);
   font-weight: 500;
@@ -475,6 +484,15 @@ summary:focus-visible {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-accent);
+  margin: 0;
+}
+
+.scenario-title {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 1.25;
+  color: var(--color-text);
   margin: 0;
 }
 
