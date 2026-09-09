@@ -126,6 +126,16 @@ p { margin: 0 0 var(--space-3); }
   margin-bottom: var(--space-2);
 }
 
+/* Bugfix 2026-09-09 (found from Johar's own follow-up screenshot): the
+   negative margin below was meant as the usual "bigger tap target without
+   shifting visual position" trick, but that trick only cancels out for a
+   statically-positioned element. On an absolutely positioned one, `top`
+   locates the MARGIN edge, so a negative margin pulls the actual visible
+   box up and to the left of where `left: 0; top: 50%` put it — measured
+   8px off in both axes, which is exactly why the arrow read as not lined
+   up with the title. Dropped the margin; the padding alone still gives a
+   comfortably larger hit area, and now the button's own center genuinely
+   lands on the row's center the way top: 50% + translateY(-50%) intends. */
 .app-header__back {
   position: absolute;
   left: 0;
@@ -134,7 +144,6 @@ p { margin: 0 0 var(--space-3); }
   background: none;
   border: none;
   padding: var(--space-1);
-  margin: calc(var(--space-1) * -1);
   font-size: 1.125rem;
   line-height: 1;
   color: var(--color-text-secondary);
@@ -676,6 +685,17 @@ summary:focus-visible {
   padding: var(--space-2) var(--space-4);
   font-size: 1rem;
   cursor: pointer;
+}
+
+/* Follow-up bugfix 2026-09-09 (Johar caught this on a zoomed look at the
+   previous fix): with the margin/stretch bug above gone, Retry and Exit
+   were still 3px apart in height (47px vs 44px) — .btn-continue's 2px
+   border vs .btn-secondary's 1px, with identical padding otherwise.
+   Bumping Exit's border to match makes the pair genuinely the same
+   height, not just close. Placed after .btn-secondary deliberately: same
+   specificity, so source order decides, and this needs to win. */
+.debrief-exit {
+  border-width: 2px;
 }
 
 .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
