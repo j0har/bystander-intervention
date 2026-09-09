@@ -3,8 +3,8 @@
 // Per Component Architecture Spec v1.4 §C0 (doc sweep complete, 2026-09-07 —
 // matches this file's actual 14-screen/5-scenario behavior).
 
-import { screens, totalScreens, dPathwayMap, debriefBaselines } from "./data.js?v=20260907a";
-import { renderScreen, formatPercent } from "./render.js?v=20260907a";
+import { screens, totalScreens, dPathwayMap, debriefBaselines, phaseCards } from "./data.js?v=20260909a";
+import { renderScreen, formatPercent, el } from "./render.js?v=20260909a";
 import {
   trackInitialized,
   trackAnswered,
@@ -19,6 +19,12 @@ import { scormInit, scormSetIncomplete, scormSetCompleted, scormTerminate } from
 // Structurally absent on the deployed GitHub Pages domain; no build step
 // needed to strip it.
 const DEV_NAV_ENABLED = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+
+// Fixed D order, five parts, matching the order the learner practises them
+// in (screens 4/5=Direct, 6/7=Distract, 8/9=Delegate, 10/11=Document,
+// 12/13=Delay). Read from phaseCards' own key order rather than a second
+// hard-coded list, so the two can't drift apart.
+const D_ORDER = Object.keys(phaseCards);
 
 function initialState() {
   return {
@@ -50,15 +56,56 @@ let state = initialState();
 const appEl = document.getElementById("app");
 const progressEl = document.getElementById("progress");
 
+// Which five-part-track index a screen belongs to (0-4), or null for the
+// three framing screens (splash, intro, power dynamics) that come before
+// the first scenario. A ScenarioScreen's own scenarioNumber (1-5) already
+// matches D_ORDER position 1:1; a PhaseCardScreen looks its D up in
+// D_ORDER directly. Debrief (screen 14) is handled separately below — all
+// five parts read as complete there, not "current".
+function currentDIndex(screen) {
+  if (screen.component === "ScenarioScreen") return screen.scenarioNumber - 1;
+  if (screen.component === "PhaseCardScreen") return D_ORDER.indexOf(screen.data.d);
+  return null;
+}
+
+// Persistent header content — a static module title (DBI Row 14 Design
+// pass, 2026-09-09: the bar read bare once the old per-section labels were
+// dropped) plus the five-part practice track. Stays decorative/aria-hidden
+// on the outer #progress container, same posture the plain "Screen N of
+// 14" text had before — a screen-reader-facing progress affordance would
+// be a deliberate follow-up, not something to fold in silently here. Real
+// navigation context for AT users still comes from each screen's own
+// heading (focus moves there on every mount, per mountScreen below).
 function updateProgress() {
+  const screen = screens[state.currentScreenIndex];
   // The splash screen shows no progress indicator — "Screen 1 of 14" reads
   // wrong above a title/Start screen.
-  if (screens[state.currentScreenIndex].variant === "splash") {
+  if (screen.variant === "splash") {
     progressEl.textContent = "";
     return;
   }
-  const n = state.currentScreenIndex + 1;
-  progressEl.textContent = `Screen ${n} of ${totalScreens}`;
+
+  progressEl.innerHTML = "";
+  progressEl.appendChild(el("div", { class: "app-header__title" }, screens[0].data.headline));
+
+  const allComplete = screen.variant === "debrief";
+  const curIdx = currentDIndex(screen);
+  const track = el(
+    "div",
+    { class: "app-header__track" },
+    D_ORDER.map((d, i) => {
+      const done = allComplete || (curIdx !== null && i < curIdx);
+      const current = !allComplete && curIdx === i;
+      const cls = ["track-part"];
+      if (done) cls.push("track-part--done");
+      if (current) cls.push("track-part--current");
+      return el("div", {
+        class: cls.join(" "),
+        style: done || current ? `--part-color: ${phaseCards[d].color}` : "",
+      });
+    })
+  );
+  progressEl.appendChild(track);
 }
 
 // Builds the debrief's five comparison lines from what the learner actually
@@ -70,6 +117,12 @@ function updateProgress() {
 // guard only covers an unreachable-in-practice edge (module reloaded mid-
 // way — no persistence, so this can't actually happen without a fresh
 // registration anyway).
+//
+// Returns one object per line (not a pre-joined string, DBI Row 14 Design
+// pass 2026-09-09) so render.js can pair each line with its scenario's
+// puzzle-piece art and the D-color left edge the pick actually mapped to.
+// `color` falls back to the neutral secondary-text token for an
+// "off-framework" pick, since no D token applies there.
 const SCENARIO_SCREEN_IDS = [4, 6, 8, 10, 12];
 function buildComparisonLines() {
   return SCENARIO_SCREEN_IDS.map((screenId) => {
@@ -77,7 +130,15 @@ function buildComparisonLines() {
     const baseline = debriefBaselines[screenId];
     const opt = chosen && baseline ? baseline.options[chosen] : null;
     if (!opt) return null;
-    return `You and ${formatPercent(opt.percent)} of people chose to ${opt.choice} when ${baseline.situation}.`;
+    const d = dPathwayMap[screenId]?.[chosen];
+    const screen = screens.find((s) => s.id === screenId);
+    return {
+      percent: formatPercent(opt.percent),
+      choice: opt.choice,
+      situation: baseline.situation,
+      color: d && d !== "off-framework" ? phaseCards[d].color : "var(--color-text-secondary)",
+      illustration: screen?.data.illustration,
+    };
   }).filter(Boolean);
 }
 
