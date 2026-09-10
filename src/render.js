@@ -297,8 +297,9 @@ export function renderScenarioScreen(screen, ctx) {
 
     ctx.onSubmit(id, scenarioNumber, optionId);
 
-    // Lock the answer after first submit (folded in from PR #1's intent,
-    // rebuilt fresh 2026-09-07 — see appShell.js/render.js). All
+    // Lock the answer after first submit (folded in from PR #1, Row 14,
+    // 2026-08-25/26 — that PR predates this rebuild and never merged, so
+    // its intent is rebuilt fresh here rather than merged/rebased). All
     // radios disable and Submit hides once feedback renders, so the form
     // can't submit again — trackAnswered() can only fire once per screen
     // by construction, and the debrief's per-scenario selection (recorded
