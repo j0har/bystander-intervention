@@ -239,19 +239,11 @@ export function trackHintOpened() {
   sendStatement(stmt);
 }
 
-/** F5 — reference <details> toggled open, every open (not close), any of the
- * 5 scenario screens. One activity ID — content is identical everywhere. */
-export function trackReferenceOpened(fromScreenId) {
-  const stmt = baseStatement(
-    "http://adlnet.gov/expapi/verbs/experienced",
-    "experienced",
-    "module/reference",
-    "interaction",
-    "The 5Ds reference"
-  );
-  stmt.context.extensions[`${BASE_IRI}extensions/opened-from-screen`] = fromScreenId;
-  sendStatement(stmt);
-}
+// F5 (reference <details> toggled open) removed 2026-09-09 — the floating
+// "5Ds" disclosure it tracked is gone (Johar: broken layout, overlapped the
+// Submit button and answer options on scenario screens). No replacement
+// statement; the xAPI spec doc's F5 entry is now stale along with the rest
+// of the pre-rebuild doc sweep already tracked as a separate task.
 
 /** F6 — learner reaches the Debrief screen. Fires once per registration.
  * result.score is intentionally absent — no scoring model is defined. */

@@ -608,29 +608,6 @@ summary:focus-visible {
 
 .feedback--reconsider { border-left-color: var(--color-text-secondary); }
 
-/* Reference disclosure — persistent 5Ds */
-.reference {
-  position: sticky;
-  bottom: var(--space-3);
-  margin-top: var(--space-5);
-  background: var(--color-surface);
-  border-radius: var(--radius);
-  padding: var(--space-2) var(--space-3);
-  box-shadow: 0 2px 10px rgba(42, 31, 26, 0.12);
-  max-width: 280px;
-}
-
-.reference summary {
-  cursor: pointer;
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.reference dl { margin: var(--space-2) 0 0; font-size: 0.875rem; }
-.reference dt { font-weight: 500; margin-top: var(--space-2); }
-.reference dt:first-child { margin-top: 0; }
-.reference dd { margin: 0.15em 0 0; color: var(--color-text-secondary); }
-
 /* Debrief screen (DBI Row 14 Design pass, 2026-09-09, direction 1f): each
    line now pairs with its scenario's puzzle-piece art (the visual anchor
    back to the person affected) and picks up a left-edge colour from

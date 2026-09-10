@@ -3,16 +3,15 @@
 // Per Component Architecture Spec v1.4 §C0 (doc sweep complete, 2026-09-07 —
 // matches this file's actual 14-screen/5-scenario behavior).
 
-import { screens, totalScreens, dPathwayMap, debriefBaselines, phaseCards } from "./data.js?v=20260909a";
-import { renderScreen, formatPercent, el } from "./render.js?v=20260909a";
+import { screens, totalScreens, dPathwayMap, debriefBaselines, phaseCards } from "./data.js?v=20260909c";
+import { renderScreen, formatPercent, el } from "./render.js?v=20260909c";
 import {
   trackInitialized,
   trackAnswered,
   trackScreenCompleted,
   trackHintOpened,
-  trackReferenceOpened,
   trackModuleCompleted,
-} from "./xapi.js?v=20260907a";
+} from "./xapi.js?v=20260909c";
 import { scormInit, scormSetIncomplete, scormSetCompleted, scormTerminate } from "./scorm.js?v=20260907a";
 
 // Dev navigation shortcut — gated at runtime, never shippable by default.
@@ -234,7 +233,6 @@ function mountScreen(index) {
       }
     },
     onHintOpen: () => trackHintOpened(),
-    onReferenceOpen: (fromScreenId) => trackReferenceOpened(fromScreenId),
   };
 
   let node;
