@@ -67,15 +67,20 @@ function currentDIndex(screen) {
   return null;
 }
 
-// Persistent header content — a back arrow (when there's somewhere to go
-// back to) sharing a row with a static module title (DBI Row 14 Design
+// Persistent header content — a back arrow (when there's somewhere to
+// go back to) sharing a row with a static module title (DBI Row 14 Design
 // pass, 2026-09-09: the bar read bare once the old per-section labels were
-// dropped), plus the five-part practice track below. Stays decorative/
-// aria-hidden on the outer #progress container, same posture the plain
-// "Screen N of 14" text had before — a screen-reader-facing progress
-// affordance would be a deliberate follow-up, not something to fold in
-// silently here. Real navigation context for AT users still comes from
-// each screen's own heading (focus moves there on every mount, per
+// dropped), plus the five-part practice track below. The title and track
+// are individually aria-hidden (decorative — a screen-reader-facing
+// progress affordance would be a deliberate follow-up, not something to
+// fold in silently here); the back button is not, since it's a genuine
+// control. #progress itself carries no aria-hidden (real-browser axe pass,
+// 2026-09-09 — a nested aria-hidden="false" override on the button used to
+// live here instead, which axe's aria-hidden-focus rule correctly flags as
+// unreliable across assistive tech regardless of anecdotal browser
+// support; hiding only the decorative children is the standard pattern and
+// has no such caveat). Real navigation context for AT users still comes
+// from each screen's own heading (focus moves there on every mount, per
 // mountScreen below).
 //
 // Back-arrow bugfix (2026-09-09): this used to be a per-screen "← Back"
@@ -100,14 +105,11 @@ function updateProgress() {
     state.currentScreenIndex > 0 &&
     state.completedScreens.has(screens[state.currentScreenIndex - 1]?.id);
   const headerRow = el("div", { class: "app-header__row" }, [
-    // aria-hidden="false" here deliberately overrides #progress's own
-    // aria-hidden="true" (index.html) — supported by all major browser/AT
-    // combinations for exactly this "one real control inside an otherwise
-    // decorative container" case. Needed because this button is a genuine
-    // navigation control, unlike the title/track around it: the previous
-    // per-screen "← Back" link this replaces (bugfix, 2026-09-09) lived in
-    // ordinary screen content and was never hidden, so this override is
-    // what keeps its accessibility unchanged by the move into the header.
+    // Genuine navigation control, not decorative — carries no aria-hidden,
+    // unlike the title/track around it. The previous per-screen "← Back"
+    // link this replaces (bugfix, 2026-09-09) lived in ordinary screen
+    // content and was never hidden, so this keeps its accessibility
+    // unchanged by the move into the header.
     canGoBack
       ? el(
           "button",
@@ -115,13 +117,12 @@ function updateProgress() {
             type: "button",
             class: "app-header__back",
             "aria-label": "Back",
-            "aria-hidden": "false",
             onclick: () => goTo(state.currentScreenIndex - 1),
           },
           "←"
         )
       : null,
-    el("div", { class: "app-header__title" }, screens[0].data.headline),
+    el("div", { class: "app-header__title", "aria-hidden": "true" }, screens[0].data.headline),
   ]);
   progressEl.appendChild(headerRow);
 
@@ -129,7 +130,7 @@ function updateProgress() {
   const curIdx = currentDIndex(screen);
   const track = el(
     "div",
-    { class: "app-header__track" },
+    { class: "app-header__track", "aria-hidden": "true" },
     D_ORDER.map((d, i) => {
       const done = allComplete || (curIdx !== null && i < curIdx);
       const current = !allComplete && curIdx === i;
