@@ -21,14 +21,18 @@
 // the learner completes each scenario. Wording is verbatim from
 // DBI-Learner-Copy-FINAL-2026-09-05.md / DBI-5Ds-Content-Reconciliation-
 // 2026-09-03.md (system-of-record for sourcing) — not Claude's to author.
-// Icon set switched to the "-tinted" variants (DBI Row 14 Design pass,
-// 2026-09-09) — these are fixed-color glyphs meant to sit on the card's own
-// tinted icon disc; unlike the plain set they don't read --icon-color, so
-// they stay legible regardless of the disc's tint. Reuses the existing
-// --color-d-* tokens for the disc/rule/eyebrow color (DBI Row 9).
+// Icon set switched to the "-white" variants (DBI PhaseCard 3a build,
+// DBI-PhaseCard-3a-Final-Spec-2026-09-10.md) — the card's icon disc is now
+// a full-colour header band (--card-color) rather than a lightly-tinted
+// disc, so the glyph itself needs to read against solid colour, not a
+// tint. The "-tinted" set (DBI Row 14, 2026-09-09) stays in the repo,
+// unused by this component now — no other screen referenced it either, so
+// nothing else to update, but not deleted here (dead-asset cleanup is its
+// own backlog item, not in scope for this build). Reuses the existing
+// --color-d-* tokens for the header band/rule/eyebrow color (DBI Row 9).
 export const phaseCards = {
   Direct: {
-    icon: "icon-5d-direct-tinted.svg",
+    icon: "icon-5d-direct-white.svg",
     color: "var(--color-d-direct)",
     definition:
       "Calmly addressing the behaviour and drawing a clear boundary in the shared digital space.",
@@ -36,7 +40,7 @@ export const phaseCards = {
     example: "“Let’s keep our comments constructive. That message might have come across more critically than expected.”",
   },
   Distract: {
-    icon: "icon-5d-distract-tinted.svg",
+    icon: "icon-5d-distract-white.svg",
     color: "var(--color-d-distract)",
     definition:
       "Subtly redirecting a conversation to ease tension or interrupt harm when something feels unsafe.",
@@ -44,7 +48,7 @@ export const phaseCards = {
     example: "“Let’s refocus on the project details. I think we were talking about the next steps?”",
   },
   Delegate: {
-    icon: "icon-5d-delegate-tinted.svg",
+    icon: "icon-5d-delegate-white.svg",
     color: "var(--color-d-delegate)",
     definition:
       "Bringing someone in to help address the issue appropriately — only if the person affected wants that support brought in.",
@@ -53,7 +57,7 @@ export const phaseCards = {
       "A teammate mentions that a client keeps steamrolling them on calls, and it’s starting to wear on them. You ask: “Would it help if I brought this to our team lead, or would you rather handle it your own way for now?”",
   },
   Document: {
-    icon: "icon-5d-document-tinted.svg",
+    icon: "icon-5d-document-white.svg",
     color: "var(--color-d-document)",
     definition: "Ask first, then help capture what happened — only with their say in how it’s used.",
     whenToUse:
@@ -62,7 +66,7 @@ export const phaseCards = {
       "After a tense exchange in a group chat, a colleague mentions it’s still bothering them. You ask: “Would it help if I noted what was said and when — only if that’s something you’d want on record?”",
   },
   Delay: {
-    icon: "icon-5d-delay-tinted.svg",
+    icon: "icon-5d-delay-white.svg",
     color: "var(--color-d-delay)",
     definition: "Check in privately with the person who was affected.",
     whenToUse: "When someone withdrew, was ignored, corrected sharply, or experienced uncomfortable interactions online.",
