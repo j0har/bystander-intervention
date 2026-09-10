@@ -601,12 +601,22 @@ summary:focus-visible {
 }
 
 .feedback--correct { border-left-color: var(--color-d-delegate); }
-.feedback--correct .feedback__signal { color: var(--color-d-delegate); }
+/* --color-d-delegate (#627066) was tuned for 4.5:1+ against --color-bg
+   (DBI Row 9, 2026-08-08) — but .feedback's own background is the darker
+   --color-bg-weighted, where the same color measures only 4.18:1. Real-
+   browser axe pass, 2026-09-09: darkened for this text use only (border
+   above stays on the token unchanged — decorative, no text-contrast rule
+   applies). */
+.feedback--correct .feedback__signal { color: #58645B; }
 
 .feedback--defensible { border-left-color: var(--color-d-delay); }
-.feedback--defensible .feedback__signal { color: var(--color-d-delay); }
+/* Same issue, same fix, same date — --color-d-delay (#796A5B) measures
+   4.18:1 against --color-bg-weighted despite being tuned for --color-bg. */
+.feedback--defensible .feedback__signal { color: #6C5F51; }
 
 .feedback--reconsider { border-left-color: var(--color-text-secondary); }
+/* --color-text-secondary already clears 5.19:1 against --color-bg-weighted
+   — checked in the same pass, no change needed. */
 
 /* Debrief screen (DBI Row 14 Design pass, 2026-09-09, direction 1f): each
    line now pairs with its scenario's puzzle-piece art (the visual anchor
