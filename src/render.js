@@ -30,6 +30,14 @@ function formatPercent(n) {
   return Number.isInteger(n) ? `${n}%` : `${n.toFixed(1)}%`;
 }
 
+// Fixed D order, matching the order the learner practises them in (screens
+// 4/5=Direct, 6/7=Distract, 8/9=Delegate, 10/11=Document, 12/13=Delay).
+// Read from phaseCards' own key order (same approach appShell.js's own
+// D_ORDER uses) rather than a second hard-coded list, so the two can't
+// drift apart. Used here only for the in-card progress track's done/not-
+// done state — see renderPhaseCardScreen below.
+const D_ORDER = Object.keys(phaseCards);
+
 // ---------------------------------------------------------------------
 // StatementScreen — screens 1, 2, 3, and the debrief variant (14)
 // ---------------------------------------------------------------------
@@ -164,40 +172,63 @@ export function renderStatementScreen(screen, ctx) {
 
 // ---------------------------------------------------------------------
 // PhaseCardScreen — screens 5, 7, 9, 11, 13. One D per screen, earned
-// progressively after its scenario. Real typographic hierarchy (DBI Row 14
-// Design pass, 2026-09-09): icon promoted into a tinted disc, an eyebrow
-// ties the card back to the scenario just completed, D name set large in
-// Fraunces over a colour rule, "When to use"/"Example" demoted to
-// small-caps labels with the example in a tinted quote block. Colour comes
-// only from the D token (--card-color), same as before.
+// progressively after its scenario. "Colour field" (direction 3a), per
+// DBI-PhaseCard-3a-Final-Spec-2026-09-10.md — supersedes the Row 14
+// (2026-09-09) tinted-icon-disc treatment. Colour now fills a full-width
+// header band (icon disc + eyebrow + D name over solid --card-color)
+// instead of a 4px top border; definition/when-to-use/example sit below
+// it in a white body, separated by hairline rules instead of plain
+// paragraph spacing. DOM order is unchanged from the prior build: icon/
+// eyebrow/title first, then definition, "When to use," "Example."
 //
-// The icon and the text block are two explicit grid children (DBI Row 14
-// bugfix, 2026-09-09) — not nine flat siblings. The desktop 2-column grid
-// (styles.css, .phase-card @900px) auto-places direct children into
-// alternating columns; with nine flat children that scattered the eyebrow/
-// rule/labels into column 2 on their own rows instead of grouping all the
-// text under the icon. Wrapping everything but the icon in one
-// .phase-card__content div gives the grid exactly two cells to place.
-// ---------------------------------------------------------------------
+// In-card progress track: the header band repeats the shared app header's
+// own 5-part D track (appShell.js's updateProgress()) — an intentional
+// echo, not a second accessible-progress affordance (resolved in the spec's
+// "Duplication question," not reopened here). Same decorative posture:
+// aria-hidden on the track container, no accessible name of its own. The
+// screen's own <h1> below (visually hidden, matches the prior build) stays
+// the one real progress signal for AT users, unchanged.
 export function renderPhaseCardScreen(screen, ctx) {
   const { data, id } = screen;
   const card = phaseCards[data.d];
+  const curIdx = D_ORDER.indexOf(data.d);
 
-  const cardEl = el("div", { class: "card phase-card", style: `--card-color: ${card.color}` }, [
-    el("div", { class: "phase-card__icon-wrap" }, [
-      el("img", { src: `assets/icons/${card.icon}`, alt: "", "aria-hidden": "true", class: "icon-5d" }),
+  const track = el(
+    "div",
+    { class: "phase-card__track", "aria-hidden": "true" },
+    D_ORDER.map((d, i) =>
+      el("div", {
+        class: "phase-card__track-part" + (i <= curIdx ? " phase-card__track-part--done" : ""),
+      })
+    )
+  );
+
+  const header = el("div", { class: "phase-card__header" }, [
+    track,
+    el("div", { class: "phase-card__header-content" }, [
+      el("div", { class: "phase-card__icon-disc" }, [
+        el("img", { src: `assets/icons/${card.icon}`, alt: "", "aria-hidden": "true", class: "icon-5d" }),
+      ]),
+      el("div", { class: "phase-card__header-text" }, [
+        el("p", { class: "phase-card__eyebrow" }, "The 5Ds"),
+        el("h2", {}, data.d),
+      ]),
     ]),
-    el("div", { class: "phase-card__content" }, [
-      el("p", { class: "phase-card__eyebrow" }, "The 5Ds"),
-      el("h2", {}, data.d),
-      el("div", { class: "phase-card__rule" }),
-      el("p", { class: "phase-card__definition" }, card.definition),
+  ]);
+
+  const body = el("div", { class: "phase-card__body" }, [
+    el("p", { class: "phase-card__definition" }, card.definition),
+    el("div", { class: "phase-card__section" }, [
       el("p", { class: "phase-card__label" }, "When to use"),
       el("p", {}, card.whenToUse),
+    ]),
+    el("div", { class: "phase-card__section phase-card__section--example" }, [
       el("p", { class: "phase-card__label" }, "Example"),
       el("p", { class: "phase-card__example" }, card.example),
     ]),
   ]);
+
+  const cardEl = el("div", { class: "phase-card", style: `--card-color: ${card.color}` }, [header, body]);
 
   return el(
     "section",
@@ -266,9 +297,8 @@ export function renderScenarioScreen(screen, ctx) {
 
     ctx.onSubmit(id, scenarioNumber, optionId);
 
-    // Lock the answer after first submit (folded in from PR #1, Row 14,
-    // 2026-08-25/26 — that PR predates this rebuild and never merged, so
-    // its intent is rebuilt fresh here rather than merged/rebased). All
+    // Lock the answer after first submit (folded in from PR #1's intent,
+    // rebuilt fresh 2026-09-07 — see appShell.js/render.js). All
     // radios disable and Submit hides once feedback renders, so the form
     // can't submit again — trackAnswered() can only fire once per screen
     // by construction, and the debrief's per-scenario selection (recorded

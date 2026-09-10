@@ -302,46 +302,88 @@ summary:focus-visible {
 
 /* CardGridScreen (old Screen 2, five-up grid) removed 2026-09-07 — the
    progressive phase-transition cards replaced it, nothing else used
-   .card-grid. .card itself is kept: PhaseCardScreen reuses it below for a
-   single card instead of a grid of five. */
+   .card-grid. The shared .card base class itself (background/radius/
+   padding) was retired here, 2026-09-10, when PhaseCardScreen — its last
+   consumer — moved to its own fully-specified `.phase-card` root (see
+   below): `.card p` was a compound selector that outranked
+   `.phase-card__eyebrow`/`.phase-card__definition` on specificity, so as
+   long as PhaseCardScreen also carried the `.card` class its text was
+   silently rendering in --color-text-secondary regardless of what this
+   component's own rules said. Caught in this build's own render/contrast
+   check, not by inspection. */
 
-.card {
-  background: var(--color-surface);
-  border-radius: var(--radius);
-  border-top: 4px solid var(--card-color, var(--color-accent));
-  padding: var(--space-4);
-}
-
-/* PhaseCardScreen (screens 5, 7, 9, 11, 13) — real typographic hierarchy
-   (DBI Row 14 Design pass, 2026-09-09, direction 1c): icon promoted into a
-   tinted disc, an eyebrow ties the card to the scenario just finished, the
-   D name set large over a colour rule, and the example set off in a
-   tinted quote block. */
+/* PhaseCardScreen (screens 5, 7, 9, 11, 13) — "Colour field" (direction
+   3a), per DBI-PhaseCard-3a-Final-Spec-2026-09-10.md. Replaces the prior
+   4px-top-border + tinted-icon-disc treatment (Row 14 Design pass,
+   2026-09-09, direction 1c) — colour now fills a full-width header band
+   (~30% of the card's area) instead of a thin accent, which is what
+   changes the card's silhouette rather than just its decoration (why 3a
+   won over 3c, "Warm ground" — see the spec doc's own reasoning). DOM
+   order is unchanged: icon/eyebrow/title first (now inside the header
+   band), definition/when-to-use/example below (now in a white body),
+   render.js. This component's root is fully self-specified below — no
+   shared `.card` base. */
 .screen--phasecard { display: flex; flex-direction: column; align-items: center; }
 
 .phase-card {
   max-width: var(--max-width);
   width: 100%;
-  padding: var(--space-5) var(--space-4) var(--space-4);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10), 0 14px 30px -14px rgba(0, 0, 0, 0.34);
 }
 
-.phase-card__icon-wrap {
-  width: 6.5rem;
-  height: 6.5rem;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--card-color, var(--color-accent)) 16%, white);
+.phase-card__header {
+  background: var(--card-color, var(--color-accent));
+  padding: var(--space-4) var(--space-4) var(--space-5);
+}
+
+/* In-card progress track — repeats the shared app header's own 5-part D
+   track (.app-header__track / appShell.js's updateProgress()) inside this
+   card's header band. Resolved as an intentional echo, not pursued for
+   differentiation (spec's "Duplication question") — the shared header
+   stays unchanged, out of scope for this component. Same decorative
+   posture as .app-header__track: aria-hidden on the container in
+   render.js, no accessible name of its own — the screen's own <h1> (below,
+   visually hidden) remains the one real progress signal for AT users. */
+.phase-card__track {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 6px;
   margin-bottom: var(--space-3);
 }
 
-.phase-card__icon-wrap .icon-5d {
-  width: 2.5rem;
-  height: 2.5rem;
+.phase-card__track-part {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.phase-card__track-part--done {
+  background: #fff;
+}
+
+.phase-card__header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.phase-card__icon-disc {
+  width: 4.5rem;
+  height: 4.5rem;
+  flex: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phase-card__icon-disc .icon-5d {
+  width: 2.25rem;
+  height: 2.25rem;
 }
 
 .phase-card__eyebrow {
@@ -349,29 +391,51 @@ summary:focus-visible {
   text-transform: uppercase;
   font-size: 0.6875rem;
   letter-spacing: 0.14em;
-  color: var(--card-color, var(--color-accent));
-  margin: 0 0 0.375rem;
+  /* Accessibility fix, 2026-09-10: first pass spec'd this at white 82%
+     opacity directly on the D-colour band — checked against WCAG 2.1 AA
+     (4.5:1 floor, also the AODA-relevant standard) with a contrast script,
+     not by eye, and all five D tokens failed (4.00–4.12:1). Full-opacity
+     white clears AA on all five (~5.0–5.2:1, same range as the title) and
+     needs no re-check if a D token's hex ever changes, since it's no
+     longer a blend calculation. Hierarchy now comes from size (11px vs.
+     32/42px), uppercase, and 0.14em tracking alone. */
+  color: #fff;
+  margin: 0 0 0.25rem;
 }
 
-.phase-card h2 {
-  font-size: 2.125rem;
+.phase-card__header-text h2 {
+  font-size: 2rem;
   line-height: 1.1;
   letter-spacing: -0.01em;
-  margin: 0 0 var(--space-3);
+  color: #fff;
+  margin: 0;
 }
 
-.phase-card__rule {
-  width: 3.5rem;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--card-color, var(--color-accent));
-  margin-bottom: var(--space-3);
+.phase-card__body {
+  background: var(--color-surface);
+  padding: var(--space-4) var(--space-4) var(--space-5);
+  /* Seam where the white body meets the colour header band — spec calls
+     for this instead of a hard edge. */
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.06);
 }
 
 .phase-card__definition {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 1.3125rem;
+  line-height: 1.3;
+  /* Full-strength text colour (was --color-text-secondary) — one of the
+     three original "weak body contrast" complaints, confirmed fixed. */
   color: var(--color-text);
-  font-size: 1.125rem;
-  margin-bottom: var(--space-4);
+  margin: 0 0 var(--space-4);
+}
+
+/* "When to use" / "Example" sections — a three-zone hairline rhythm
+   replaces the prior plain paragraph spacing. */
+.phase-card__section {
+  border-top: 1px solid rgba(42, 31, 26, 0.13);
+  padding-top: var(--space-3);
+  margin-top: var(--space-3);
 }
 
 .phase-card__label {
@@ -380,39 +444,35 @@ summary:focus-visible {
   font-size: 0.75rem;
   letter-spacing: 0.04em;
   color: var(--card-color, var(--color-accent));
-  margin-bottom: 0.25em;
+  margin: 0 0 0.25em;
+}
+
+.phase-card__body > p,
+.phase-card__section > p:not(.phase-card__label) {
+  color: var(--color-text);
 }
 
 .phase-card__example {
   font-style: italic;
-  background: color-mix(in srgb, var(--card-color, var(--color-accent)) 12%, white);
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--card-color, var(--color-accent)) 10%, #F6F1EB);
+  border-left: 4px solid var(--card-color, var(--color-accent));
   border-radius: var(--radius);
   padding: var(--space-3) var(--space-4);
   margin: 0;
 }
 
-/* Bugfix 2026-09-09: this grid used to auto-place nine flat .phase-card
-   children (icon-wrap, eyebrow, h2, rule, definition, two labels, two
-   text blocks) two-per-row, scattering the eyebrow/labels into column 2
-   on rows of their own instead of grouping all the text under the icon.
-   render.js now wraps everything but the icon in one .phase-card__content
-   div, so the grid has exactly the two cells it was meant to have. */
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
   .phase-card {
-    display: grid;
-    grid-template-columns: 8.25rem 1fr;
-    gap: var(--space-5);
-    align-items: start;
-    padding: var(--space-6) var(--space-6) var(--space-5);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10), 0 18px 38px -16px rgba(0, 0, 0, 0.32);
   }
-  .phase-card__icon-wrap { width: 8.25rem; height: 8.25rem; margin-bottom: 0; }
-  .phase-card__icon-wrap .icon-5d { width: 3.125rem; height: 3.125rem; }
-  .phase-card h2 { font-size: 2.625rem; }
+  .phase-card__header { padding: var(--space-5) var(--space-6) var(--space-6); }
+  .phase-card__body { padding: var(--space-5) var(--space-6) var(--space-6); }
+  .phase-card__icon-disc { width: 5.5rem; height: 5.5rem; }
+  .phase-card__icon-disc .icon-5d { width: 2.75rem; height: 2.75rem; }
+  .phase-card__header-text h2 { font-size: 2.625rem; }
+  .phase-card__definition { font-size: 1.6875rem; }
 }
-
-.card p { margin: 0 0 var(--space-2); font-size: 0.9375rem; color: var(--color-text-secondary); }
-
-.card p:last-child { margin-bottom: 0; }
 
 .closing { font-style: italic; color: var(--color-text-secondary); }
 
