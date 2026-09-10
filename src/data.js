@@ -308,7 +308,7 @@ export const screens = [
         {
           id: "B",
           correct: true,
-          text: "Use the chat, or speak up, to suggest the facilitator come back to your colleague.",
+          text: "Ask the facilitator to come back to your colleague.",
           feedback:
             "Yes, the facilitator is responsible for directing and managing the discussion. A private message can bring your colleague back into the conversation without you directly confronting the person who interrupted.",
         },
