@@ -132,6 +132,22 @@ export function renderStatementScreen(screen, ctx) {
   const bodyChildren = (data.body || []).map((p) => el("p", {}, p));
 
   const children = [
+    // Screen 2's Remote-Team--Streamline-Brooklyn.svg (asset landed in PR
+    // #12, 2026-09-10, but never wired to a render path). Uses the
+    // .hero-graphic treatment (styles.css) — full-width, capped-height,
+    // object-fit: cover — deliberately smaller/lighter than the splash
+    // treatment above, since this screen already carries three body
+    // paragraphs and forcing a scroll before Continue is the exact
+    // problem the scenario-illustration redesign (Row 14, 2026-09-09)
+    // fixed elsewhere in this module.
+    data.illustration
+      ? el("img", {
+          src: `assets/illustrations/${data.illustration}`,
+          alt: "",
+          "aria-hidden": "true",
+          class: "hero-graphic",
+        })
+      : null,
     data.icon
       ? el("img", { src: `assets/icons/${data.icon}`, alt: "", "aria-hidden": "true", class: "icon-risk" })
       : null,
