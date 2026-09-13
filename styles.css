@@ -258,23 +258,28 @@ p { margin: 0 0 var(--space-3); }
 
 .screen__body strong { font-weight: 500; color: var(--color-text); }
 
-/* Full-width, capped-height content illustration — this rule already
-   existed (design-token scale established, never given a comment) but had
-   no consumer. Wired to Screen 2's Remote-Team--Streamline-Brooklyn.svg,
-   2026-09-13 (the asset itself landed in PR #12, 2026-09-10; only the
-   render path and this field were missing). Deliberately a smaller
-   footprint than .splash-graphic (no width cap, full-bleed) — Screen 2
-   already carries three body paragraphs, and forcing a scroll before
-   Continue is the exact problem the scenario-illustration redesign (Row
-   14, 2026-09-09) fixed elsewhere in this module. See render.js's generic
-   StatementScreen branch. */
-.hero-graphic {
+/* Screen 2 (Introduction) illustration — full, uncropped rendering of the
+   1:1 source art, width-driven and centered like .splash-graphic above,
+   but capped smaller so it carries real presence as an important
+   secondary screen without competing with the splash hero. 2026-09-13:
+   replaces a same-day first attempt (`.hero-graphic`, object-fit: cover in
+   a 180px-capped box) that Johar rejected on sight — it forced the native
+   400x400 square art into a landscape crop, cutting off most of the
+   illustration, and introduced a banner frame this module doesn't use
+   anywhere else; he'd also never approved that treatment to begin with.
+   Corrected before merge, same PR. No background fill needed — the image
+   is never cropped or letterboxed, so there's nothing for a fallback
+   color to show behind. See render.js's generic StatementScreen branch. */
+.intro-illustration {
+  display: block;
   width: 100%;
-  max-height: 180px;
-  object-fit: cover;
-  border-radius: var(--radius);
-  margin-bottom: var(--space-4);
-  background: var(--color-bg-weighted);
+  max-width: min(240px, 60vw);
+  height: auto;
+  margin: 0 auto var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .intro-illustration { max-width: 280px; }
 }
 
 /* Buttons */

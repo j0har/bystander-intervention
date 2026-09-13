@@ -3,8 +3,8 @@
 // Per Component Architecture Spec v1.4 §C0 (doc sweep complete, 2026-09-07 —
 // matches this file's actual 14-screen/5-scenario behavior).
 
-import { screens, totalScreens, dPathwayMap, debriefBaselines, phaseCards } from "./data.js?v=20260913a";
-import { renderScreen, formatPercent, el } from "./render.js?v=20260913a";
+import { screens, totalScreens, dPathwayMap, debriefBaselines, phaseCards } from "./data.js?v=20260913b";
+import { renderScreen, formatPercent, el } from "./render.js?v=20260913b";
 import {
   trackInitialized,
   trackAnswered,

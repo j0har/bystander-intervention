@@ -134,18 +134,18 @@ export function renderStatementScreen(screen, ctx) {
   const children = [
     // Screen 2's Remote-Team--Streamline-Brooklyn.svg (asset landed in PR
     // #12, 2026-09-10, but never wired to a render path). Uses the
-    // .hero-graphic treatment (styles.css) — full-width, capped-height,
-    // object-fit: cover — deliberately smaller/lighter than the splash
-    // treatment above, since this screen already carries three body
-    // paragraphs and forcing a scroll before Continue is the exact
-    // problem the scenario-illustration redesign (Row 14, 2026-09-09)
-    // fixed elsewhere in this module.
+    // .intro-illustration treatment (styles.css): the full, uncropped 1:1
+    // source art, width-driven and centered like .splash-graphic above but
+    // sized down so it doesn't compete with the splash hero. A same-day
+    // first attempt used object-fit: cover in a capped-height box — Johar
+    // rejected it on sight (cropped the square art into a banner shape not
+    // used anywhere else in the module); corrected before merge, same PR.
     data.illustration
       ? el("img", {
           src: `assets/illustrations/${data.illustration}`,
           alt: "",
           "aria-hidden": "true",
-          class: "hero-graphic",
+          class: "intro-illustration",
         })
       : null,
     data.icon
