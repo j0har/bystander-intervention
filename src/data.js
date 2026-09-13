@@ -188,14 +188,33 @@ export const screens = [
     component: "StatementScreen",
     weighted: false,
     data: {
+      // Wired 2026-09-13 — asset landed via PR #12 (2026-09-10) but was
+      // never connected to any render path. Renders via .intro-illustration
+      // (styles.css): the full, uncropped 1:1 source art, width-driven and
+      // centered like .splash-graphic but sized down so it doesn't compete
+      // with the splash hero. Replaces a same-day first attempt
+      // (.hero-graphic, object-fit: cover in a capped-height box) that
+      // Johar rejected on sight — it cropped the square source art into a
+      // banner shape not used anywhere else in the module, and was never
+      // checked with him before being treated as settled. Corrected same
+      // day, same PR, before merge.
+      illustration: "Remote-Team--Streamline-Brooklyn.svg",
       headline: "What is Online Bystander Intervention?",
-      // Illustration candidate identified but not sized/placed —
-      // Remote-Team--Streamline-Brooklyn.svg, per DBI Row 14 (out of scope
-      // for this rebuild, deferred to the Row 14 Design session).
+      // Copy cut 2026-09-13 (Johar's own edit, in his ongoing "tighten the
+      // copy" pass — DBI-Learner-Copy-FINAL-2026-09-05.md is not treated as
+      // frozen just because it's named FINAL). Dropped the original opening
+      // paragraph ("Most of our collaboration now happens online...") as
+      // throat-clearing the headline question already covers. Second
+      // paragraph gains "in a digital environment" so it still reads as a
+      // complete definition on its own now that the first paragraph's
+      // "these environments" framing is gone. Third paragraph tightened:
+      // "the 5Ds of active bystander intervention," "workplace situations"
+      // (not "familiar"), "you can choose actions to help" (not "you have
+      // an opportunity to"). DBI-Learner-Copy-FINAL-2026-09-05.md and
+      // DBI-HTML-Storyboard-v2.0.md swept to match in the same edit.
       body: [
-        "Most of our collaboration now happens online in chat threads, email conversations, shared files, and virtual meetings. These tools make working together easier, but they also create moments where someone is sidelined, a comment lands wrong, or a message feels sharper than intended.",
-        "Online bystander intervention is the act of safely supporting someone who may be experiencing harm in these environments and responding in ways that maintain respect and inclusion.",
-        "In this 10-minute learning experience, you’ll practice applying the 5Ds of bystander intervention. You’ll encounter familiar workplace situations where colleagues are mistreated and you have an opportunity to choose actions to help.",
+        "Online bystander intervention is the act of safely supporting someone who may be experiencing harm and responding in ways that maintain respect and inclusion in a digital environment.",
+        "In this 10-minute learning experience, you’ll practice applying the 5Ds of active bystander intervention. You’ll encounter workplace situations where colleagues are mistreated and you can choose actions to help.",
       ],
       advanceLabel: "Continue",
     },
