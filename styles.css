@@ -258,6 +258,16 @@ p { margin: 0 0 var(--space-3); }
 
 .screen__body strong { font-weight: 500; color: var(--color-text); }
 
+/* Full-width, capped-height content illustration — this rule already
+   existed (design-token scale established, never given a comment) but had
+   no consumer. Wired to Screen 2's Remote-Team--Streamline-Brooklyn.svg,
+   2026-09-13 (the asset itself landed in PR #12, 2026-09-10; only the
+   render path and this field were missing). Deliberately a smaller
+   footprint than .splash-graphic (no width cap, full-bleed) — Screen 2
+   already carries three body paragraphs, and forcing a scroll before
+   Continue is the exact problem the scenario-illustration redesign (Row
+   14, 2026-09-09) fixed elsewhere in this module. See render.js's generic
+   StatementScreen branch. */
 .hero-graphic {
   width: 100%;
   max-height: 180px;
