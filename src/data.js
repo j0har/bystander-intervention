@@ -188,10 +188,15 @@ export const screens = [
     component: "StatementScreen",
     weighted: false,
     data: {
+      // Wired 2026-09-13 — asset landed via PR #12 (2026-09-10) but was
+      // never connected to any render path. Uses .hero-graphic
+      // (styles.css): a full-width, capped-height, object-fit:cover
+      // treatment that already existed in the stylesheet, unused, since
+      // before this rebuild — not a fresh design decision, and not routed
+      // through Claude Design. See render.js's generic StatementScreen
+      // branch for the render path.
+      illustration: "Remote-Team--Streamline-Brooklyn.svg",
       headline: "What is Online Bystander Intervention?",
-      // Illustration candidate identified but not sized/placed —
-      // Remote-Team--Streamline-Brooklyn.svg, per DBI Row 14 (out of scope
-      // for this rebuild, deferred to the Row 14 Design session).
       body: [
         "Most of our collaboration now happens online in chat threads, email conversations, shared files, and virtual meetings. These tools make working together easier, but they also create moments where someone is sidelined, a comment lands wrong, or a message feels sharper than intended.",
         "Online bystander intervention is the act of safely supporting someone who may be experiencing harm in these environments and responding in ways that maintain respect and inclusion.",
