@@ -201,13 +201,24 @@ export function renderStatementScreen(screen, ctx) {
 // own 5-part D track (appShell.js's updateProgress()) — an intentional
 // echo, not a second accessible-progress affordance (resolved in the spec's
 // "Duplication question," not reopened here). Same decorative posture:
-// aria-hidden on the track container, no accessible name of its own. The
-// screen's own <h1> below (visually hidden, matches the prior build) stays
-// the one real progress signal for AT users, unchanged.
+// aria-hidden on the track container, no accessible name of its own.
+//
+// 2026-09-14: eyebrow text changed "The 5Ds" -> "5Ds Framework" (matches
+// the splash subtitle's own phrasing instead of a third variant) and its
+// size bumped — the original 11px all-caps "THE 5DS" was reading the
+// numeral 5 close to a letter S at that size (Johar's flag, confirmed
+// against a live screenshot). Also new: a visible "Card N of 5" line,
+// folded into the same header AND into the screen's own <h1> below —
+// previously the only progress signal here was two aria-hidden decorative
+// tracks plus a hidden heading that named the D but never the learner's
+// position in the sequence. See styles.css's .phase-card__progress
+// comment for the contrast reasoning (full-opacity white, not dimmed).
 export function renderPhaseCardScreen(screen, ctx) {
   const { data, id } = screen;
   const card = phaseCards[data.d];
   const curIdx = D_ORDER.indexOf(data.d);
+  const position = curIdx + 1;
+  const total = D_ORDER.length;
 
   const track = el(
     "div",
@@ -226,7 +237,8 @@ export function renderPhaseCardScreen(screen, ctx) {
         el("img", { src: `assets/icons/${card.icon}`, alt: "", "aria-hidden": "true", class: "icon-5d" }),
       ]),
       el("div", { class: "phase-card__header-text" }, [
-        el("p", { class: "phase-card__eyebrow" }, "The 5Ds"),
+        el("p", { class: "phase-card__eyebrow" }, "5Ds Framework"),
+        el("p", { class: "phase-card__progress" }, `Card ${position} of ${total}`),
         el("h2", {}, data.d),
       ]),
     ]),
@@ -250,7 +262,11 @@ export function renderPhaseCardScreen(screen, ctx) {
     "section",
     { class: "screen screen--phasecard", "aria-labelledby": `s${id}-title`, tabindex: "-1" },
     [
-      el("h1", { id: `s${id}-title`, class: "visually-hidden-optional" }, `Card earned: ${data.d}`),
+      el(
+        "h1",
+        { id: `s${id}-title`, class: "visually-hidden-optional" },
+        `Card ${position} of ${total} earned: ${data.d}`
+      ),
       cardEl,
       el("button", { type: "button", class: "btn-continue", onclick: ctx.onAdvance }, data.advanceLabel),
     ]
@@ -351,7 +367,7 @@ export function renderScenarioScreen(screen, ctx) {
   });
 
   // Illustration + eyebrow sit side by side (DBI Row 14 Design pass,
-  // 2026-09-09): a fixed 88px/104px square instead of the old full-width
+  // 2026-09-09): a fixed 100px/116px square instead of the old full-width
   // stacked treatment, which forced a scroll before the question on every
   // scenario screen. The eyebrow is the same "Scenario N of 5" text the
   // hidden <h1> always carried — now visible, doing double duty as the

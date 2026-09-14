@@ -266,10 +266,10 @@ p { margin: 0 0 var(--space-3); }
    a 180px-capped box) that Johar rejected on sight — it forced the native
    400x400 square art into a landscape crop, cutting off most of the
    illustration, and introduced a banner frame this module doesn't use
-   anywhere else; he'd also never approved that treatment to begin with.
-   Corrected before merge, same PR. No background fill needed — the image
-   is never cropped or letterboxed, so there's nothing for a fallback
-   color to show behind. See render.js's generic StatementScreen branch. */
+   anywhere else. Corrected before merge, same PR. No background fill
+   needed — the image is never cropped or letterboxed, so there's nothing
+   for a fallback color to show behind. See render.js's generic
+   StatementScreen branch. */
 .intro-illustration {
   display: block;
   width: 100%;
@@ -404,16 +404,46 @@ summary:focus-visible {
 .phase-card__eyebrow {
   font-weight: 500;
   text-transform: uppercase;
-  font-size: 0.6875rem;
-  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
   /* Accessibility fix, 2026-09-10: first pass spec'd this at white 82%
      opacity directly on the D-colour band — checked against WCAG 2.1 AA
      (4.5:1 floor, also the AODA-relevant standard) with a contrast script,
      not by eye, and all five D tokens failed (4.00–4.12:1). Full-opacity
      white clears AA on all five (~5.0–5.2:1, same range as the title) and
      needs no re-check if a D token's hex ever changes, since it's no
-     longer a blend calculation. Hierarchy now comes from size (11px vs.
-     32/42px), uppercase, and 0.14em tracking alone. */
+     longer a blend calculation. Hierarchy now comes from size (12px vs.
+     32/42px), uppercase, and tracking alone.
+     Size bumped 11px -> 12px and wording changed to "5Ds Framework" (was
+     "The 5Ds") 2026-09-14 — matches the splash subtitle's own phrasing
+     ("Practicing the 5Ds Framework") instead of a third variant, and the
+     original 11px/all-caps/heavy-tracking combination was reading the
+     numeral "5" as close to "S" at that size (Johar's own flag, confirmed
+     against a live screenshot before changing). Tracking eased slightly
+     (0.14em -> 0.12em) since the added characters don't need as much room
+     to stay legible as the original 4-character "THE 5DS" did. */
+  color: #fff;
+  margin: 0 0 0.15rem;
+}
+
+/* NEW 2026-09-14 — visible progress position ("Card 2 of 5"), folded into
+   the header alongside the eyebrow. Previously the only progress signal on
+   this screen was two aria-hidden decorative tracks (the shared header's
+   and this card's own .phase-card__track) plus a visually-hidden <h1>
+   that named the D but never the learner's position in the sequence
+   ("Card earned: Direct" — no "2 of 5"). This line is real, visible text,
+   and appShell.js's caller folds the same "N of 5" into that <h1> too
+   (see render.js), so screen-reader users get the position signal that
+   was previously sighted-only-and-decorative. Full-opacity white, same
+   contrast reasoning as .phase-card__eyebrow above — do not dim this via
+   opacity, it would reintroduce the exact AA failure that eyebrow already
+   had fixed once (2026-09-10 note above). Hierarchy from .phase-card__eyebrow
+   comes via weight/size only. */
+.phase-card__progress {
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
   color: #fff;
   margin: 0 0 0.25rem;
 }
@@ -525,7 +555,11 @@ summary:focus-visible {
    direction 1b): a fixed square instead of the old full-width stacked
    treatment, which forced a scroll before the question on every scenario
    screen. Sits in a row with the "Scenario N of 5" eyebrow, which doubles
-   as the screen's <h1> — see render.js. */
+   as the screen's <h1> — see render.js. Sizes bumped 2026-09-14 (88/104 ->
+   100/116, eyebrow 11px -> 12px, title 18px -> 20px) — Johar's read on a
+   live screenshot that the illustration and header text both felt a
+   little small; same category of fix as the phase-card eyebrow above, not
+   a redesign. */
 .scenario-meta {
   display: flex;
   align-items: center;
@@ -534,13 +568,13 @@ summary:focus-visible {
 }
 
 .scenario-illustration {
-  width: 88px;
-  height: 88px;
+  width: 100px;
+  height: 100px;
   flex: none;
 }
 
 @media (min-width: 640px) {
-  .scenario-illustration { width: 104px; height: 104px; }
+  .scenario-illustration { width: 116px; height: 116px; }
 }
 
 /* Eyebrow + short title stack together next to the illustration (DBI Row
@@ -555,8 +589,8 @@ summary:focus-visible {
 .scenario-eyebrow {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: 0.6875rem;
-  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--color-accent);
   margin: 0;
@@ -565,7 +599,7 @@ summary:focus-visible {
 .scenario-title {
   font-family: var(--font-heading);
   font-weight: 500;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   line-height: 1.25;
   color: var(--color-text);
   margin: 0;
@@ -577,6 +611,16 @@ summary:focus-visible {
   padding: var(--space-4);
   margin-bottom: var(--space-4);
 }
+
+/* Bugfix 2026-09-14 (Johar's own measurement: 24px gap above the stem
+   text, 40px below, against a uniform 24px box padding on all sides).
+   Root cause: the global `p { margin: 0 0 var(--space-3) }` rule gives
+   the stem's own (only) paragraph a 16px bottom margin, and padding on
+   the parent blocks margin-collapse, so that margin stacks on top of the
+   box's own 24px padding instead of disappearing into it. Confirmed via
+   getBoundingClientRect() on the live build before this fix, not
+   guessed — 24px top gap, 40px bottom gap, delta exactly 16px. */
+.stem p:last-child { margin-bottom: 0; }
 
 .stem blockquote {
   margin: var(--space-2) 0;
@@ -718,9 +762,15 @@ summary:focus-visible {
 
 .comparison-list li p { margin: 0; }
 
+/* Sized 2026-09-14 (64/68 -> 80/84): measured against the live build first
+   — the text column is the tallest element in each row (3 lines, ~83px),
+   not the illustration, so growing the image up to ~80-84px costs nothing
+   in row height or added scroll. Confirmed via getBoundingClientRect(),
+   not eyeballed. Going meaningfully past this starts growing each row
+   (and the 5-row list's total scroll length) for real. */
 .comparison-illustration {
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   flex: none;
   background-size: contain;
   background-repeat: no-repeat;
@@ -728,7 +778,7 @@ summary:focus-visible {
 }
 
 @media (min-width: 640px) {
-  .comparison-illustration { width: 68px; height: 68px; }
+  .comparison-illustration { width: 84px; height: 84px; }
 }
 
 .comparison-percent {
