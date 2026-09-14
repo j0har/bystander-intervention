@@ -51,7 +51,7 @@ export const phaseCards = {
     icon: "icon-5d-delegate-white.svg",
     color: "var(--color-d-delegate)",
     definition:
-      "Bringing someone in to help address the issue appropriately — only if the person affected wants that support brought in.",
+      "Bringing someone in to help address the issue appropriately, but only if the person affected wants that support brought in.",
     whenToUse: "Helpful when the behaviour involves power imbalances, repeat issues, or impacts someone’s ability to participate.",
     example:
       "A teammate mentions that a client keeps steamrolling them on calls, and it’s starting to wear on them. You ask: “Would it help if I brought this to our team lead, or would you rather handle it your own way for now?”",
@@ -59,11 +59,11 @@ export const phaseCards = {
   Document: {
     icon: "icon-5d-document-white.svg",
     color: "var(--color-d-document)",
-    definition: "Ask first, then help capture what happened — only with their say in how it’s used.",
+    definition: "Ask first, then help capture what happened, but only with their say in how it’s used.",
     whenToUse:
-      "Useful if a colleague may need a record later, or the situation could escalate — ask before you start noting anything down, not after.",
+      "Useful if a colleague may need a record later, or the situation could escalate. Ask before you start noting anything down, not after.",
     example:
-      "After a tense exchange in a group chat, a colleague mentions it’s still bothering them. You ask: “Would it help if I noted what was said and when — only if that’s something you’d want on record?”",
+      "After a tense exchange in a group chat, a colleague mentions it’s still bothering them. You ask: “Would it help if I noted what was said and when, but only if that’s something you’d want on record?”",
   },
   Delay: {
     icon: "icon-5d-delay-white.svg",
@@ -100,25 +100,25 @@ export const dPathwayMap = {
 // DBI-Learner-Copy-FINAL-2026-09-05.md), and Screen 10 is new content
 // entirely (the old responder-risk item, rewritten to test Document) — see
 // prototype-build-note.md's 2026-09-07 entry for both worked calculations.
-// `choice` text is a first-pass draft distillation for Johar's sign-off,
-// same pattern as Screen 8's stem draft — not settled copy.
+// `choice` text reflects Johar's finalized copy — see DBI Debrief
+// Comparison-Line Copy Audit (2026-09-09, locked 2026-09-14).
 // Formula: percentage = [k×0.8 + (5−k)×(0.2/(m−1))] / 5, k = personas
 // picking that option (of 5), m = option count on that screen.
 export const debriefBaselines = {
   4: {
     situation: "a stereotype went unanswered in a busy Slack channel",
     options: {
-      A: { percent: 52.0, choice: "answer in the channel directly" },
-      B: { percent: 24.0, choice: "check in with the colleague privately" },
-      C: { percent: 24.0, choice: "forward it to a manager" },
+      A: { percent: 52.0, choice: "respond directly in the channel" },
+      B: { percent: 24.0, choice: "check in with your colleague privately" },
+      C: { percent: 24.0, choice: "forward the message to your manager" },
     },
   },
   6: {
     situation: "a colleague was interrupted twice in a meeting and went quiet",
     options: {
-      A: { percent: 24.0, choice: "call out the interruption directly" },
-      B: { percent: 52.0, choice: "ask the facilitator to redirect" },
-      C: { percent: 24.0, choice: "wait and message privately after" },
+      A: { percent: 24.0, choice: "call out the person interrupting" },
+      B: { percent: 52.0, choice: "ask the facilitator to return to your colleague" },
+      C: { percent: 24.0, choice: "send a message after the meeting" },
     },
   },
   // RECOMPUTED 2026-09-07 — final copy has 3 options (A/B/C), not the 4 the
@@ -129,9 +129,9 @@ export const debriefBaselines = {
   8: {
     situation: "a senior manager’s correction went out reply-all, CC’d to directors",
     options: {
-      A: { percent: 24.0, choice: "push back on the tone publicly" },
-      B: { percent: 10.0, choice: "let the thread move to next steps" },
-      C: { percent: 66.0, choice: "check in privately and ask first" },
+      A: { percent: 24.0, choice: "call out the manager" },
+      B: { percent: 10.0, choice: "acknowledge the correction and move on" },
+      C: { percent: 66.0, choice: "check in with your colleague privately" },
     },
   },
   // NEW 2026-09-07 — first run against final copy (new stem/options, no
@@ -143,17 +143,17 @@ export const debriefBaselines = {
   10: {
     situation: "a colleague disclosed a recurring comment about their accent",
     options: {
-      A: { percent: 21.3, choice: "offer to raise it with their manager" },
-      B: { percent: 50.7, choice: "offer to watch for it and confirm" },
+      A: { percent: 21.3, choice: "offer to report it to their manager" },
+      B: { percent: 50.7, choice: "offer to keep an eye out for them" },
       C: { percent: 6.7, choice: "reassure them it probably wasn’t intentional" },
-      D: { percent: 21.3, choice: "say you’ll address it directly" },
+      D: { percent: 21.3, choice: "offer to confront the person directly" },
     },
   },
   12: {
     situation: "a comment about someone’s appearance went unaddressed on a call",
     options: {
-      A: { percent: 65.3, choice: "address it briefly and follow up privately" },
-      B: { percent: 6.7, choice: "redirect the conversation and follow up privately" },
+      A: { percent: 65.3, choice: "address it and follow up privately" },
+      B: { percent: 6.7, choice: "redirect the conversation to the agenda" },
       C: { percent: 21.3, choice: "follow up privately only" },
       D: { percent: 6.7, choice: "message the person who made the comment" },
     },
@@ -389,26 +389,26 @@ export const screens = [
       options: [
         {
           id: "A",
-          text: "Offer to raise it with their manager so someone with authority can step in.",
+          text: "Offer to loop in their manager so someone with authority can step in.",
           feedback:
             "The instinct to tell their manager shows that you are taking this situation seriously, but it's a decision that should be made in consultation with the person affected.",
         },
         {
           id: "B",
           correct: true,
-          text: "Ask if they would like you to keep an eye out and confirm when you witness it.",
+          text: "Ask if they'd like you to keep an eye out and report what you see.",
           feedback:
             "Yes, by asking first, you allow the person affected to make the decision about how they want to proceed. Your offer to keep an eye out for them and note what you see is the right kind of support here.",
         },
         {
           id: "C",
-          text: "Tell them that the coworker probably didn't mean anything by it.",
+          text: "Tell them the coworker probably didn't mean anything by it.",
           feedback:
             "Reframing the coworker's intent doesn't acknowledge what your colleague just disclosed to you. They've told you that this has happened more than once and it's bothering them.",
         },
         {
           id: "D",
-          text: "Tell them that it's unacceptable and that you will address it with them directly.",
+          text: "Call it unacceptable and say you'll confront the coworker.",
           feedback:
             "Calling this unacceptable is the right response. But the decision to raise it with the coworker yourself has the potential to go wrong and cause more harm for your colleague, you, and the person you're confronting.",
         },
@@ -435,7 +435,7 @@ export const screens = [
         {
           id: "A",
           correct: true,
-          text: "Address the comment briefly in the meeting and send a private message afterward.",
+          text: "Address it briefly in the meeting, then message them privately.",
           feedback:
             "Yes, responding in the meeting resets the norm for everyone who saw it, and the private message reaches the person it actually happened to. Public harm and personal impact are two different problems and this response addresses both.",
         },
@@ -446,9 +446,9 @@ export const screens = [
           // Rendered with its own signal tier (render.js), not folded into
           // either "best-fit" or "worth a second look."
           defensible: true,
-          text: "Redirect the conversation to the agenda and check in with your teammate privately afterward.",
+          text: "Redirect to the agenda, then check in with them privately.",
           feedback:
-            "This is a reasonable read. Redirecting protects your teammate from more attention in the moment, and checking in privately afterward reaches them directly. What it gives up is the peer signal — the group hears the subject change but not that anyone thought the comment was a problem.",
+            "This is a reasonable read. Redirecting protects your teammate from more attention in the moment, and checking in privately afterward reaches them directly. What it gives up is the peer signal: the group hears the subject change but not that anyone thought the comment was a problem.",
         },
         {
           id: "C",
@@ -458,7 +458,7 @@ export const screens = [
         },
         {
           id: "D",
-          text: "Send a private message to the person who made the comment.",
+          text: "Send a private message to whoever made the comment.",
           feedback:
             "This talks about your teammate without ever talking to them. The person who was affected gets no signal that anyone noticed, and the response happens somewhere they can't see it. Support that never reaches the person it's for isn't support yet.",
         },

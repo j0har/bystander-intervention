@@ -250,7 +250,7 @@ export function renderPhaseCardScreen(screen, ctx) {
     "section",
     { class: "screen screen--phasecard", "aria-labelledby": `s${id}-title`, tabindex: "-1" },
     [
-      el("h1", { id: `s${id}-title`, class: "visually-hidden-optional" }, `${data.d} — card earned`),
+      el("h1", { id: `s${id}-title`, class: "visually-hidden-optional" }, `Card earned: ${data.d}`),
       cardEl,
       el("button", { type: "button", class: "btn-continue", onclick: ctx.onAdvance }, data.advanceLabel),
     ]
