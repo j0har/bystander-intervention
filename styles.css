@@ -415,35 +415,26 @@ summary:focus-visible {
      longer a blend calculation. Hierarchy now comes from size (12px vs.
      32/42px), uppercase, and tracking alone.
      Size bumped 11px -> 12px and wording changed to "5Ds Framework" (was
-     "The 5Ds") 2026-09-14 — matches the splash subtitle's own phrasing
-     ("Practicing the 5Ds Framework") instead of a third variant, and the
-     original 11px/all-caps/heavy-tracking combination was reading the
-     numeral "5" as close to "S" at that size (Johar's own flag, confirmed
-     against a live screenshot before changing). Tracking eased slightly
-     (0.14em -> 0.12em) since the added characters don't need as much room
-     to stay legible as the original 4-character "THE 5DS" did. */
-  color: #fff;
-  margin: 0 0 0.15rem;
-}
+     "The 5Ds") 2026-09-14 (Round 1, CSS punch list) — matches the splash
+     subtitle's own phrasing ("Practicing the 5Ds Framework") instead of a
+     third variant, and the original 11px/all-caps/heavy-tracking
+     combination was reading the numeral "5" as close to "S" at that size
+     (Johar's own flag, confirmed against a live screenshot before
+     changing). Tracking eased slightly (0.14em -> 0.12em) since the added
+     characters don't need as much room to stay legible as the original
+     4-character "THE 5DS" did.
 
-/* NEW 2026-09-14 — visible progress position ("Card 2 of 5"), folded into
-   the header alongside the eyebrow. Previously the only progress signal on
-   this screen was two aria-hidden decorative tracks (the shared header's
-   and this card's own .phase-card__track) plus a visually-hidden <h1>
-   that named the D but never the learner's position in the sequence
-   ("Card earned: Direct" — no "2 of 5"). This line is real, visible text,
-   and appShell.js's caller folds the same "N of 5" into that <h1> too
-   (see render.js), so screen-reader users get the position signal that
-   was previously sighted-only-and-decorative. Full-opacity white, same
-   contrast reasoning as .phase-card__eyebrow above — do not dim this via
-   opacity, it would reintroduce the exact AA failure that eyebrow already
-   had fixed once (2026-09-10 note above). Hierarchy from .phase-card__eyebrow
-   comes via weight/size only. */
-.phase-card__progress {
-  font-weight: 400;
-  text-transform: uppercase;
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
+     Round 2, same day: the separate .phase-card__progress paragraph below
+     ("Card N of 5") is gone — folded into this line instead, so the
+     header carries one text line, not two. Content is now
+     `The Five Ds · N of 5` (render.js), rendered uppercase by this rule
+     as "THE FIVE DS · N OF 5". Middot, not an em dash or hyphen, per the
+     module's no-em-dash-in-learner-copy rule and less ambiguous than a
+     pipe at 12px. "Five" is spelled out rather than "5Ds" — a bare digit
+     next to the "N OF 5" position number risked the same digit/letter
+     misread this rule already fixed once (2026-09-10), just relocated to
+     a different collision. The screen-reader-only <h1> below (render.js)
+     still carries "Card N of 5 earned: <D>" independently — unchanged. */
   color: #fff;
   margin: 0 0 0.25rem;
 }
@@ -555,11 +546,29 @@ summary:focus-visible {
    direction 1b): a fixed square instead of the old full-width stacked
    treatment, which forced a scroll before the question on every scenario
    screen. Sits in a row with the "Scenario N of 5" eyebrow, which doubles
-   as the screen's <h1> — see render.js. Sizes bumped 2026-09-14 (88/104 ->
-   100/116, eyebrow 11px -> 12px, title 18px -> 20px) — Johar's read on a
-   live screenshot that the illustration and header text both felt a
-   little small; same category of fix as the phase-card eyebrow above, not
-   a redesign. */
+   as the screen's <h1> — see render.js. Sizes bumped 2026-09-14 Round 1
+   (88/104 -> 100/116, eyebrow 11px -> 12px, title 18px -> 20px) — Johar's
+   read on a live screenshot that the illustration and header text both
+   felt a little small; same category of fix as the phase-card eyebrow
+   above, not a redesign.
+
+   2026-09-14 Round 2 — base (320–639px) sizes bumped again, illustration
+   and title together rather than illustration alone: at mobile widths the
+   two compete for the same fixed-width row, so growing the illustration
+   on its own shrinks the safe zone for the title before any of the 5 real
+   shortTitle strings wraps to 3 lines. Measured curve at 375px reference
+   width (max illustration before a 3-line wrap, by title size): 20px
+   title -> 140px illustration max, 22px -> 128px max. Landed on
+   124px/1.375rem (22px) title/13px eyebrow — both genuinely bigger
+   (illustration +24%, title +10%) while staying close to the original
+   100:20 illustration:title ratio (new ratio 5.6 vs. old 5.0), with a few
+   px of margin under the 128px ceiling for cross-browser font-metric
+   variance. Full reasoning: `DBI Scenario-Phasecard-Debrief sizing —
+   Round 2.md`.
+
+   Known gap, not a bug: the 640px+ step below is still 116px, smaller
+   than this new 124px base — sizing the desktop step is explicitly a
+   separate open sub-item, same measurement method, not done here. */
 .scenario-meta {
   display: flex;
   align-items: center;
@@ -568,12 +577,13 @@ summary:focus-visible {
 }
 
 .scenario-illustration {
-  width: 100px;
-  height: 100px;
+  width: 124px;
+  height: 124px;
   flex: none;
 }
 
 @media (min-width: 640px) {
+  /* Unchanged this pass — see the "known gap" note above. */
   .scenario-illustration { width: 116px; height: 116px; }
 }
 
@@ -589,7 +599,7 @@ summary:focus-visible {
 .scenario-eyebrow {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -599,7 +609,7 @@ summary:focus-visible {
 .scenario-title {
   font-family: var(--font-heading);
   font-weight: 500;
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   line-height: 1.25;
   color: var(--color-text);
   margin: 0;
@@ -658,7 +668,8 @@ summary:focus-visible {
 .scenario-form label:hover { border-color: var(--color-accent); }
 
 .scenario-form input[type="radio"] {
-  margin-top: 0.2em;
+  font-size: 1.0625rem;
+  margin-top: 0.25em;
   flex-shrink: 0;
   width: 1.1em;
   height: 1.1em;
@@ -762,15 +773,19 @@ summary:focus-visible {
 
 .comparison-list li p { margin: 0; }
 
-/* Sized 2026-09-14 (64/68 -> 80/84): measured against the live build first
-   — the text column is the tallest element in each row (3 lines, ~83px),
-   not the illustration, so growing the image up to ~80-84px costs nothing
-   in row height or added scroll. Confirmed via getBoundingClientRect(),
-   not eyeballed. Going meaningfully past this starts growing each row
-   (and the 5-row list's total scroll length) for real. */
+/* Sized 2026-09-14 Round 1 (64/68 -> 80/84): measured against the live
+   build first — the text column is the tallest element in each row (3
+   lines, ~83px), not the illustration, so growing the image up to
+   ~80-84px costs nothing in row height or added scroll. Confirmed via
+   getBoundingClientRect(), not eyeballed.
+
+   Round 2, same day (80/84 -> 104/108): re-measured the ceiling directly
+   — past ~110px every row starts growing 1:1 with the image, so 104/108
+   takes most of the remaining headroom (same +4px desktop-step pattern as
+   Round 1) with margin to spare rather than pushing right to the edge. */
 .comparison-illustration {
-  width: 80px;
-  height: 80px;
+  width: 104px;
+  height: 104px;
   flex: none;
   background-size: contain;
   background-repeat: no-repeat;
@@ -778,7 +793,7 @@ summary:focus-visible {
 }
 
 @media (min-width: 640px) {
-  .comparison-illustration { width: 84px; height: 84px; }
+  .comparison-illustration { width: 108px; height: 108px; }
 }
 
 .comparison-percent {

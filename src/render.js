@@ -203,16 +203,22 @@ export function renderStatementScreen(screen, ctx) {
 // "Duplication question," not reopened here). Same decorative posture:
 // aria-hidden on the track container, no accessible name of its own.
 //
-// 2026-09-14: eyebrow text changed "The 5Ds" -> "5Ds Framework" (matches
-// the splash subtitle's own phrasing instead of a third variant) and its
-// size bumped — the original 11px all-caps "THE 5DS" was reading the
-// numeral 5 close to a letter S at that size (Johar's flag, confirmed
-// against a live screenshot). Also new: a visible "Card N of 5" line,
-// folded into the same header AND into the screen's own <h1> below —
-// previously the only progress signal here was two aria-hidden decorative
-// tracks plus a hidden heading that named the D but never the learner's
-// position in the sequence. See styles.css's .phase-card__progress
-// comment for the contrast reasoning (full-opacity white, not dimmed).
+// 2026-09-14 (Round 1, CSS punch list): eyebrow text changed "The 5Ds" ->
+// "5Ds Framework" (matches the splash subtitle's own phrasing instead of a
+// third variant) and its size bumped — the original 11px all-caps
+// "THE 5DS" was reading the numeral 5 close to a letter S at that size
+// (Johar's flag, confirmed against a live screenshot). Also added: a
+// visible "Card N of 5" line, folded into the same header AND into the
+// screen's own <h1> below — previously the only progress signal here was
+// two aria-hidden decorative tracks plus a hidden heading that named the D
+// but never the learner's position in the sequence.
+//
+// 2026-09-14 (Round 2, same day): the eyebrow and progress line merge into
+// one — `The Five Ds · N of 5`, rendered uppercase by styles.css's
+// .phase-card__eyebrow. See that rule's comment for the full "why one
+// line / why a middot / why spell out Five" reasoning. The screen-reader
+// <h1> below still carries "Card N of 5 earned: <D>" independently,
+// unchanged by this pass.
 export function renderPhaseCardScreen(screen, ctx) {
   const { data, id } = screen;
   const card = phaseCards[data.d];
@@ -237,8 +243,7 @@ export function renderPhaseCardScreen(screen, ctx) {
         el("img", { src: `assets/icons/${card.icon}`, alt: "", "aria-hidden": "true", class: "icon-5d" }),
       ]),
       el("div", { class: "phase-card__header-text" }, [
-        el("p", { class: "phase-card__eyebrow" }, "5Ds Framework"),
-        el("p", { class: "phase-card__progress" }, `Card ${position} of ${total}`),
+        el("p", { class: "phase-card__eyebrow" }, `The Five Ds · ${position} of ${total}`),
         el("h2", {}, data.d),
       ]),
     ]),
