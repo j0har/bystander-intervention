@@ -4,7 +4,7 @@
 // matches this file's actual 14-screen/5-scenario behavior).
 
 import { screens, totalScreens, dPathwayMap, debriefBaselines, phaseCards } from "./data.js?v=20260913b";
-import { renderScreen, formatPercent, el } from "./render.js?v=20260913b";
+import { renderScreen, formatPercent, el } from "./render.js?v=20260914a";
 import {
   trackInitialized,
   trackAnswered,
