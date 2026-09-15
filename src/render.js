@@ -39,6 +39,50 @@ function formatPercent(n) {
 const D_ORDER = Object.keys(phaseCards);
 
 // ---------------------------------------------------------------------
+// Power Dynamics diagram (Screen 3) — DBI Screen 3 — Power Dynamics
+// redesign, 2026-09-15 Claude Design mockup. A flat-line diagram, not a
+// generic illustration: one figure (the person causing harm) with two
+// arrows fanning out to the two people whose safety depends on the
+// answer — the person harmed, and the learner. The diagram itself carries
+// the instructional content (whose safety is at stake, that there are two
+// separate people to consider) as dual-coding (Mayer) reinforcement of
+// what the two prompts below already say in words — same relationship
+// every other illustration in this module has to its surrounding text.
+// That's why the whole thing is safe to mark aria-hidden below (render
+// call site): the information is never ONLY in the image, matching this
+// module's standing convention for decorative illustrations.
+//
+// Inlined as markup (not an <img src="...svg">) so its colors are real
+// CSS custom-property references (styles.css's .power-diagram__* rules)
+// that stay in sync with the palette automatically, the same reason
+// comparison-list's colour spine reads var(--line-color) rather than a
+// baked hex — an <img>-referenced external SVG can't see the page's
+// custom properties or fonts.
+const POWER_DIAGRAM_MARKUP = `
+<svg viewBox="0 0 400 244" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="power-diagram-arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path class="power-diagram__arrowhead" d="M0,0 L10,5 L0,10 Z"></path>
+    </marker>
+  </defs>
+  <text x="200" y="16" text-anchor="middle" class="power-diagram__label">Person causing harm</text>
+  <circle cx="200" cy="44" r="13" class="power-diagram__source-fill"></circle>
+  <circle cx="200" cy="81" r="23" class="power-diagram__source-fill"></circle>
+  <path d="M185,101 L110,159" class="power-diagram__arrow" marker-end="url(#power-diagram-arrowhead)"></path>
+  <path d="M215,101 L290,159" class="power-diagram__arrow" marker-end="url(#power-diagram-arrowhead)"></path>
+  <circle cx="95" cy="175" r="11" stroke-width="2.5" class="power-diagram__target-fill power-diagram__target-stroke--harmed"></circle>
+  <circle cx="95" cy="202" r="19" stroke-width="2.5" class="power-diagram__target-fill power-diagram__target-stroke--harmed"></circle>
+  <text x="95" y="230" text-anchor="middle" class="power-diagram__label">Person harmed</text>
+  <circle cx="305" cy="175" r="11" stroke-width="2.5" class="power-diagram__target-fill power-diagram__target-stroke--you"></circle>
+  <circle cx="305" cy="202" r="19" stroke-width="2.5" class="power-diagram__target-fill power-diagram__target-stroke--you"></circle>
+  <text x="305" y="230" text-anchor="middle" class="power-diagram__label power-diagram__label--accent">You</text>
+</svg>`;
+
+function buildPowerDiagram() {
+  return el("div", { class: "power-diagram", "aria-hidden": "true", html: POWER_DIAGRAM_MARKUP });
+}
+
+// ---------------------------------------------------------------------
 // StatementScreen — screens 1, 2, 3, and the debrief variant (14)
 // ---------------------------------------------------------------------
 export function renderStatementScreen(screen, ctx) {
@@ -156,12 +200,23 @@ export function renderStatementScreen(screen, ctx) {
   ];
 
   if (data.powerQuestions) {
+    // DBI Screen 3 — Power Dynamics redesign, 2026-09-15. The diagram
+    // (built above) sits between the intro paragraph and the two
+    // consideration cards, per the mockup. Cards move off a bold "N."
+    // text lead-in to an <ol>/<li> structure: the ordered list gives
+    // assistive tech the real "1 of 2 / 2 of 2" position, and the visible
+    // numbered badge is pure CSS generated content (styles.css's
+    // counter-based .power-question::before) — decoration layered on top
+    // of real list semantics, not a second copy of the number, and the
+    // card keeps the left-edge colour-spine treatment already established
+    // by comparison-list / phase-card__example, not a third card pattern.
+    children.push(buildPowerDiagram());
     const pq = el(
-      "div",
+      "ol",
       { class: "power-questions" },
       data.powerQuestions.map((q) =>
-        el("div", { class: "power-question" }, [
-          el("p", {}, [el("strong", {}, `${q.n}. ${q.text}`)]),
+        el("li", { class: "power-question" }, [
+          el("p", {}, q.text),
           q.note ? el("p", {}, q.note) : null,
         ])
       )
