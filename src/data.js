@@ -229,10 +229,21 @@ export const screens = [
   },
 
   // ---- Screen 3 — Power Dynamics -----------------------------------------
+  // DBI Screen 3 — Power Dynamics redesign (2026-09-15 Claude Design
+  // mockup): hideProgressTrack is new — this screen sits before the first
+  // scenario and isn't one of the five scored/assessed steps, so the
+  // shared D-track (appShell.js) would misleadingly suggest it advances
+  // practice. Scoped exception, checked in appShell.js's updateProgress();
+  // the header row above it (back control + title) and the shared
+  // .app-header__track component itself are both unchanged for every
+  // other screen. Copy (headline/body/powerQuestions/bodyAfter) is
+  // unchanged by this task — only visual treatment (diagram, card
+  // styling, header) — per the task card's own scope note.
   {
     id: 3,
     component: "StatementScreen",
     weighted: true,
+    hideProgressTrack: true,
     data: {
       headline: "Power Dynamics",
       body: [
