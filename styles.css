@@ -635,6 +635,21 @@ summary:focus-visible {
   margin: 0;
 }
 
+/* Scenario screens picked up screen--weighted 2026-09-15 (header-gap /
+   scoped-tightening fix — see task card) — --color-bg-weighted is now
+   their background instead of --color-bg. --color-accent (#A0596A) as
+   text measures 4.53:1 on --color-bg (passes AA) but only 4.07:1 on
+   --color-bg-weighted (fails the 4.5:1 floor). Same trap as
+   .feedback--correct/.feedback--defensible above: darkened for
+   text-on-weighted use only, computed (not guessed) at 4.64:1 against
+   --color-bg-weighted. --color-accent itself is unchanged for its other
+   uses (buttons, borders, .stem blockquote) — those aren't text-on-
+   --color-bg-weighted and aren't subject to this rule. */
+.screen--weighted .scenario-eyebrow,
+.screen--weighted .validation-message {
+  color: #935262;
+}
+
 .scenario-title {
   font-family: var(--font-heading);
   font-weight: 500;

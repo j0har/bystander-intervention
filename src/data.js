@@ -249,6 +249,7 @@ export const screens = [
   {
     id: 4,
     component: "ScenarioScreen",
+    weighted: true,
     scenarioNumber: 1,
     // Escalating the target's situation to a manager without asking first —
     // same error pattern as the old scheme's Screen 4/C (FDD A6: E4/E6).
@@ -291,6 +292,7 @@ export const screens = [
   {
     id: 6,
     component: "ScenarioScreen",
+    weighted: true,
     scenarioNumber: 2,
     data: {
       illustration: "scenario-2-puzzle-piece.svg",
@@ -330,6 +332,7 @@ export const screens = [
   {
     id: 8,
     component: "ScenarioScreen",
+    weighted: true,
     scenarioNumber: 3,
     // NOTE: the old scheme flagged this scenario's 4th option ("forward to
     // HR immediately") as a hard-fail instance. That option does not exist
@@ -375,6 +378,7 @@ export const screens = [
   {
     id: 10,
     component: "ScenarioScreen",
+    weighted: true,
     scenarioNumber: 4,
     // Escalating to the target's manager without asking first — same
     // pattern as Screen 4/C above (FDD A6: E4/E6). This is the item that
@@ -424,6 +428,7 @@ export const screens = [
   {
     id: 12,
     component: "ScenarioScreen",
+    weighted: true,
     scenarioNumber: 5,
     data: {
       illustration: "scenario-5-puzzle-piece.svg",
