@@ -222,9 +222,22 @@ p { margin: 0 0 var(--space-3); }
   padding-bottom: var(--space-5);
 }
 
+/* 2026-09-15 bugfix (Johar flagged a couple-second load delay pushing
+   Screen 2's text down — same root cause here, confirmed by measurement
+   before fixing): width is percentage-driven and height was `auto`, with
+   no `aspect-ratio` and no width/height attributes on the <img>, so the
+   browser couldn't reserve vertical space until the SVG actually loaded
+   and reported its intrinsic size — real-Chromium Resource Timing showed
+   this is normally fast (tens of ms) but any nonzero delay (slower
+   network/device) reads as content visibly jumping once the image
+   resolves. `aspect-ratio: 1 / 1` reserves the box immediately from the
+   CSS alone, before the image is even requested. Safe here specifically
+   because the source SVG is confirmed natively 400x400 (viewBox/width/
+   height all square) — checked, not assumed. */
 .splash-graphic {
   width: 100%;
   max-width: min(320px, 88vw);
+  aspect-ratio: 1 / 1;
   height: auto;
   margin-bottom: var(--space-4);
 }
@@ -270,10 +283,15 @@ p { margin: 0 0 var(--space-3); }
    needed — the image is never cropped or letterboxed, so there's nothing
    for a fallback color to show behind. See render.js's generic
    StatementScreen branch. */
+/* 2026-09-15 bugfix: same missing-aspect-ratio gap as .splash-graphic
+   above (see that rule's comment for the full diagnosis) — this is the
+   specific image Johar caught the delay/push-down on. Remote-Team's SVG
+   is confirmed natively 400x400 square, so aspect-ratio: 1/1 is safe. */
 .intro-illustration {
   display: block;
   width: 100%;
   max-width: min(240px, 60vw);
+  aspect-ratio: 1 / 1;
   height: auto;
   margin: 0 auto var(--space-4);
 }
@@ -566,9 +584,21 @@ summary:focus-visible {
    variance. Full reasoning: `DBI Scenario-Phasecard-Debrief sizing —
    Round 2.md`.
 
-   Known gap, not a bug: the 640px+ step below is still 116px, smaller
-   than this new 124px base — sizing the desktop step is explicitly a
-   separate open sub-item, same measurement method, not done here. */
+   2026-09-15 — 640px+ step resolved (was the "known gap" above: 116px,
+   smaller than the 124px mobile base, an inversion). Real-Chromium
+   Playwright measurement against all 5 shortTitle strings at 640/768/
+   1024px viewports found the actual wrap ceiling is nowhere near this
+   size — .scenario-title never wraps below ~300px+ illustration width at
+   this container's max-width (42rem/672px caps the row regardless of
+   viewport past 640px, so 768px and 1024px behave identically to 672px).
+   Wrap ceiling doesn't bind here, so the desktop value is a proportion
+   call instead: applied the same +16px mobile-to-desktop step this
+   component used historically (100px mobile -> 116px desktop, pre-Round
+   2), to the new 124px mobile base -> 140px. Screenshot-compared against
+   the old 116px at 768px before landing on it: 140px reads as clearly
+   bigger without crowding the fixed-size (22px) title/eyebrow text.
+   Title/eyebrow have no separate desktop step — same size at every
+   width, unaffected by this change. */
 .scenario-meta {
   display: flex;
   align-items: center;
@@ -583,8 +613,7 @@ summary:focus-visible {
 }
 
 @media (min-width: 640px) {
-  /* Unchanged this pass — see the "known gap" note above. */
-  .scenario-illustration { width: 116px; height: 116px; }
+  .scenario-illustration { width: 140px; height: 140px; }
 }
 
 /* Eyebrow + short title stack together next to the illustration (DBI Row
