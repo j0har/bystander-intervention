@@ -186,7 +186,15 @@ export const screens = [
   {
     id: 2,
     component: "StatementScreen",
-    weighted: false,
+    // 2026-09-15: was false — the only non-splash screen still sitting on
+    // plain --color-bg once Screens 3/4/6/8/10/12/14 all picked up the
+    // weighted treatment (see task card history). No principled reason for
+    // Screen 2 alone to keep the unanchored header gap; nothing on this
+    // screen renders --color-accent as text (checked render.js — h1,
+    // .screen__body p, and .btn-continue are all safe on the darker
+    // background, unlike .scenario-eyebrow/.validation-message on scenario
+    // screens), so this is a pure consistency fix with no contrast fallout.
+    weighted: true,
     data: {
       // Wired 2026-09-13 — asset landed via PR #12 (2026-09-10) but was
       // never connected to any render path. Renders via .intro-illustration

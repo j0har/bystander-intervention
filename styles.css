@@ -356,7 +356,21 @@ summary:focus-visible {
    band), definition/when-to-use/example below (now in a white body),
    render.js. This component's root is fully self-specified below — no
    shared `.card` base. */
-.screen--phasecard { display: flex; flex-direction: column; align-items: center; }
+/* 2026-09-15: pulls the floating card up to close a real gap disparity
+   Johar flagged — measured, not assumed: header-to-first-visual-content
+   was 48px here vs. 16px on a weighted screen (.screen--weighted cancels
+   #app's own padding-top the same way, via negative margin, then re-pads
+   internally — this reuses that exact technique) before ANY colour/card
+   boundary appears. Phase-card's own internal design (floating card,
+   drop shadow, "Colour field" 3a spec) is unchanged — only the dead
+   plain-background gap above it is closed, matching weighted screens'
+   16px. */
+.screen--phasecard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: calc(var(--space-5) * -1);
+}
 
 .phase-card {
   max-width: var(--max-width);
@@ -603,7 +617,38 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  margin-bottom: var(--space-4);
+  /* 2026-09-15: was var(--space-4) (24px) — trimmed to var(--space-3)
+     (16px) as part of the same pass that tightens .screen--weighted's own
+     padding below. Johar's repeated read (four-plus sessions): the space
+     above and below the scenario image/title reads as excessive. */
+  margin-bottom: var(--space-3);
+}
+
+/* 2026-09-15: scenario screens specifically get a tighter --screen-weighted
+   padding than Power Dynamics/Debrief (var(--space-5)=32px top/bottom,
+   unchanged for those two, per the original task card's explicit
+   constraint — --space-5 itself isn't touched). Halved to var(--space-3)
+   =16px top/bottom (sides unchanged) — combined with the .scenario-meta
+   trim above, saves 40px of vertical space per scenario screen.
+
+   Measured (real Chromium, 390px, dev-nav jump, fonts settled, scroll
+   reset before each read, Submit-button-bottom vs. viewport): this 40px
+   is real but small next to total content height. Before -> after:
+   Screen 4 (3 opts) 229px -> 189px overflow; Screen 6 (3 opts) 148px ->
+   108px; Screen 8 (3 opts) 256px -> 216px; Screen 10 (4 opts) 384px ->
+   344px; Screen 12 (4 opts) 357px -> 317px. Every scenario screen still
+   requires real scroll at 390px after this pass — none reach 0. The
+   dominant driver is total stacked content (124px illustration + title +
+   stem + 3-4 full option cards + Submit), not header/title padding; a
+   prior in-repo comment claiming Screen 4 reached "room to spare" was a
+   measurement error and has been corrected here, not carried forward.
+   Closing the remaining gap would mean shrinking/dropping the
+   illustration on mobile, denser option-card spacing (touch-target
+   trade-off), or accepting scroll as normal phone UX for a 4-option
+   question — a distinct, more invasive pass, out of scope for the
+   header-gap/padding fix this card asked for. */
+.screen--scenario.screen--weighted {
+  padding: var(--space-3) var(--space-4);
 }
 
 .scenario-illustration {
