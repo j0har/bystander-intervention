@@ -590,7 +590,19 @@ summary:focus-visible {
 
 .power-diagram__target-fill { fill: none; }
 
-.power-diagram__target-stroke--harmed { stroke: var(--color-text); }
+/* 2026-09-16 fix: was --color-text (near-black, 14.3:1 on bg) while this
+   figure's own label uses --color-text-secondary (6B5B52) — checked the
+   two circles' and labels' actual rendered coordinates (getBoundingClientRect)
+   against Johar's screenshot report of "unusual spacing/overlap" on this
+   figure only: coordinates were pixel-identical to the "you" figure, so
+   there is no layout bug. The high-contrast stroke sitting on a lower-
+   contrast label is what reads as the circle crowding its own text — the
+   "you" figure doesn't show this because its circle and label already
+   share one token (--color-accent). Matching this circle's stroke to its
+   own label (and to .power-diagram__source-fill's stroke/label pairing
+   above) removes the mismatch; still 5.8:1 on --color-bg, no contrast
+   regression (element is aria-hidden regardless). */
+.power-diagram__target-stroke--harmed { stroke: var(--color-text-secondary); }
 
 .power-diagram__target-stroke--you { stroke: var(--color-accent); }
 
