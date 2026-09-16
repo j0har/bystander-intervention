@@ -126,17 +126,6 @@ function updateProgress() {
   ]);
   progressEl.appendChild(headerRow);
 
-  // DBI Screen 3 — Power Dynamics redesign (2026-09-15): Screen 3 sits
-  // before the first scenario and isn't one of the five scored/assessed
-  // steps, so the D-track below would misleadingly suggest it advances
-  // practice — previously it rendered as a fully neutral track (no
-  // segment ever marked done/current here, since currentDIndex() returns
-  // null for a StatementScreen). Scoped to this one screen via its own
-  // hideProgressTrack flag (data.js) rather than a change to the shared
-  // header component: the row above (back control + title) is unchanged,
-  // and every other screen keeps .app-header__track exactly as before.
-  if (screen.hideProgressTrack) return;
-
   const allComplete = screen.variant === "debrief";
   const curIdx = currentDIndex(screen);
   const track = el(
