@@ -13,11 +13,11 @@
   --color-text-secondary: #6B5B52;/* warm mid-brown */
   --color-surface: #FFFFFF;
 
-  --color-d-distract: #916339;  /* 2026-08-08: darkened from #C4956A — 2.38:1 -> 4.62:1 on #F6F1EB, DBI Row 9 */
-  --color-d-delegate: #627066;  /* 2026-08-08: darkened from #7A8B7F — 3.21:1 -> 4.63:1 on #F6F1EB, DBI Row 9 */
-  --color-d-document: #776498;  /* 2026-08-08: darkened from #8B7BA8 — 3.40:1 -> 4.60:1 on #F6F1EB, DBI Row 9 */
-  --color-d-delay: #796A5B;  /* 2026-08-08: darkened from #9B8B7A — 2.94:1 -> 4.63:1 on #F6F1EB, DBI Row 9 */
-  --color-d-direct: #A0596A;  /* unchanged — already 4.53:1 on #F6F1EB, DBI Row 9 */
+  --color-d-distract: #916339;  /* 4.62:1 on #F6F1EB — WCAG AA text contrast */
+  --color-d-delegate: #627066;  /* 4.63:1 on #F6F1EB — WCAG AA text contrast */
+  --color-d-document: #776498;  /* 4.60:1 on #F6F1EB — WCAG AA text contrast */
+  --color-d-delay: #796A5B;  /* 4.63:1 on #F6F1EB — WCAG AA text contrast */
+  --color-d-direct: #A0596A;  /* 4.53:1 on #F6F1EB — WCAG AA text contrast */
 
   /* Type */
   --font-heading: "Fraunces", Georgia, serif;
@@ -80,17 +80,15 @@ p { margin: 0 0 var(--space-3); }
   left: 0;
 }
 
-/* Persistent header (#progress) — a back arrow (when there's somewhere to
+/* Persistent header (#progress): a back arrow (when there's somewhere to
    go back to) sharing a row with a static module title, plus the
-   five-part practice track below (DBI Row 14 Design pass, 2026-09-09,
-   direction 2a). A subtly weighted background band (--color-bg-weighted,
-   same token .screen--weighted uses) separates the header from the white
-   screen card beneath it — this was in Design's mockup but missed in the
-   first implementation pass; bugfix 2026-09-09. Stays decorative/
-   aria-hidden on the container, same posture the plain "Screen N of 14"
-   text had before it — see appShell.js's updateProgress() comment on why a
-   screen-reader-facing progress affordance is a deliberate follow-up, not
-   bundled in here. Cleared to empty on the splash screen, same as before. */
+   five-part practice track below. A weighted background band
+   (--color-bg-weighted, same token .screen--weighted uses) separates the
+   header from the white screen card beneath it. Stays decorative/
+   aria-hidden on the container — see appShell.js's updateProgress()
+   comment on why a screen-reader-facing progress affordance is a
+   deliberate follow-up, not bundled in here. Cleared to empty on the
+   splash screen. */
 .progress-indicator {
   max-width: var(--max-width);
   margin: 0 auto var(--space-3);
@@ -99,11 +97,9 @@ p { margin: 0 0 var(--space-3); }
   padding: var(--space-2) var(--space-3) var(--space-3);
 }
 
-/* appShell.js sets textContent = "" (no children at all) on the splash
-   screen, same as before this pass — but the background/padding above are
-   new, so without this the empty container now shows as an orphan shaded
-   bar above the splash screen instead of disappearing the way the old
-   plain-text version did. */
+/* appShell.js sets textContent = "" on the splash screen — without this,
+   the empty container shows as an orphan shaded bar instead of
+   disappearing. */
 .progress-indicator:empty {
   background: none;
   padding: 0;
@@ -112,11 +108,7 @@ p { margin: 0 0 var(--space-3); }
 
 /* Back arrow + title row. The arrow is absolutely positioned within this
    row (not a flex sibling) so the title stays visually centered whether or
-   not a back arrow is present — matches the Design mockup, where the title
-   sits centered above the track regardless of screen. Bugfix 2026-09-09:
-   previously there was no header back control at all — "← Back" was a
-   plain text link buried in some screens' own scrolling content (and
-   missing entirely from phase-card screens); see appShell.js. */
+   not a back arrow is present. */
 .app-header__row {
   position: relative;
   display: flex;
@@ -126,16 +118,10 @@ p { margin: 0 0 var(--space-3); }
   margin-bottom: var(--space-2);
 }
 
-/* Bugfix 2026-09-09 (found from Johar's own follow-up screenshot): the
-   negative margin below was meant as the usual "bigger tap target without
-   shifting visual position" trick, but that trick only cancels out for a
-   statically-positioned element. On an absolutely positioned one, `top`
-   locates the MARGIN edge, so a negative margin pulls the actual visible
-   box up and to the left of where `left: 0; top: 50%` put it — measured
-   8px off in both axes, which is exactly why the arrow read as not lined
-   up with the title. Dropped the margin; the padding alone still gives a
-   comfortably larger hit area, and now the button's own center genuinely
-   lands on the row's center the way top: 50% + translateY(-50%) intends. */
+/* No negative margin here: on an absolutely positioned element, `top`
+   locates the margin edge, so a negative margin would pull the visible box
+   away from where `left: 0; top: 50%` puts it. Padding alone gives a
+   comfortable tap target without that offset. */
 .app-header__back {
   position: absolute;
   left: 0;
@@ -209,10 +195,9 @@ p { margin: 0 0 var(--space-3); }
 
 .screen__body p { margin-bottom: var(--space-3); }
 
-/* Splash screen (Screen 1) — DBI Row 14 Design pass, 2026-09-09 (direction
-   1a): the old 180px illustration cap read as a small image with a lot of
-   surrounding white space relative to the title. Illustration is now
-   width-driven, and the headline is set larger to match. */
+/* Splash screen (Screen 1): illustration is width-driven (not a fixed
+   height cap) so it reads as a substantial image rather than a small one
+   with excess surrounding white space; headline sized to match. */
 .screen--splash {
   display: flex;
   flex-direction: column;
@@ -222,18 +207,12 @@ p { margin: 0 0 var(--space-3); }
   padding-bottom: var(--space-5);
 }
 
-/* 2026-09-15 bugfix (Johar flagged a couple-second load delay pushing
-   Screen 2's text down — same root cause here, confirmed by measurement
-   before fixing): width is percentage-driven and height was `auto`, with
-   no `aspect-ratio` and no width/height attributes on the <img>, so the
-   browser couldn't reserve vertical space until the SVG actually loaded
-   and reported its intrinsic size — real-Chromium Resource Timing showed
-   this is normally fast (tens of ms) but any nonzero delay (slower
-   network/device) reads as content visibly jumping once the image
-   resolves. `aspect-ratio: 1 / 1` reserves the box immediately from the
-   CSS alone, before the image is even requested. Safe here specifically
-   because the source SVG is confirmed natively 400x400 (viewBox/width/
-   height all square) — checked, not assumed. */
+/* aspect-ratio: 1/1 reserves the image's box immediately from CSS alone,
+   before the image is requested — without it, width is percentage-driven
+   but height is auto, so the browser can't reserve vertical space until
+   the SVG loads, and content visibly jumps into place. Safe here only
+   because the source SVG is confirmed natively 400x400 (square
+   viewBox/width/height). */
 .splash-graphic {
   width: 100%;
   max-width: min(320px, 88vw);
@@ -271,26 +250,13 @@ p { margin: 0 0 var(--space-3); }
 
 .screen__body strong { font-weight: 500; color: var(--color-text); }
 
-/* Screen 2 (Introduction) illustration — full, uncropped rendering of the
-   1:1 source art, width-driven and centered like .splash-graphic above,
-   but capped smaller so it carries real presence as an important
-   secondary screen without competing with the splash hero. 2026-09-13:
-   replaces a same-day first attempt (`.hero-graphic`, object-fit: cover in
-   a 180px-capped box) that Johar rejected on sight — it forced the native
-   400x400 square art into a landscape crop, cutting off most of the
-   illustration, and introduced a banner frame this module doesn't use
-   anywhere else. Corrected before merge, same PR. No background fill
-   needed — the image is never cropped or letterboxed, so there's nothing
-   for a fallback color to show behind. See render.js's generic
-   StatementScreen branch.
-   2026-09-23: Screen 3 (Power Dynamics) reuses this same rule for its
-   header illustration — the discarded powerQuestions diagram had its own
-   .power-diagram rules, removed below with the diagram itself; Screen 3
-   needs no new CSS of its own. */
-/* 2026-09-15 bugfix: same missing-aspect-ratio gap as .splash-graphic
-   above (see that rule's comment for the full diagnosis) — this is the
-   specific image Johar caught the delay/push-down on. Remote-Team's SVG
-   is confirmed natively 400x400 square, so aspect-ratio: 1/1 is safe. */
+/* Screen 2/3 header illustration: full, uncropped rendering of the 1:1
+   source art, width-driven and centered like .splash-graphic but capped
+   smaller. No background fill needed — the image is never cropped or
+   letterboxed. Screen 3 reuses this same rule for its own header
+   illustration; it needs no CSS of its own.
+   aspect-ratio: 1/1 avoids the same load-shift gap as .splash-graphic
+   above. Remote-Team's SVG is confirmed natively 400x400 square. */
 .intro-illustration {
   display: block;
   width: 100%;
@@ -337,38 +303,22 @@ summary:focus-visible {
 /* Card grid (Screen 2) */
 .intro { color: var(--color-text-secondary); }
 
-/* CardGridScreen (old Screen 2, five-up grid) removed 2026-09-07 — the
-   progressive phase-transition cards replaced it, nothing else used
-   .card-grid. The shared .card base class itself (background/radius/
-   padding) was retired here, 2026-09-10, when PhaseCardScreen — its last
-   consumer — moved to its own fully-specified `.phase-card` root (see
-   below): `.card p` was a compound selector that outranked
-   `.phase-card__eyebrow`/`.phase-card__definition` on specificity, so as
-   long as PhaseCardScreen also carried the `.card` class its text was
-   silently rendering in --color-text-secondary regardless of what this
-   component's own rules said. Caught in this build's own render/contrast
-   check, not by inspection. */
+/* No shared `.card` base class — `.phase-card` is fully self-specified
+   below. A shared `.card p` rule previously outranked
+   `.phase-card__eyebrow`/`.phase-card__definition` on specificity, so text
+   under a shared base can silently pick up the wrong color; keeping
+   phase-card fully self-contained avoids that class of bug. */
 
-/* PhaseCardScreen (screens 5, 7, 9, 11, 13) — "Colour field" (direction
-   3a), per DBI-PhaseCard-3a-Final-Spec-2026-09-10.md. Replaces the prior
-   4px-top-border + tinted-icon-disc treatment (Row 14 Design pass,
-   2026-09-09, direction 1c) — colour now fills a full-width header band
-   (~30% of the card's area) instead of a thin accent, which is what
-   changes the card's silhouette rather than just its decoration (why 3a
-   won over 3c, "Warm ground" — see the spec doc's own reasoning). DOM
-   order is unchanged: icon/eyebrow/title first (now inside the header
-   band), definition/when-to-use/example below (now in a white body),
-   render.js. This component's root is fully self-specified below — no
-   shared `.card` base. */
-/* 2026-09-15: pulls the floating card up to close a real gap disparity
-   Johar flagged — measured, not assumed: header-to-first-visual-content
-   was 48px here vs. 16px on a weighted screen (.screen--weighted cancels
-   #app's own padding-top the same way, via negative margin, then re-pads
-   internally — this reuses that exact technique) before ANY colour/card
-   boundary appears. Phase-card's own internal design (floating card,
-   drop shadow, "Colour field" 3a spec) is unchanged — only the dead
-   plain-background gap above it is closed, matching weighted screens'
-   16px. */
+/* PhaseCardScreen (screens 5, 7, 9, 11, 13). Colour fills a full-width
+   header band (~30% of the card) instead of a thin accent border, which is
+   what changes the card's silhouette rather than just its decoration. DOM
+   order: icon/eyebrow/title in the header band, definition/when-to-use/
+   example below in a white body (render.js). Fully self-specified root —
+   no shared `.card` base (see note above). */
+/* Negative top margin cancels #app's own padding-top, then the card's own
+   floating design (drop shadow) provides the visual gap — matches the
+   16px header-to-content gap that .screen--weighted screens get via the
+   same technique. */
 .screen--phasecard {
   display: flex;
   flex-direction: column;
@@ -390,14 +340,12 @@ summary:focus-visible {
   padding: var(--space-4) var(--space-4) var(--space-5);
 }
 
-/* In-card progress track — repeats the shared app header's own 5-part D
+/* In-card progress track — echoes the shared app header's own 5-part D
    track (.app-header__track / appShell.js's updateProgress()) inside this
-   card's header band. Resolved as an intentional echo, not pursued for
-   differentiation (spec's "Duplication question") — the shared header
-   stays unchanged, out of scope for this component. Same decorative
-   posture as .app-header__track: aria-hidden on the container in
-   render.js, no accessible name of its own — the screen's own <h1> (below,
-   visually hidden) remains the one real progress signal for AT users. */
+   card's header band. Intentional duplication, not pursued for
+   differentiation. Decorative: aria-hidden on the container in render.js,
+   no accessible name of its own — the screen's own <h1> (visually hidden)
+   is the real progress signal for AT users. */
 .phase-card__track {
   display: flex;
   gap: 6px;
@@ -442,35 +390,17 @@ summary:focus-visible {
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.12em;
-  /* Accessibility fix, 2026-09-10: first pass spec'd this at white 82%
-     opacity directly on the D-colour band — checked against WCAG 2.1 AA
-     (4.5:1 floor, also the AODA-relevant standard) with a contrast script,
-     not by eye, and all five D tokens failed (4.00–4.12:1). Full-opacity
-     white clears AA on all five (~5.0–5.2:1, same range as the title) and
-     needs no re-check if a D token's hex ever changes, since it's no
-     longer a blend calculation. Hierarchy now comes from size (12px vs.
-     32/42px), uppercase, and tracking alone.
-     Size bumped 11px -> 12px and wording changed to "5Ds Framework" (was
-     "The 5Ds") 2026-09-14 (Round 1, CSS punch list) — matches the splash
-     subtitle's own phrasing ("Practicing the 5Ds Framework") instead of a
-     third variant, and the original 11px/all-caps/heavy-tracking
-     combination was reading the numeral "5" as close to "S" at that size
-     (Johar's own flag, confirmed against a live screenshot before
-     changing). Tracking eased slightly (0.14em -> 0.12em) since the added
-     characters don't need as much room to stay legible as the original
-     4-character "THE 5DS" did.
-
-     Round 2, same day: the separate .phase-card__progress paragraph below
-     ("Card N of 5") is gone — folded into this line instead, so the
-     header carries one text line, not two. Content is now
-     `The Five Ds · N of 5` (render.js), rendered uppercase by this rule
-     as "THE FIVE DS · N OF 5". Middot, not an em dash or hyphen, per the
-     module's no-em-dash-in-learner-copy rule and less ambiguous than a
-     pipe at 12px. "Five" is spelled out rather than "5Ds" — a bare digit
-     next to the "N OF 5" position number risked the same digit/letter
-     misread this rule already fixed once (2026-09-10), just relocated to
-     a different collision. The screen-reader-only <h1> below (render.js)
-     still carries "Card N of 5 earned: <D>" independently — unchanged. */
+  /* Full-opacity white (not a translucent white on the D-colour band)
+     clears the 4.5:1 WCAG AA floor on all five D tokens — checked with a
+     contrast script, not by eye; a translucent white failed on all five.
+     Hierarchy comes from size/uppercase/tracking alone, so no per-token
+     recheck is needed if a D hex ever changes.
+     Content is `The Five Ds · N of 5` (render.js), rendered uppercase
+     here. Middot, not an em dash or hyphen, per the module's
+     no-em-dash-in-learner-copy rule. "Five" is spelled out rather than
+     "5Ds" — a bare digit next to the "N OF 5" position number risks a
+     digit/letter misread. The screen-reader-only <h1> below (render.js)
+     carries "Card N of 5 earned: <D>" independently. */
   color: #fff;
   margin: 0 0 0.25rem;
 }
@@ -496,8 +426,8 @@ summary:focus-visible {
   font-weight: 500;
   font-size: 1.3125rem;
   line-height: 1.3;
-  /* Full-strength text colour (was --color-text-secondary) — one of the
-     three original "weak body contrast" complaints, confirmed fixed. */
+  /* Full-strength text colour, not the secondary tone — this is the
+     card's primary content. */
   color: var(--color-text);
   margin: 0 0 var(--space-4);
 }
@@ -548,16 +478,9 @@ summary:focus-visible {
 
 .closing { font-style: italic; color: var(--color-text-secondary); }
 
-/* Risk assessment two-question layout (Screen 3). The flat-line diagram
-   that used to sit above this block (.power-diagram and its children —
-   DBI Screen 3 — Power Dynamics redesign, 2026-09-15 mockup) is removed,
-   2026-09-23: discarded, not tweaked, on a fresh QA read that it didn't
-   communicate enough to earn the image treatment (three PRs of overlap/
-   progress-bar firefighting on it — see DBI-Component-Architecture-Spec
-   and DBI-HTML-Storyboard, Screen 3, for the fuller history). Screen 3's
-   header now uses a plain illustration via the existing .intro-
-   illustration rule above — no new CSS needed. This block (cards below)
-   is unchanged. */
+/* Risk assessment two-question layout (Screen 3). Header uses a plain
+   illustration via .intro-illustration above — no diagram-specific CSS
+   needed for this screen. */
 .power-questions {
   display: grid;
   grid-template-columns: 1fr;
@@ -585,11 +508,8 @@ summary:focus-visible {
 }
 
 /* Numbered accent badge — CSS counter + generated content, not a second
-   copy of the number in the accessibility tree. render.js's <ol>/<li>
-   structure already gives assistive tech the real "1 of 2 / 2 of 2"
-   position; this is decoration on top of that list semantics, the same
-   relationship the phase-card's visible "N of 5" text has to its own
-   aria-hidden decorative track. */
+   copy of the number in the accessibility tree (render.js's <ol>/<li>
+   already gives AT the real "1 of 2 / 2 of 2" position). */
 .power-question::before {
   content: counter(power-question);
   flex: none;
@@ -602,15 +522,10 @@ summary:focus-visible {
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 0.875rem;
-  /* --color-accent as text on its own 14%-tint background measures
-     4.24:1 (computed, WCAG relative-luminance formula) — fails the 4.5:1
-     AA floor at this 14px/500-weight size, and real-browser axe (Screen 3,
-     390/1024px) didn't catch it: axe-core's color-contrast rule doesn't
-     reliably evaluate ::before generated-content text. Same trap this
-     module already hit and fixed twice for --color-accent-on-tint
-     (.screen--weighted .scenario-eyebrow/.validation-message, .feedback
-     tiers) — reusing that established darkened value here rather than a
-     third one-off: #935262 on this 14% tint measures 4.83:1. */
+  /* axe-core's color-contrast rule doesn't reliably evaluate ::before
+     generated-content text, so this was checked by hand: --color-accent on
+     this 14% tint measures 4.24:1 (fails the 4.5:1 AA floor); #935262 on
+     the same tint measures 4.83:1. */
   color: #935262;
   background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
 }
@@ -624,83 +539,32 @@ summary:focus-visible {
   margin-bottom: var(--space-2);
 }
 
-/* Scenario screens. .unscored-label (old "taught, not scored" pill)
-   removed 2026-09-07 — no screen carries that state any more, all five
-   remaining scenarios are uniformly diagnostic. */
-
-/* Scenario illustration + eyebrow (DBI Row 14 Design pass, 2026-09-09,
-   direction 1b): a fixed square instead of the old full-width stacked
-   treatment, which forced a scroll before the question on every scenario
-   screen. Sits in a row with the "Scenario N of 5" eyebrow, which doubles
-   as the screen's <h1> — see render.js. Sizes bumped 2026-09-14 Round 1
-   (88/104 -> 100/116, eyebrow 11px -> 12px, title 18px -> 20px) — Johar's
-   read on a live screenshot that the illustration and header text both
-   felt a little small; same category of fix as the phase-card eyebrow
-   above, not a redesign.
-
-   2026-09-14 Round 2 — base (320–639px) sizes bumped again, illustration
-   and title together rather than illustration alone: at mobile widths the
-   two compete for the same fixed-width row, so growing the illustration
-   on its own shrinks the safe zone for the title before any of the 5 real
-   shortTitle strings wraps to 3 lines. Measured curve at 375px reference
-   width (max illustration before a 3-line wrap, by title size): 20px
-   title -> 140px illustration max, 22px -> 128px max. Landed on
-   124px/1.375rem (22px) title/13px eyebrow — both genuinely bigger
-   (illustration +24%, title +10%) while staying close to the original
-   100:20 illustration:title ratio (new ratio 5.6 vs. old 5.0), with a few
-   px of margin under the 128px ceiling for cross-browser font-metric
-   variance. Full reasoning: `DBI Scenario-Phasecard-Debrief sizing —
-   Round 2.md`.
-
-   2026-09-15 — 640px+ step resolved (was the "known gap" above: 116px,
-   smaller than the 124px mobile base, an inversion). Real-Chromium
-   Playwright measurement against all 5 shortTitle strings at 640/768/
-   1024px viewports found the actual wrap ceiling is nowhere near this
-   size — .scenario-title never wraps below ~300px+ illustration width at
-   this container's max-width (42rem/672px caps the row regardless of
-   viewport past 640px, so 768px and 1024px behave identically to 672px).
-   Wrap ceiling doesn't bind here, so the desktop value is a proportion
-   call instead: applied the same +16px mobile-to-desktop step this
-   component used historically (100px mobile -> 116px desktop, pre-Round
-   2), to the new 124px mobile base -> 140px. Screenshot-compared against
-   the old 116px at 768px before landing on it: 140px reads as clearly
-   bigger without crowding the fixed-size (22px) title/eyebrow text.
-   Title/eyebrow have no separate desktop step — same size at every
-   width, unaffected by this change. */
+/* Scenario illustration + eyebrow (screens 4/6/8/10/12): a fixed square
+   sits in a row with the "Scenario N of 5" eyebrow, which doubles as the
+   screen's <h1> (render.js). Sizes: 124px illustration/22px title/13px
+   eyebrow at base width, 140px illustration at 640px+ — chosen so the
+   illustration and title compete for the same fixed-width row without
+   forcing a 3-line title wrap at mobile widths (measured against all 5
+   shortTitle strings; the container's max-width caps the row the same way
+   from 640px up, so no further step is needed past that). */
 .scenario-meta {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  /* 2026-09-15: was var(--space-4) (24px) — trimmed to var(--space-3)
-     (16px) as part of the same pass that tightens .screen--weighted's own
-     padding below. Johar's repeated read (four-plus sessions): the space
-     above and below the scenario image/title reads as excessive. */
+  /* var(--space-3), not --space-4 — the image/title pairing above already
+     reads as complete without the extra vertical space. */
   margin-bottom: var(--space-3);
 }
 
-/* 2026-09-15: scenario screens specifically get a tighter --screen-weighted
-   padding than Power Dynamics/Debrief (var(--space-5)=32px top/bottom,
-   unchanged for those two, per the original task card's explicit
-   constraint — --space-5 itself isn't touched). Halved to var(--space-3)
-   =16px top/bottom (sides unchanged) — combined with the .scenario-meta
-   trim above, saves 40px of vertical space per scenario screen.
-
-   Measured (real Chromium, 390px, dev-nav jump, fonts settled, scroll
-   reset before each read, Submit-button-bottom vs. viewport): this 40px
-   is real but small next to total content height. Before -> after:
-   Screen 4 (3 opts) 229px -> 189px overflow; Screen 6 (3 opts) 148px ->
-   108px; Screen 8 (3 opts) 256px -> 216px; Screen 10 (4 opts) 384px ->
-   344px; Screen 12 (4 opts) 357px -> 317px. Every scenario screen still
-   requires real scroll at 390px after this pass — none reach 0. The
-   dominant driver is total stacked content (124px illustration + title +
-   stem + 3-4 full option cards + Submit), not header/title padding; a
-   prior in-repo comment claiming Screen 4 reached "room to spare" was a
-   measurement error and has been corrected here, not carried forward.
-   Closing the remaining gap would mean shrinking/dropping the
-   illustration on mobile, denser option-card spacing (touch-target
-   trade-off), or accepting scroll as normal phone UX for a 4-option
-   question — a distinct, more invasive pass, out of scope for the
-   header-gap/padding fix this card asked for. */
+/* Scenario screens use a tighter --screen-weighted padding
+   (var(--space-3)=16px top/bottom) than Power Dynamics/Debrief
+   (var(--space-5)=32px, unchanged for those two). Every scenario screen
+   still requires scroll at 390px viewport width even with this padding —
+   the dominant driver is total stacked content (illustration + title +
+   stem + option cards + Submit), not header padding. Closing that gap
+   further would mean shrinking the illustration on mobile, denser
+   option-card spacing (a touch-target trade-off), or accepting scroll as
+   normal phone UX for a 4-option question — out of scope here. */
 .screen--scenario.screen--weighted {
   padding: var(--space-3) var(--space-4);
 }
@@ -715,8 +579,8 @@ summary:focus-visible {
   .scenario-illustration { width: 140px; height: 140px; }
 }
 
-/* Eyebrow + short title stack together next to the illustration (DBI Row
-   14, 2026-09-09 follow-up — see render.js's comment on scenarioMeta). */
+/* Eyebrow + short title stack together next to the illustration — see
+   render.js's comment on scenarioMeta. */
 .scenario-meta__text {
   display: flex;
   flex-direction: column;
@@ -734,16 +598,10 @@ summary:focus-visible {
   margin: 0;
 }
 
-/* Scenario screens picked up screen--weighted 2026-09-15 (header-gap /
-   scoped-tightening fix — see task card) — --color-bg-weighted is now
-   their background instead of --color-bg. --color-accent (#A0596A) as
-   text measures 4.53:1 on --color-bg (passes AA) but only 4.07:1 on
-   --color-bg-weighted (fails the 4.5:1 floor). Same trap as
-   .feedback--correct/.feedback--defensible above: darkened for
-   text-on-weighted use only, computed (not guessed) at 4.64:1 against
-   --color-bg-weighted. --color-accent itself is unchanged for its other
-   uses (buttons, borders, .stem blockquote) — those aren't text-on-
-   --color-bg-weighted and aren't subject to this rule. */
+/* --color-accent measures 4.53:1 on --color-bg (passes AA) but only 4.07:1
+   on --color-bg-weighted (fails). Darkened to #935262 for text-on-weighted
+   use only (4.64:1) — --color-accent itself is unchanged for buttons/
+   borders/.stem blockquote, which aren't text-on-weighted. */
 .screen--weighted .scenario-eyebrow,
 .screen--weighted .validation-message {
   color: #935262;
@@ -765,14 +623,10 @@ summary:focus-visible {
   margin-bottom: var(--space-4);
 }
 
-/* Bugfix 2026-09-14 (Johar's own measurement: 24px gap above the stem
-   text, 40px below, against a uniform 24px box padding on all sides).
-   Root cause: the global `p { margin: 0 0 var(--space-3) }` rule gives
-   the stem's own (only) paragraph a 16px bottom margin, and padding on
-   the parent blocks margin-collapse, so that margin stacks on top of the
-   box's own 24px padding instead of disappearing into it. Confirmed via
-   getBoundingClientRect() on the live build before this fix, not
-   guessed — 24px top gap, 40px bottom gap, delta exactly 16px. */
+/* Root cause of asymmetric stem padding: the global `p { margin: 0 0
+   var(--space-3) }` rule gives the stem's last paragraph a bottom margin,
+   and padding on the parent blocks margin-collapse, so that margin stacks
+   on top of the box's own padding instead of disappearing into it. */
 .stem p:last-child { margin-bottom: 0; }
 
 .stem blockquote {
@@ -818,8 +672,7 @@ summary:focus-visible {
   height: 1.1em;
 }
 
-/* Answer-lock after first submit (folded in from PR #1's intent, rebuilt
-   fresh 2026-09-07 — see appShell.js/render.js). */
+/* Answer-lock after first submit — see appShell.js/render.js. */
 .scenario-form input[type="radio"]:disabled { cursor: default; }
 
 .scenario-form label:has(input[type="radio"]:disabled) {
@@ -859,10 +712,10 @@ summary:focus-visible {
 
 .feedback p:last-child { margin-bottom: 0; }
 
-/* Correctness signal (folded in from PR #1's intent, rebuilt fresh
-   2026-09-07 with a third tier — see render.js's comment on why Screen
-   12/B needs "also reasonable" distinct from a plain miss). Text label is
-   the real signal; color is reinforcing only, never load-bearing alone. */
+/* Correctness signal, three tiers not two — see render.js's comment on why
+   Screen 12/B needs "also reasonable" distinct from a plain miss. Text
+   label is the real signal; color is reinforcing only, never load-bearing
+   alone. */
 .feedback__signal {
   font-family: var(--font-body);
   font-size: 0.8125rem;
@@ -874,29 +727,26 @@ summary:focus-visible {
 }
 
 .feedback--correct { border-left-color: var(--color-d-delegate); }
-/* --color-d-delegate (#627066) was tuned for 4.5:1+ against --color-bg
-   (DBI Row 9, 2026-08-08) — but .feedback's own background is the darker
-   --color-bg-weighted, where the same color measures only 4.18:1. Real-
-   browser axe pass, 2026-09-09: darkened for this text use only (border
-   above stays on the token unchanged — decorative, no text-contrast rule
+/* --color-d-delegate is tuned for 4.5:1+ against --color-bg, but
+   .feedback's background is the darker --color-bg-weighted, where it
+   measures only 4.18:1 — darkened to #58645B for this text use only (the
+   border above stays on the token, decorative, no text-contrast rule
    applies). */
 .feedback--correct .feedback__signal { color: #58645B; }
 
 .feedback--defensible { border-left-color: var(--color-d-delay); }
-/* Same issue, same fix, same date — --color-d-delay (#796A5B) measures
+/* Same issue as .feedback--correct above — --color-d-delay measures
    4.18:1 against --color-bg-weighted despite being tuned for --color-bg. */
 .feedback--defensible .feedback__signal { color: #6C5F51; }
 
 .feedback--reconsider { border-left-color: var(--color-text-secondary); }
 /* --color-text-secondary already clears 5.19:1 against --color-bg-weighted
-   — checked in the same pass, no change needed. */
+   — no change needed. */
 
-/* Debrief screen (DBI Row 14 Design pass, 2026-09-09, direction 1f): each
-   line now pairs with its scenario's puzzle-piece art (the visual anchor
-   back to the person affected) and picks up a left-edge colour from
-   whichever D the pick mapped to. Retry/Exit are swapped from their prior
-   styling — Retry (the button that keeps the learner engaged) is now the
-   filled primary, Exit the quiet outline; the reverse read backwards. */
+/* Debrief screen: each line pairs with its scenario's puzzle-piece art and
+   picks up a left-edge colour from whichever D the pick mapped to. Retry
+   is the filled primary (keeps the learner engaged), Exit the quiet
+   outline. */
 .comparison-list {
   list-style: none;
   margin: 0 0 var(--space-3);
@@ -916,16 +766,9 @@ summary:focus-visible {
 
 .comparison-list li p { margin: 0; }
 
-/* Sized 2026-09-14 Round 1 (64/68 -> 80/84): measured against the live
-   build first — the text column is the tallest element in each row (3
-   lines, ~83px), not the illustration, so growing the image up to
-   ~80-84px costs nothing in row height or added scroll. Confirmed via
-   getBoundingClientRect(), not eyeballed.
-
-   Round 2, same day (80/84 -> 104/108): re-measured the ceiling directly
-   — past ~110px every row starts growing 1:1 with the image, so 104/108
-   takes most of the remaining headroom (same +4px desktop-step pattern as
-   Round 1) with margin to spare rather than pushing right to the edge. */
+/* Sized to the text column's height (the tallest element in each row, ~3
+   lines) — growing the image up to this size costs nothing in row height
+   or added scroll. */
 .comparison-illustration {
   width: 104px;
   height: 104px;
@@ -956,11 +799,9 @@ summary:focus-visible {
   .debrief-actions { flex-direction: row; align-items: center; }
 }
 
-/* Bugfix 2026-09-09: .btn-continue's own margin-top (meant for its usual
-   standalone/after-a-form placement) was leaking into this row, pushing
-   Retry down against Exit — and with the row's default flex
-   align-items: stretch, Exit was then stretching to match Retry's
-   inflated (margin + height) footprint, making it visibly taller too. */
+/* margin-top: 0 overrides .btn-continue's own margin-top (meant for
+   standalone placement after a form), which would otherwise push Retry
+   down against Exit in this flex row. */
 .debrief-retry {
   margin-top: 0;
 }
@@ -975,13 +816,10 @@ summary:focus-visible {
   cursor: pointer;
 }
 
-/* Follow-up bugfix 2026-09-09 (Johar caught this on a zoomed look at the
-   previous fix): with the margin/stretch bug above gone, Retry and Exit
-   were still 3px apart in height (47px vs 44px) — .btn-continue's 2px
-   border vs .btn-secondary's 1px, with identical padding otherwise.
-   Bumping Exit's border to match makes the pair genuinely the same
-   height, not just close. Placed after .btn-secondary deliberately: same
-   specificity, so source order decides, and this needs to win. */
+/* Matches .btn-continue's 2px border so Retry and Exit render at the same
+   height (both have identical padding otherwise). Placed after
+   .btn-secondary deliberately — same specificity, so source order
+   decides, and this needs to win. */
 .debrief-exit {
   border-width: 2px;
 }

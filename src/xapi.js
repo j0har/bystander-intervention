@@ -1,17 +1,12 @@
-// xapi.js — tracking module, per DBI-xAPI-Integration-Spec-v1.2.md §1–3
-// (doc sweep complete, 2026-09-07 — that spec now matches this file's
-// actual 14-screen/5-scenario behavior, including the live SCORM Cloud
-// account details and the actor-normalization fix below). Design driver is
-// cohort-level trend analysis over time, never per-attempt scoring: no
-// `result.score` appears anywhere in this module, by design, on any
-// statement.
+// xapi.js — tracking module. Design driver is cohort-level trend analysis
+// over time, never per-attempt scoring: no `result.score` appears anywhere
+// in this module, by design.
 //
 // Actor identity and the LRS endpoint/auth pair are supplied externally by
-// whatever launches the module (SCORM Cloud / an LMS) at launch time. This
-// build does NOT hard-code a mock actor or a static endpoint. If the module
-// is opened with no LMS launch context (e.g. local dev, GitHub Pages with no
-// launch params), tracking calls no-op and log locally instead of sending
-// statements with a fabricated actor — per spec §6.
+// whatever launches the module (SCORM Cloud / an LMS) at launch time. If
+// opened with no LMS launch context (local dev, GitHub Pages with no launch
+// params), tracking calls no-op and log locally instead of sending
+// statements with a fabricated actor.
 
 const BASE_IRI = "https://joharsingh.com/xapi/dbi/";
 
@@ -29,14 +24,10 @@ function uuidv4() {
 
 /** Normalize a launch-parameter actor into a valid xAPI 1.0.3 Agent object.
  * SCORM Cloud's `actor` launch parameter follows the older Tin Can Launch
- * shape (pre-dates the finalized xAPI 1.0 spec): `name` and `account` as
- * single-element arrays, and account fields named `accountServiceHomePage`/
- * `accountName` instead of xAPI's `homePage`/`name`. Sent verbatim, this
- * fails xAPI 1.0.3 Agent validation (the Account IFI must be a single
- * object with `homePage`/`name`) — confirmed against a real SCORM Cloud
- * launch response, 2026-08-10 (see DBI SCORM Cloud account setup task).
- * Normalize once here so every statement downstream carries a spec-valid
- * actor. */
+ * shape: `name`/`account` as single-element arrays, and account fields
+ * named `accountServiceHomePage`/`accountName` instead of xAPI's
+ * `homePage`/`name`. Sent verbatim this fails xAPI 1.0.3 Agent validation,
+ * so every statement is normalized once here. */
 function normalizeActor(raw) {
   if (!raw || typeof raw !== "object") return raw;
   const first = (v) => (Array.isArray(v) ? v[0] : v);
@@ -69,9 +60,7 @@ function readLaunchParams() {
   // SCORM Cloud's own registration ID for this launch. Statements must be
   // sent under this exact registration — the LRS endpoint/auth pair is
   // registration-scoped, and a mismatched context.registration is rejected
-  // with 403. Confirmed live, 2026-08-11 (see DBI SCORM Cloud account setup
-  // task): every statement POST failed with 403 because registrationId was
-  // previously always a locally-generated random UUID, never this value.
+  // with 403.
   const registration = params.get("registration");
   if (!endpoint || !auth) return null;
   let actor;
@@ -81,9 +70,8 @@ function readLaunchParams() {
     actor = undefined;
   }
   // SCORM Cloud returns `endpoint` with a trailing slash (e.g.
-  // ".../lrs/<key>/") — strip it so the '/statements' join below never
-  // produces a double slash. Confirmed against a real launch, 2026-08-10;
-  // the double slash was silently breaking every statement POST.
+  // ".../lrs/<key>/") — stripped so the '/statements' join below never
+  // produces a double slash.
   return { endpoint: endpoint.replace(/\/+$/, ""), authToken: auth, actor, registration };
 }
 
@@ -120,9 +108,8 @@ async function flushQueue() {
       });
       if (!res.ok) throw new Error(`xAPI send failed: ${res.status}`);
       queue.shift();
-      // Single-glance confirmation a statement actually reached the LRS —
-      // added 2026-08-10 after repeated rounds of "did it work?" that
-      // needed a Network-tab inspection to answer.
+      // Confirms a statement actually reached the LRS without needing a
+      // Network-tab inspection.
       console.info("[xapi:sent]", item.statement.verb.id.split("/").pop(), item.statement.object.id);
     } catch (err) {
       item.attempts += 1;
@@ -163,15 +150,14 @@ function baseStatement(verbId, verbDisplay, objectId, objectType, objectName) {
 /** F1 — module load, before first screen renders. Fires once per registration. */
 export function trackInitialized() {
   launchContext = readLaunchParams();
-  // Use SCORM Cloud's own registration ID when we have one (the normal
-  // launched case) so statements land under the registration the LRS auth
-  // token is actually scoped to. Only fall back to a random UUID when
-  // there's no launch context at all (local dev / unlaunched).
+  // Use SCORM Cloud's own registration ID when we have one so statements
+  // land under the registration the LRS auth token is scoped to; fall back
+  // to a random UUID only when there's no launch context at all (local dev
+  // / unlaunched).
   registrationId = launchContext?.registration ?? uuidv4();
-  // Single-glance confirmation of which mode this launch is running in —
-  // added 2026-08-10. Read this first before checking anything else: if it
-  // says "NOT found", the bug is in readLaunchParams()/the launch URL, not
-  // in the send logic below.
+  // Confirms which mode this launch is running in — check this first if
+  // something isn't sending: the bug is either in readLaunchParams()/the
+  // launch URL, or in the send logic below.
   console.info(
     "[xapi] launch context",
     launchContext ? "FOUND — sending to " + launchContext.endpoint : "NOT found — local-only mode, nothing will be sent to an LRS"
@@ -220,12 +206,10 @@ export function trackScreenCompleted(screenId, scenarioInstance, dPathway) {
 }
 
 /** F4 — hint <details> toggled open, capstone only. Fires once, first open
- * only. DEAD as of the 2026-09-07 rebuild: DBI-Learner-Copy-FINAL-2026-09-05
- * .md's capstone (Screen 12) carries no hint copy, and none is invented here
- * (not Claude's to author) — so no screen sets `data.hint` any more and
- * this never fires. Kept, not deleted: cheap to restore if a hint comes
- * back for that screen, and removing an exported tracking function is a
- * bigger, separate call. Flagged, not silently left unexplained. */
+ * only. Currently dead: no screen sets `data.hint` (the capstone carries no
+ * hint copy), so this never fires. Kept rather than removed — cheap to
+ * restore if a hint comes back, and removing an exported tracking function
+ * is a separate call from a comment cleanup. */
 export function trackHintOpened() {
   if (hintOpened) return;
   hintOpened = true;
@@ -238,12 +222,6 @@ export function trackHintOpened() {
   );
   sendStatement(stmt);
 }
-
-// F5 (reference <details> toggled open) removed 2026-09-09 — the floating
-// "5Ds" disclosure it tracked is gone (Johar: broken layout, overlapped the
-// Submit button and answer options on scenario screens). No replacement
-// statement; the xAPI spec doc's F5 entry is now stale along with the rest
-// of the pre-rebuild doc sweep already tracked as a separate task.
 
 /** F6 — learner reaches the Debrief screen. Fires once per registration.
  * result.score is intentionally absent — no scoring model is defined. */

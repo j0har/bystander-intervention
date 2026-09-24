@@ -1,10 +1,9 @@
 // scorm.js — thin SCORM-detection adapter. Mirrors completion/status only
-// through a SCORM API when one is present at runtime (e.g. the module is
+// through a SCORM API when one is present at runtime (the module is
 // launched inside a SCORM-wrapping LMS instead of taking the xAPI-first
-// path). No suspend-data / resume support — this is deliberately narrower
-// than answer-level tracking, which xAPI already covers per-choice
-// regardless of whether a SCORM API is present. Per shell architecture
-// Decision 1 addendum: reset-on-reload applies here too.
+// path). No suspend-data / resume support — narrower than xAPI's
+// answer-level tracking, which already covers per-choice detail regardless
+// of whether a SCORM API is present.
 
 const VERSIONS = ["1.2", "2004"];
 
@@ -28,13 +27,9 @@ function findAPI(win, triesLeft = 500) {
   let found = climbParents(win, triesLeft);
   if (!found.API && !found.API_1484_11 && found.opener && found.opener !== found) {
     // ADL SCORM 1.2/2004 RTE API-discovery fallback: an LMS may launch the
-    // SCO in a new browser window instead of an iframe — SCORM Cloud does
-    // exactly this. In that case window.parent is just the SCO's own
-    // window (nothing to climb), and the API instead lives somewhere in
-    // window.opener's parent chain. Confirmed required live against
-    // SCORM Cloud 2026-08-12 — without this, findAPI always returned null
-    // on that platform, regardless of whether the LMS actually exposed an
-    // API.
+    // SCO in a new browser window instead of an iframe (SCORM Cloud does
+    // this), putting the API in window.opener's parent chain instead of
+    // window.parent's.
     found = climbParents(found.opener, triesLeft);
   }
   return found.API_1484_11 ? { api: found.API_1484_11, version: "2004" }
@@ -50,9 +45,8 @@ let handle = null;
 export function scormInit() {
   const found = findAPI(window);
   if (!found) {
-    // Single-glance confirmation of which mode this launch is running in —
-    // mirrors xapi.js's launch-context log (added 2026-08-12, same
-    // rationale: read this first before checking anything else).
+    // Confirms which mode this launch is running in, mirroring xapi.js's
+    // launch-context log.
     console.info("[scorm] no SCORM API found — xAPI-only path, nothing will be mirrored to a SCORM runtime");
     handle = null;
     return false;
@@ -87,10 +81,9 @@ function setValue(name12, name2004, value) {
       handle.api.SetValue(name2004, value);
       handle.api.Commit("");
     }
-    // Single-glance confirmation a value actually reached the SCORM API —
-    // added 2026-08-12, same rationale as xapi.js's [xapi:sent] log (the
-    // prior version only logged failures, so success and untested looked
-    // identical from the console).
+    // Confirms a value actually reached the SCORM API, mirroring xapi.js's
+    // [xapi:sent] log — without it, success and untested look identical
+    // from the console.
     console.info("[scorm:sent]", handle.version === "1.2" ? name12 : name2004, "=", value);
   } catch (err) {
     console.warn("[scorm] SetValue failed", name12, err);
