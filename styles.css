@@ -304,10 +304,10 @@ summary:focus-visible {
 .intro { color: var(--color-text-secondary); }
 
 /* No shared `.card` base class — `.phase-card` is fully self-specified
-   below. A shared `.card p` rule previously outranked
-   `.phase-card__eyebrow`/`.phase-card__definition` on specificity, so text
-   under a shared base can silently pick up the wrong color; keeping
-   phase-card fully self-contained avoids that class of bug. */
+   below. A shared `.card p` rule would outrank
+   `.phase-card__eyebrow`/`.phase-card__definition` on specificity, letting
+   text under a shared base silently pick up the wrong color; staying fully
+   self-contained avoids that. */
 
 /* PhaseCardScreen (screens 5, 7, 9, 11, 13). Colour fills a full-width
    header band (~30% of the card) instead of a thin accent border, which is
@@ -432,8 +432,8 @@ summary:focus-visible {
   margin: 0 0 var(--space-4);
 }
 
-/* "When to use" / "Example" sections — a three-zone hairline rhythm
-   replaces the prior plain paragraph spacing. */
+/* "When to use" / "Example" sections use a three-zone hairline rhythm
+   instead of plain paragraph spacing, so each zone reads as its own unit. */
 .phase-card__section {
   border-top: 1px solid rgba(42, 31, 26, 0.13);
   padding-top: var(--space-3);
