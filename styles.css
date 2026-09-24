@@ -670,6 +670,7 @@ summary:focus-visible {
   flex-shrink: 0;
   width: 1.1em;
   height: 1.1em;
+  accent-color: var(--color-accent);
 }
 
 /* Answer-lock after first submit — see appShell.js/render.js. */
