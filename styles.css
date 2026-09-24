@@ -282,7 +282,11 @@ p { margin: 0 0 var(--space-3); }
    anywhere else. Corrected before merge, same PR. No background fill
    needed — the image is never cropped or letterboxed, so there's nothing
    for a fallback color to show behind. See render.js's generic
-   StatementScreen branch. */
+   StatementScreen branch.
+   2026-09-23: Screen 3 (Power Dynamics) reuses this same rule for its
+   header illustration — the discarded powerQuestions diagram had its own
+   .power-diagram rules, removed below with the diagram itself; Screen 3
+   needs no new CSS of its own. */
 /* 2026-09-15 bugfix: same missing-aspect-ratio gap as .splash-graphic
    above (see that rule's comment for the full diagnosis) — this is the
    specific image Johar caught the delay/push-down on. Remote-Team's SVG
@@ -544,78 +548,16 @@ summary:focus-visible {
 
 .closing { font-style: italic; color: var(--color-text-secondary); }
 
-/* DBI Screen 3 — Power Dynamics redesign (2026-09-15 mockup, Claude
-   Design). Two pieces: the flat-line diagram (dual-coding fix, Mayer —
-   this was the one screen in the module with no supporting visual
-   anchor; render.js's POWER_DIAGRAM_MARKUP comment has the full
-   rationale) and the two consideration cards (bold "N." text lead-in ->
-   CSS-counter numbered badge; the left-edge colour spine below is
-   unchanged from the prior build — it already matched the
-   comparison-list / phase-card__example precedent this task asked for,
-   not a new pattern). Screen 3 also drops the shared header's D-track for
-   this one screen — see appShell.js's updateProgress() and data.js's
-   hideProgressTrack flag; nothing here changes the shared header itself. */
-.power-diagram {
-  display: block;
-  width: 100%;
-  max-width: 320px;
-  margin: 0 auto var(--space-4);
-}
-
-.power-diagram svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-@media (min-width: 640px) {
-  .power-diagram { max-width: 400px; }
-}
-
-.power-diagram__label {
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  fill: var(--color-text-secondary);
-}
-
-.power-diagram__label--accent {
-  fill: var(--color-accent);
-  font-weight: 700;
-}
-
-.power-diagram__source-fill { fill: var(--color-text-secondary); }
-
-.power-diagram__target-fill { fill: none; }
-
-/* 2026-09-16 fix: was --color-text (near-black, 14.3:1 on bg) while this
-   figure's own label uses --color-text-secondary (6B5B52) — checked the
-   two circles' and labels' actual rendered coordinates (getBoundingClientRect)
-   against Johar's screenshot report of "unusual spacing/overlap" on this
-   figure only: coordinates were pixel-identical to the "you" figure, so
-   there is no layout bug. The high-contrast stroke sitting on a lower-
-   contrast label is what reads as the circle crowding its own text — the
-   "you" figure doesn't show this because its circle and label already
-   share one token (--color-accent). Matching this circle's stroke to its
-   own label (and to .power-diagram__source-fill's stroke/label pairing
-   above) removes the mismatch; still 5.8:1 on --color-bg, no contrast
-   regression (element is aria-hidden regardless). */
-.power-diagram__target-stroke--harmed { stroke: var(--color-text-secondary); }
-
-.power-diagram__target-stroke--you { stroke: var(--color-accent); }
-
-.power-diagram__arrow {
-  fill: none;
-  stroke: var(--color-accent);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-}
-
-.power-diagram__arrowhead { fill: var(--color-accent); }
-
-/* Risk assessment two-question layout (Screen 3) */
+/* Risk assessment two-question layout (Screen 3). The flat-line diagram
+   that used to sit above this block (.power-diagram and its children —
+   DBI Screen 3 — Power Dynamics redesign, 2026-09-15 mockup) is removed,
+   2026-09-23: discarded, not tweaked, on a fresh QA read that it didn't
+   communicate enough to earn the image treatment (three PRs of overlap/
+   progress-bar firefighting on it — see DBI-Component-Architecture-Spec
+   and DBI-HTML-Storyboard, Screen 3, for the fuller history). Screen 3's
+   header now uses a plain illustration via the existing .intro-
+   illustration rule above — no new CSS needed. This block (cards below)
+   is unchanged. */
 .power-questions {
   display: grid;
   grid-template-columns: 1fr;

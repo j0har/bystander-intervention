@@ -30,13 +30,20 @@
 // nothing else to update, but not deleted here (dead-asset cleanup is its
 // own backlog item, not in scope for this build). Reuses the existing
 // --color-d-* tokens for the header band/rule/eyebrow color (DBI Row 9).
+//
+// whenToUse (2026-09-23, Johar + Claude, final QA pass): all five now open
+// "When [present-tense clause]," matching the existing "When to use:"
+// field label instead of introducing a new connector — previously each
+// opened on a different word ("Useful in" / "Helpful when" / "Useful if"),
+// and Delay's was past-tense with a dropped auxiliary ("corrected sharply"
+// missing "was"). Verbatim from DBI-Learner-Copy-FINAL-2026-09-05.md.
 export const phaseCards = {
   Direct: {
     icon: "icon-5d-direct-white.svg",
     color: "var(--color-d-direct)",
     definition:
       "Calmly addressing the behaviour and drawing a clear boundary in the shared digital space.",
-    whenToUse: "When it feels safe, peer-level, and the situation is appropriate for quick course-correction.",
+    whenToUse: "When it feels safe, peer-level, and the moment calls for a quick course-correction.",
     example: "“Let’s keep our comments constructive. That message might have come across more critically than expected.”",
   },
   Distract: {
@@ -44,7 +51,7 @@ export const phaseCards = {
     color: "var(--color-d-distract)",
     definition:
       "Subtly redirecting a conversation to ease tension or interrupt harm when something feels unsafe.",
-    whenToUse: "Useful in early signs of exclusion, tension, or questionable comments in a chat or channel.",
+    whenToUse: "When there are early signs of exclusion, tension, or questionable comments in a chat or channel.",
     example: "“Let’s refocus on the project details. I think we were talking about the next steps?”",
   },
   Delegate: {
@@ -52,7 +59,7 @@ export const phaseCards = {
     color: "var(--color-d-delegate)",
     definition:
       "Bringing someone in to help address the issue appropriately, but only if the person affected wants that support brought in.",
-    whenToUse: "Helpful when the behaviour involves power imbalances, repeat issues, or impacts someone’s ability to participate.",
+    whenToUse: "When the behaviour involves power imbalances, repeat issues, or affects someone’s ability to participate.",
     example:
       "A teammate mentions that a client keeps steamrolling them on calls, and it’s starting to wear on them. You ask: “Would it help if I brought this to our team lead, or would you rather handle it your own way for now?”",
   },
@@ -61,7 +68,7 @@ export const phaseCards = {
     color: "var(--color-d-document)",
     definition: "Ask first, then help capture what happened, but only with their say in how it’s used.",
     whenToUse:
-      "Useful if a colleague may need a record later, or the situation could escalate. Ask before you start noting anything down, not after.",
+      "When a colleague may need a record later, or the situation could escalate. Ask before you start noting anything down, not after.",
     example:
       "After a tense exchange in a group chat, a colleague mentions it’s still bothering them. You ask: “Would it help if I noted what was said and when, but only if that’s something you’d want on record?”",
   },
@@ -69,7 +76,7 @@ export const phaseCards = {
     icon: "icon-5d-delay-white.svg",
     color: "var(--color-d-delay)",
     definition: "Check in privately with the person who was affected.",
-    whenToUse: "When someone withdrew, was ignored, corrected sharply, or experienced uncomfortable interactions online.",
+    whenToUse: "When someone withdraws, is ignored, is corrected sharply, or has an uncomfortable interaction online.",
     example: "“I noticed the interaction in the channel earlier and just wanted to check in. How are you doing?”",
   },
 };
@@ -241,11 +248,21 @@ export const screens = [
   // Screen 3 now renders the header exactly like Screen 2: back control +
   // title + neutral track. Copy (headline/body/powerQuestions/bodyAfter)
   // is unchanged by this correction.
+  //
+  // 2026-09-23 (Johar + Claude, discard-not-tweak): the shipped
+  // powerQuestions visual diagram (PR #16, three follow-up PRs #17-19 to
+  // fix overlap/progress-bar bugs it introduced) is replaced with a plain
+  // header illustration — same .intro-illustration pattern Screen 2 uses.
+  // Judged not meaningful enough to justify the image treatment, on a
+  // fresh QA read — not a bug fix, a scope call; three PRs of firefighting
+  // on the diagram is the data point behind it. Text content (the two
+  // power questions + closing line) is unchanged — visual-only swap.
   {
     id: 3,
     component: "StatementScreen",
     weighted: true,
     data: {
+      illustration: "Video-Conference-4--Streamline-Brooklyn.svg",
       headline: "Power Dynamics",
       body: [
         "The most appropriate response in a situation will depend on the power dynamics in the relationships present. Before you respond, consider:",
