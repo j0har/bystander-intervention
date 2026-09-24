@@ -25,7 +25,7 @@ export const phaseCards = {
     definition:
       "Calmly addressing the behaviour and drawing a clear boundary in the shared digital space.",
     whenToUse: "When it feels safe, peer-level, and the moment calls for a quick course-correction.",
-    example: "“Let’s keep our comments constructive. That message might have come across more critically than expected.”",
+    example: "“What did you mean by that?”",
   },
   Distract: {
     icon: "icon-5d-distract-white.svg",
@@ -41,8 +41,7 @@ export const phaseCards = {
     definition:
       "Bringing someone in to help address the issue appropriately, but only if the person affected wants that support brought in.",
     whenToUse: "When the behaviour involves power imbalances, repeat issues, or affects someone’s ability to participate.",
-    example:
-      "A teammate mentions that a client keeps steamrolling them on calls, and it’s starting to wear on them. You ask: “Would it help if I brought this to our team lead, or would you rather handle it your own way for now?”",
+    example: "“Would it help if I brought this to our team lead, or would you rather handle it your own way for now?”",
   },
   Document: {
     icon: "icon-5d-document-white.svg",
@@ -50,15 +49,14 @@ export const phaseCards = {
     definition: "Ask first, then help capture what happened, but only with their say in how it’s used.",
     whenToUse:
       "When a colleague may need a record later, or the situation could escalate. Ask before you start noting anything down, not after.",
-    example:
-      "After a tense exchange in a group chat, a colleague mentions it’s still bothering them. You ask: “Would it help if I noted what was said and when, but only if that’s something you’d want on record?”",
+    example: "“Would it help to have this on record? I can note down what was said and when.”",
   },
   Delay: {
     icon: "icon-5d-delay-white.svg",
     color: "var(--color-d-delay)",
     definition: "Check in privately with the person who was affected.",
     whenToUse: "When someone withdraws, is ignored, is corrected sharply, or has an uncomfortable interaction online.",
-    example: "“I noticed the interaction in the channel earlier and just wanted to check in. How are you doing?”",
+    example: "“Hey, I’m sorry I froze in the moment. I saw what happened, and I wanted to check in.”",
   },
 };
 
@@ -169,7 +167,7 @@ export const screens = [
       headline: "What is Online Bystander Intervention?",
       body: [
         "Online bystander intervention is the act of safely supporting someone who may be experiencing harm and responding in ways that maintain respect and inclusion in a digital environment.",
-        "In this 10-minute learning experience, you’ll practice applying the 5Ds of active bystander intervention. You’ll encounter workplace situations where colleagues are mistreated and you can choose actions to help.",
+        "In this 10-minute learning experience, you’ll practice applying the 5Ds of active bystander intervention. You’ll encounter workplace situations where you witness colleagues being mistreated and you can choose actions to help.",
       ],
       advanceLabel: "Continue",
     },
@@ -217,7 +215,7 @@ export const screens = [
       illustration: "scenario-1-puzzle-piece.svg",
       shortTitle: "Stereotype in the chat",
       stem:
-        "Your team has a busy Slack channel that's usually pretty active, with lots of quick back-and-forth. A colleague posts a meme with a regional stereotype. Another colleague, who's usually very active in this channel, doesn't respond. The thread moves on. They haven't posted since.",
+        "Your team has a busy Slack channel that's usually pretty active, with lots of quick back-and-forth. A colleague posts a meme with a regional stereotype. Another colleague, who's usually very active in this channel, doesn't respond. No one addresses it, and they haven't posted since.",
       question: "What's the most appropriate way to respond?",
       options: [
         {
@@ -442,7 +440,7 @@ export const screens = [
     data: {
       headline: "Debrief",
       intro: "Here is how you chose to intervene in situations where you saw someone being mistreated in an online space:",
-      closingNote: "Remember four out of the five D's are indirect approaches, and that your goal is to support the person being harassed.",
+      closingNote: "There's rarely one right response. Keep practicing choosing actions that help.",
       retryLabel: "Retry",
       exitLabel: "Exit",
       exitNote: "You can close this tab now.",
