@@ -1,9 +1,7 @@
 // render.js — component render functions. Each returns a <section> element
-// ready to mount into #app. Per Component Architecture Spec v1.4 (doc sweep
-// complete, 2026-09-07 — matches this file's actual 14-screen/5-scenario
-// behavior): one <h1> per mounted screen, native elements first, the
-// feedback panel's role="status" + aria-live="polite" is the one
-// deliberate custom-ARIA usage in the whole module.
+// ready to mount into #app. One <h1> per mounted screen, native elements
+// first — the feedback panel's role="status" + aria-live="polite" is the
+// one deliberate custom-ARIA usage in the whole module.
 
 import { phaseCards } from "./data.js";
 
@@ -22,20 +20,17 @@ export function el(tag, attrs = {}, children = []) {
   return node;
 }
 
-// Formats a baseline percentage: whole numbers with no decimal (52%),
-// everything else to one decimal place (21.3%) — matches
-// DBI-Debrief-Synthetic-Baseline-Methodology-2026-09-01.md's own display
-// convention for its worked tables.
+// Whole numbers render with no decimal (52%), everything else to one
+// decimal place (21.3%) — matches the baseline-methodology doc's own
+// display convention.
 function formatPercent(n) {
   return Number.isInteger(n) ? `${n}%` : `${n.toFixed(1)}%`;
 }
 
-// Fixed D order, matching the order the learner practises them in (screens
-// 4/5=Direct, 6/7=Distract, 8/9=Delegate, 10/11=Document, 12/13=Delay).
-// Read from phaseCards' own key order (same approach appShell.js's own
-// D_ORDER uses) rather than a second hard-coded list, so the two can't
-// drift apart. Used here only for the in-card progress track's done/not-
-// done state — see renderPhaseCardScreen below.
+// Fixed D order (screens 4/5=Direct, 6/7=Distract, 8/9=Delegate,
+// 10/11=Document, 12/13=Delay), read from phaseCards' own key order so it
+// can't drift from appShell.js's own D_ORDER. Used only for the in-card
+// progress track's done/not-done state — see renderPhaseCardScreen below.
 const D_ORDER = Object.keys(phaseCards);
 
 // ---------------------------------------------------------------------
@@ -71,12 +66,12 @@ export function renderStatementScreen(screen, ctx) {
 
   if (screen.variant === "debrief") {
     // comparisonLines is computed by appShell.js at mount time from
-    // state.selections + debriefBaselines (data.js) — not static content.
-    // Each entry is {percent, choice, situation, color, illustration} (DBI
-    // Row 14 Design pass, 2026-09-09) — the puzzle-piece art anchors each
-    // line back to the scenario it came from, and the left-edge color ties
-    // it to whichever D the pick actually mapped to (var(--color-text-
-    // secondary) for an off-framework pick, since no D token applies).
+    // state.selections + debriefBaselines (data.js), not static content.
+    // Each entry is {percent, choice, situation, color, illustration} — the
+    // puzzle-piece art anchors each line back to its scenario, and the
+    // left-edge color ties it to whichever D the pick mapped to
+    // (var(--color-text-secondary) for an off-framework pick, since no D
+    // token applies).
     const comparisonList = el(
       "ul",
       { class: "comparison-list" },
@@ -117,10 +112,10 @@ export function renderStatementScreen(screen, ctx) {
       ]
     );
 
-    // Exit swaps both buttons for a short closing note — this is a
-    // standalone page with no further screens and no save, so there's
-    // nothing else for either control to do once the learner is done.
-    // Retry resets in-memory state and restarts at Screen 1.
+    // Exit swaps both buttons for a short closing note — a standalone page
+    // with no further screens and no save, so there's nothing else for
+    // either control to do once the learner is done. Retry resets
+    // in-memory state and restarts at Screen 1.
     const actions = section.querySelector(".debrief-actions");
     ctx.onExit = () => {
       actions.innerHTML = "";
@@ -132,24 +127,13 @@ export function renderStatementScreen(screen, ctx) {
   const bodyChildren = (data.body || []).map((p) => el("p", {}, p));
 
   const children = [
-    // Screen 2's Remote-Team--Streamline-Brooklyn.svg (asset landed in PR
-    // #12, 2026-09-10, but never wired to a render path). Uses the
-    // .intro-illustration treatment (styles.css): the full, uncropped 1:1
-    // source art, width-driven and centered like .splash-graphic above but
-    // sized down so it doesn't compete with the splash hero. A same-day
-    // first attempt used object-fit: cover in a capped-height box — Johar
-    // rejected it on sight (cropped the square art into a banner shape not
-    // used anywhere else in the module); corrected before merge, same PR.
-    //
-    // Screen 3 (2026-09-23): reuses this exact same branch and pattern for
-    // Video-Conference-4--Streamline-Brooklyn.svg — the shipped
-    // powerQuestions diagram (PR #16, three follow-up PRs to fix overlap/
-    // progress-bar bugs it introduced) is discarded, not tweaked, as not
-    // communicating enough to earn the image treatment on a fresh QA read.
-    // Plain header illustration instead, no new component needed. Open
-    // build check: Screen 3 renders on the weighted (deeper-tone)
-    // background, unlike Screen 2's plain-linen-only verified version —
-    // confirm this image reads cleanly against the weighted tone.
+    // Header illustration, shared by Screens 2 and 3 (.intro-illustration,
+    // styles.css): the full, uncropped source art, width-driven and
+    // centered, sized down from .splash-graphic so it doesn't compete with
+    // the splash hero.
+    // Open item: Screen 3 renders this on the weighted (deeper-tone)
+    // background, unlike Screen 2's plain-linen background — confirm it
+    // reads cleanly there (visual check pending).
     data.illustration
       ? el("img", {
           src: `assets/illustrations/${data.illustration}`,
@@ -166,14 +150,10 @@ export function renderStatementScreen(screen, ctx) {
   ];
 
   if (data.powerQuestions) {
-    // DBI Screen 3 — Power Dynamics. Cards move off a bold "N." text
-    // lead-in to an <ol>/<li> structure: the ordered list gives assistive
-    // tech the real "1 of 2 / 2 of 2" position, and the visible numbered
-    // badge is pure CSS generated content (styles.css's counter-based
-    // .power-question::before) — decoration layered on top of real list
-    // semantics, not a second copy of the number, and the card keeps the
-    // left-edge colour-spine treatment already established by
-    // comparison-list / phase-card__example, not a third card pattern.
+    // <ol>/<li> gives assistive tech the real "1 of 2 / 2 of 2" position;
+    // the visible numbered badge is pure CSS generated content (styles.css's
+    // counter-based .power-question::before) — decoration layered on top of
+    // real list semantics, not a second copy of the number.
     const pq = el(
       "ol",
       { class: "power-questions" },
@@ -206,37 +186,15 @@ export function renderStatementScreen(screen, ctx) {
 
 // ---------------------------------------------------------------------
 // PhaseCardScreen — screens 5, 7, 9, 11, 13. One D per screen, earned
-// progressively after its scenario. "Colour field" (direction 3a), per
-// DBI-PhaseCard-3a-Final-Spec-2026-09-10.md — supersedes the Row 14
-// (2026-09-09) tinted-icon-disc treatment. Colour now fills a full-width
-// header band (icon disc + eyebrow + D name over solid --card-color)
-// instead of a 4px top border; definition/when-to-use/example sit below
-// it in a white body, separated by hairline rules instead of plain
-// paragraph spacing. DOM order is unchanged from the prior build: icon/
-// eyebrow/title first, then definition, "When to use," "Example."
-//
-// In-card progress track: the header band repeats the shared app header's
-// own 5-part D track (appShell.js's updateProgress()) — an intentional
-// echo, not a second accessible-progress affordance (resolved in the spec's
-// "Duplication question," not reopened here). Same decorative posture:
-// aria-hidden on the track container, no accessible name of its own.
-//
-// 2026-09-14 (Round 1, CSS punch list): eyebrow text changed "The 5Ds" ->
-// "5Ds Framework" (matches the splash subtitle's own phrasing instead of a
-// third variant) and its size bumped — the original 11px all-caps
-// "THE 5DS" was reading the numeral 5 close to a letter S at that size
-// (Johar's flag, confirmed against a live screenshot). Also added: a
-// visible "Card N of 5" line, folded into the same header AND into the
-// screen's own <h1> below — previously the only progress signal here was
-// two aria-hidden decorative tracks plus a hidden heading that named the D
-// but never the learner's position in the sequence.
-//
-// 2026-09-14 (Round 2, same day): the eyebrow and progress line merge into
-// one — `The Five Ds · N of 5`, rendered uppercase by styles.css's
-// .phase-card__eyebrow. See that rule's comment for the full "why one
-// line / why a middot / why spell out Five" reasoning. The screen-reader
-// <h1> below still carries "Card N of 5 earned: <D>" independently,
-// unchanged by this pass.
+// progressively after its scenario. Colour fills a full-width header band
+// (icon disc + eyebrow + D name) instead of a border, so the D identity
+// reads at a glance; definition/when-to-use/example sit below in a white
+// body, separated by hairline rules. The header's 5-part track echoes the
+// shared app-header track (appShell.js) — decorative, no accessible name
+// of its own; the screen-reader <h1> below is the real progress signal for
+// AT users. Eyebrow content is `The Five Ds · N of 5` (styles.css renders
+// it uppercase) — see that rule's comment for the middot/spelling
+// reasoning.
 export function renderPhaseCardScreen(screen, ctx) {
   const { data, id } = screen;
   const card = phaseCards[data.d];
@@ -352,33 +310,22 @@ export function renderScenarioScreen(screen, ctx) {
 
     ctx.onSubmit(id, scenarioNumber, optionId);
 
-    // Lock the answer after first submit (folded in from PR #1, Row 14,
-    // 2026-08-25/26 — that PR predates this rebuild and never merged, so
-    // its intent is rebuilt fresh here rather than merged/rebased). All
-    // radios disable and Submit hides once feedback renders, so the form
-    // can't submit again — trackAnswered() can only fire once per screen
-    // by construction, and the debrief's per-scenario selection (recorded
-    // in appShell.js state) can't be silently overwritten by a retry.
+    // Locks the answer after first submit: radios disable and Submit hides
+    // once feedback renders, so trackAnswered() fires once per screen and
+    // the debrief's recorded selection can't be overwritten by a retry.
     fieldset.querySelectorAll('input[type="radio"]').forEach((input) => {
       input.disabled = true;
     });
     submitBtn.hidden = true;
 
-    // Correctness signal (folded in from PR #1, same rationale). Three
-    // tiers, not two: `correct` (best-fit), `defensible` (final copy calls
-    // out Screen 12/B explicitly as "also defensible," not a plain miss —
-    // this is a build-time read of that copy, not new wording), and the
-    // default "worth a second look" for everything else. Text label is the
-    // real signal; color is reinforcing only.
-    //
-    // Tier labels (2026-09-23): "What worked well" -> "A good call" — the
-    // old label named a process quality, not the learner's judgment, and
-    // didn't validate the person or the choice, which was the actual ask.
-    // "A good call" makes it personal ("call" = their judgment) without
-    // overclaiming exclusivity (Screen 12 has a real "reasonable trade-off"
-    // alternate that's also legitimate — ruled out "the right call" for
-    // that reason). Full triad: A good call / A reasonable trade-off / A
-    // missed opportunity.
+    // Three feedback tiers, not two: `correct` (best-fit), `defensible`
+    // (the copy calls out an alternate as also legitimate, e.g. Screen
+    // 12/B — a build-time read of that copy, not new wording), and the
+    // default for everything else. Text label is the real signal; color is
+    // reinforcing only. Labels are phrased as the learner's own judgment
+    // ("A good call" / "A reasonable trade-off" / "A missed opportunity"),
+    // not a process quality, since more than one option can be legitimate
+    // on a given screen.
     const tierClass = option.correct ? "correct" : option.defensible ? "defensible" : "reconsider";
     const tierLabel = option.correct
       ? "A good call"
@@ -398,22 +345,13 @@ export function renderScenarioScreen(screen, ctx) {
     }
   });
 
-  // Illustration + eyebrow sit side by side (DBI Row 14 Design pass,
-  // 2026-09-09): a fixed 100px/116px square instead of the old full-width
-  // stacked treatment, which forced a scroll before the question on every
-  // scenario screen. The eyebrow is the same "Scenario N of 5" text the
-  // hidden <h1> always carried — now visible, doing double duty as the
-  // screen's accessible name (no separate hidden heading needed).
-  //
-  // Follow-up 2026-09-09: Design's mockup also carried a short per-scenario
-  // title under the eyebrow ("Interrupted in a meeting"). PR #5 shipped
-  // without it — new learner-facing copy, not Claude's to invent unasked.
-  // Titles agreed with Johar directly (not re-fetched from Design, whose
-  // mockup covered only scenario 2) and added here as data.shortTitle.
-  // Eyebrow and title are wrapped together so they stack under one flex
-  // item next to the illustration; the section's aria-labelledby below
-  // points at both ids so the accessible name reads "Scenario N of 5,
-  // <title>" rather than dropping the title for AT users.
+  // Illustration + eyebrow sit side by side in a fixed-size row instead of
+  // stacking full-width, so the question is visible without scrolling
+  // first. The eyebrow doubles as the screen's accessible name — no
+  // separate hidden heading needed. Eyebrow and title are wrapped together
+  // so they stack under one flex item next to the illustration; the
+  // section's aria-labelledby below points at both ids so the accessible
+  // name reads "Scenario N of 5, <title>" for AT users.
   const scenarioMeta = el("div", { class: "scenario-meta" }, [
     data.illustration
       ? el("img", {
@@ -450,8 +388,8 @@ export function renderScenarioScreen(screen, ctx) {
     children
   );
 
-  // Continue control appears the moment feedback renders (not gated on the
-  // keyed option — retries are unlimited, module is formative).
+  // Continue appears the moment feedback renders — not gated on the keyed
+  // option, since retries are unlimited and the module is formative.
   const continueHolder = section.querySelector(".continue-holder");
   ctx.continueShown = false;
   ctx.showContinue = () => {
