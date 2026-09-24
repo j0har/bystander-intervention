@@ -39,66 +39,6 @@ function formatPercent(n) {
 const D_ORDER = Object.keys(phaseCards);
 
 // ---------------------------------------------------------------------
-// Power Dynamics diagram (Screen 3) — DBI Screen 3 — Power Dynamics
-// redesign, 2026-09-15 Claude Design mockup. A flat-line diagram, not a
-// generic illustration: one figure (the person causing harm) with two
-// arrows fanning out to the two people whose safety depends on the
-// answer — the person harmed, and the learner. The diagram itself carries
-// the instructional content (whose safety is at stake, that there are two
-// separate people to consider) as dual-coding (Mayer) reinforcement of
-// what the two prompts below already say in words — same relationship
-// every other illustration in this module has to its surrounding text.
-// That's why the whole thing is safe to mark aria-hidden below (render
-// call site): the information is never ONLY in the image, matching this
-// module's standing convention for decorative illustrations.
-//
-// Inlined as markup (not an <img src="...svg">) so its colors are real
-// CSS custom-property references (styles.css's .power-diagram__* rules)
-// that stay in sync with the palette automatically, the same reason
-// comparison-list's colour spine reads var(--line-color) rather than a
-// baked hex — an <img>-referenced external SVG can't see the page's
-// custom properties or fonts.
-const POWER_DIAGRAM_MARKUP = `
-<svg viewBox="0 0 400 244" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <marker id="power-diagram-arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path class="power-diagram__arrowhead" d="M0,0 L10,5 L0,10 Z"></path>
-    </marker>
-  </defs>
-  <text x="200" y="16" text-anchor="middle" class="power-diagram__label">Person causing harm</text>
-  <circle cx="200" cy="44" r="13" class="power-diagram__source-fill"></circle>
-  <circle cx="200" cy="81" r="23" class="power-diagram__source-fill"></circle>
-  <path d="M185,101 L110,159" class="power-diagram__arrow" marker-end="url(#power-diagram-arrowhead)"></path>
-  <path d="M215,101 L290,159" class="power-diagram__arrow" marker-end="url(#power-diagram-arrowhead)"></path>
-  <circle cx="95" cy="175" r="11" stroke-width="2.5" class="power-diagram__target-fill power-diagram__target-stroke--harmed"></circle>
-  <circle cx="95" cy="202" r="19" stroke-width="2.5" class="power-diagram__target-fill power-diagram__target-stroke--harmed"></circle>
-  <text x="95" y="237" text-anchor="middle" class="power-diagram__label">Person harmed</text>
-  <circle cx="305" cy="175" r="11" stroke-width="2.5" class="power-diagram__target-fill power-diagram__target-stroke--you"></circle>
-  <circle cx="305" cy="202" r="19" stroke-width="2.5" class="power-diagram__target-fill power-diagram__target-stroke--you"></circle>
-  <text x="305" y="237" text-anchor="middle" class="power-diagram__label power-diagram__label--accent">You</text>
-</svg>`;
-// 2026-09-16 real fix (PR #17's stroke-color fix was real but insufficient
-// — Johar caught this on the live site, correctly, after that merge):
-// checked getBoundingClientRect() in the sandbox and concluded "no bug"
-// because it only compares the two label elements' full em-box against
-// each other, and those matched. That was the wrong check. getBBox() —
-// the actual glyph ink extent — tells a different story: at y="230" these
-// labels' ink top sits at 218.75 SVG units while the circle above them
-// bottoms out at 221 (cy 202 + r 19) — the text was rendering 2.25 units
-// INTO the circle, for both figures identically (confirmed on the live
-// site with real DM Sans loaded, not the sandbox's blocked-font fallback,
-// which has different cap-height metrics and happened to hide this).
-// y="237" moves the baseline down 7 units, giving genuine ~4.75-unit
-// clearance (getBBox top 225.75 vs circle bottom 221) with room to spare
-// before the viewBox's own 244-unit floor (new bbBottom 240.75). Verified
-// by live-patching the deployed DOM and screenshotting before writing
-// this, not by recomputing on paper.
-
-function buildPowerDiagram() {
-  return el("div", { class: "power-diagram", "aria-hidden": "true", html: POWER_DIAGRAM_MARKUP });
-}
-
-// ---------------------------------------------------------------------
 // StatementScreen — screens 1, 2, 3, and the debrief variant (14)
 // ---------------------------------------------------------------------
 export function renderStatementScreen(screen, ctx) {
@@ -200,6 +140,16 @@ export function renderStatementScreen(screen, ctx) {
     // first attempt used object-fit: cover in a capped-height box — Johar
     // rejected it on sight (cropped the square art into a banner shape not
     // used anywhere else in the module); corrected before merge, same PR.
+    //
+    // Screen 3 (2026-09-23): reuses this exact same branch and pattern for
+    // Video-Conference-4--Streamline-Brooklyn.svg — the shipped
+    // powerQuestions diagram (PR #16, three follow-up PRs to fix overlap/
+    // progress-bar bugs it introduced) is discarded, not tweaked, as not
+    // communicating enough to earn the image treatment on a fresh QA read.
+    // Plain header illustration instead, no new component needed. Open
+    // build check: Screen 3 renders on the weighted (deeper-tone)
+    // background, unlike Screen 2's plain-linen-only verified version —
+    // confirm this image reads cleanly against the weighted tone.
     data.illustration
       ? el("img", {
           src: `assets/illustrations/${data.illustration}`,
@@ -216,17 +166,14 @@ export function renderStatementScreen(screen, ctx) {
   ];
 
   if (data.powerQuestions) {
-    // DBI Screen 3 — Power Dynamics redesign, 2026-09-15. The diagram
-    // (built above) sits between the intro paragraph and the two
-    // consideration cards, per the mockup. Cards move off a bold "N."
-    // text lead-in to an <ol>/<li> structure: the ordered list gives
-    // assistive tech the real "1 of 2 / 2 of 2" position, and the visible
-    // numbered badge is pure CSS generated content (styles.css's
-    // counter-based .power-question::before) — decoration layered on top
-    // of real list semantics, not a second copy of the number, and the
-    // card keeps the left-edge colour-spine treatment already established
-    // by comparison-list / phase-card__example, not a third card pattern.
-    children.push(buildPowerDiagram());
+    // DBI Screen 3 — Power Dynamics. Cards move off a bold "N." text
+    // lead-in to an <ol>/<li> structure: the ordered list gives assistive
+    // tech the real "1 of 2 / 2 of 2" position, and the visible numbered
+    // badge is pure CSS generated content (styles.css's counter-based
+    // .power-question::before) — decoration layered on top of real list
+    // semantics, not a second copy of the number, and the card keeps the
+    // left-edge colour-spine treatment already established by
+    // comparison-list / phase-card__example, not a third card pattern.
     const pq = el(
       "ol",
       { class: "power-questions" },
@@ -423,9 +370,18 @@ export function renderScenarioScreen(screen, ctx) {
     // this is a build-time read of that copy, not new wording), and the
     // default "worth a second look" for everything else. Text label is the
     // real signal; color is reinforcing only.
+    //
+    // Tier labels (2026-09-23): "What worked well" -> "A good call" — the
+    // old label named a process quality, not the learner's judgment, and
+    // didn't validate the person or the choice, which was the actual ask.
+    // "A good call" makes it personal ("call" = their judgment) without
+    // overclaiming exclusivity (Screen 12 has a real "reasonable trade-off"
+    // alternate that's also legitimate — ruled out "the right call" for
+    // that reason). Full triad: A good call / A reasonable trade-off / A
+    // missed opportunity.
     const tierClass = option.correct ? "correct" : option.defensible ? "defensible" : "reconsider";
     const tierLabel = option.correct
-      ? "What worked well"
+      ? "A good call"
       : option.defensible
       ? "A reasonable trade-off"
       : "A missed opportunity";
