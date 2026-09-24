@@ -1,42 +1,23 @@
-// data.js — screen content, single ordered array. Screen numbering here is
-// the CANONICAL 1–14 scheme from DBI-Learner-Copy-FINAL-2026-09-05.md (five
-// assessed scenarios, each immediately followed by the phase-transition
-// card for the D it tests). This replaces the prior 1–11/7-scenario/scored
-// scheme entirely — see "DBI code rebuild — scoring model and 5-scenario
-// restructure" (task card) for the full rationale. Source docs (storyboard
-// v1.2, component spec v1.3, xAPI spec v1.1) still describe the OLD scheme
-// as of this rebuild — their sweep is the next task, not done here.
+// data.js — screen content, single ordered array. Screen numbering (1-14)
+// covers five assessed scenarios, each followed by the phase-transition
+// card for the D it tests.
 //
-// Scoring-model note: there is no criterion-referenced pass/fail anywhere in
-// this module, for the learner or the org — never was, in the shipped
-// build. The old `scored` boolean is dropped, not renamed: once every
-// remaining scenario screen is uniformly diagnostic (no more "taught, not
-// scored" screens survive the cut), the field no longer distinguishes
-// anything. `hardFailOptions` is renamed `flagOptions` — the underlying
-// signal (an option that hands a decision to authority without the
-// affected person's consent, per the FDD's A6 error patterns) is kept,
-// internal/xAPI-only, never learner-visible — Johar's call, 2026-09-07.
+// No criterion-referenced pass/fail anywhere in this module, for the
+// learner or the org. `flagOptions` records whether a flagged option (one
+// that hands a decision to authority without the affected person's
+// consent, per the FDD's A6 error patterns) was ever selected —
+// internal/xAPI-only, never learner-visible.
 
 // Phase-transition card content — one card per D, revealed progressively as
-// the learner completes each scenario. Wording is verbatim from
-// DBI-Learner-Copy-FINAL-2026-09-05.md / DBI-5Ds-Content-Reconciliation-
-// 2026-09-03.md (system-of-record for sourcing) — not Claude's to author.
-// Icon set switched to the "-white" variants (DBI PhaseCard 3a build,
-// DBI-PhaseCard-3a-Final-Spec-2026-09-10.md) — the card's icon disc is now
-// a full-colour header band (--card-color) rather than a lightly-tinted
-// disc, so the glyph itself needs to read against solid colour, not a
-// tint. The "-tinted" set (DBI Row 14, 2026-09-09) stays in the repo,
-// unused by this component now — no other screen referenced it either, so
-// nothing else to update, but not deleted here (dead-asset cleanup is its
-// own backlog item, not in scope for this build). Reuses the existing
-// --color-d-* tokens for the header band/rule/eyebrow color (DBI Row 9).
+// the learner completes each scenario. Wording is verbatim from the
+// learner-copy source doc, not Claude's to author. Icon set uses the
+// "-white" variants: the card's icon disc is a full-colour header band
+// (--card-color), so the glyph needs to read against solid colour, not a
+// tint.
 //
-// whenToUse (2026-09-23, Johar + Claude, final QA pass): all five now open
-// "When [present-tense clause]," matching the existing "When to use:"
-// field label instead of introducing a new connector — previously each
-// opened on a different word ("Useful in" / "Helpful when" / "Useful if"),
-// and Delay's was past-tense with a dropped auxiliary ("corrected sharply"
-// missing "was"). Verbatim from DBI-Learner-Copy-FINAL-2026-09-05.md.
+// whenToUse: every entry opens with "When [present-tense clause]," matching
+// the "When to use" field label below it, for consistency across all five
+// cards.
 export const phaseCards = {
   Direct: {
     icon: "icon-5d-direct-white.svg",
@@ -82,12 +63,8 @@ export const phaseCards = {
 };
 
 // Which D (or "off-framework") each option maps to, for the xAPI dPathway
-// extension (F3 / completed statements). Not supplied by any source doc for
-// any screen — populated here at build time, same practice as the prior
-// scheme (see git history) — internal xAPI metadata only, invisible to
-// learners. Rebuilt against the new 1–14 ids and the final option sets
-// (Screen 8's Delegate scenario dropped its 4th option in the final copy;
-// Screen 12 is the unchanged capstone).
+// extension (F3 / completed statements). Internal xAPI metadata only,
+// invisible to learners.
 export const dPathwayMap = {
   4: { A: "Direct", B: "Delay", C: "off-framework" },
   6: { A: "Direct", B: "Distract", C: "Delay" },
@@ -97,18 +74,9 @@ export const dPathwayMap = {
 };
 
 // Synthetic baseline percentages for the debrief's "You and X% of people
-// chose to..." comparison line — per
-// DBI-Debrief-Synthetic-Baseline-Methodology-2026-09-01.md (method, persona
-// set, and 0.8-adherence formula all Johar-approved/closed 2026-09-06).
-// Screens 4/6/12 reuse that doc's own worked numbers unchanged (their option
-// sets didn't change in the final copy). Screens 8 and 10 are RECOMPUTED
-// here, not reused: Screen 8's final copy dropped a 4th option (the old
-// "forward to HR immediately" distractor never made it into
-// DBI-Learner-Copy-FINAL-2026-09-05.md), and Screen 10 is new content
-// entirely (the old responder-risk item, rewritten to test Document) — see
-// prototype-build-note.md's 2026-09-07 entry for both worked calculations.
-// `choice` text reflects Johar's finalized copy — see DBI Debrief
-// Comparison-Line Copy Audit (2026-09-09, locked 2026-09-14).
+// chose to..." comparison line, per the baseline-methodology doc (persona
+// set + 0.8-adherence formula). `choice` text reflects the finalized copy
+// for each option.
 // Formula: percentage = [k×0.8 + (5−k)×(0.2/(m−1))] / 5, k = personas
 // picking that option (of 5), m = option count on that screen.
 export const debriefBaselines = {
@@ -128,11 +96,10 @@ export const debriefBaselines = {
       C: { percent: 24.0, choice: "send a message after the meeting" },
     },
   },
-  // RECOMPUTED 2026-09-07 — final copy has 3 options (A/B/C), not the 4 the
-  // methodology doc's worked table assumed. Votes: Names it→A (1), Escalates
-  // to authority→defaults to best-fit, no authority option exists (C),
-  // Keeps it private→C (1), Weighs exposure→defaults, F4 Low (C), Applies
-  // framework→C (C). k(A)=1, k(B)=0, k(C)=4, m=3.
+  // Votes behind the percentages above (of 5 personas): Names it→A (1),
+  // Escalates to authority→C (no authority option exists, defaults to
+  // best-fit), Keeps it private→C (1), Weighs exposure→C (defaults, F4
+  // Low), Applies framework→C (1). k(A)=1, k(B)=0, k(C)=4, m=3.
   8: {
     situation: "a senior manager’s correction went out reply-all, CC’d to directors",
     options: {
@@ -141,12 +108,11 @@ export const debriefBaselines = {
       C: { percent: 66.0, choice: "check in with your colleague privately" },
     },
   },
-  // NEW 2026-09-07 — first run against final copy (new stem/options, no
-  // prior worked table exists). Votes: Names it→D (most direct/confrontational,
-  // even unsafe) (1), Escalates to authority→A (routes to their manager) (1),
-  // Keeps it private→B (stays contained, no third party) (1), Weighs
-  // exposure→defaults, F4 Low here (B) (1), Applies framework→B (best fit)
-  // (1). k(A)=1, k(B)=3, k(C)=0, k(D)=1, m=4.
+  // Votes behind the percentages above (of 5 personas): Names it→D (most
+  // direct/confrontational, even unsafe), Escalates to authority→A (routes
+  // to their manager), Keeps it private→B (stays contained, no third
+  // party), Weighs exposure→B (defaults, F4 Low here), Applies
+  // framework→B (best fit). k(A)=1, k(B)=3, k(C)=0, k(D)=1, m=4.
   10: {
     situation: "a colleague disclosed a recurring comment about their accent",
     options: {
@@ -180,11 +146,8 @@ export const screens = [
       illustration: "Diverse-Team--Streamline-Brooklyn.svg",
       headline: "Online Bystander Intervention",
       subtitle: "Practicing the 5Ds Framework",
-      // No caption. There is no "your progress isn't saved" warning anywhere
-      // in this module, on any screen — Johar's standing preference,
-      // reaffirmed 2026-09-07 (not an open gap, not deferred to Screen 2 or
-      // anywhere else; an earlier draft of this rebuild framed it as a gap
-      // to resolve, which was a misreading).
+      // No "your progress isn't saved" warning anywhere in this module, on
+      // any screen — a deliberate scope call, not a gap.
       advanceLabel: "Start",
     },
   },
@@ -193,40 +156,17 @@ export const screens = [
   {
     id: 2,
     component: "StatementScreen",
-    // 2026-09-15: was false — the only non-splash screen still sitting on
-    // plain --color-bg once Screens 3/4/6/8/10/12/14 all picked up the
-    // weighted treatment (see task card history). No principled reason for
-    // Screen 2 alone to keep the unanchored header gap; nothing on this
-    // screen renders --color-accent as text (checked render.js — h1,
-    // .screen__body p, and .btn-continue are all safe on the darker
-    // background, unlike .scenario-eyebrow/.validation-message on scenario
-    // screens), so this is a pure consistency fix with no contrast fallout.
+    // weighted: true so the header band renders consistently with the
+    // other non-splash screens — h1/.screen__body p/.btn-continue are all
+    // safe as text on the darker background here (unlike
+    // .scenario-eyebrow/.validation-message on scenario screens).
     weighted: true,
     data: {
-      // Wired 2026-09-13 — asset landed via PR #12 (2026-09-10) but was
-      // never connected to any render path. Renders via .intro-illustration
-      // (styles.css): the full, uncropped 1:1 source art, width-driven and
-      // centered like .splash-graphic but sized down so it doesn't compete
-      // with the splash hero. Replaces a same-day first attempt
-      // (.hero-graphic, object-fit: cover in a capped-height box) that
-      // Johar rejected on sight — it cropped the square source art into a
-      // banner shape not used anywhere else in the module, and was never
-      // checked with him before being treated as settled. Corrected same
-      // day, same PR, before merge.
+      // Renders via .intro-illustration (styles.css): full, uncropped 1:1
+      // source art, width-driven and centered, sized down from the splash
+      // hero so it doesn't compete with it.
       illustration: "Remote-Team--Streamline-Brooklyn.svg",
       headline: "What is Online Bystander Intervention?",
-      // Copy cut 2026-09-13 (Johar's own edit, in his ongoing "tighten the
-      // copy" pass — DBI-Learner-Copy-FINAL-2026-09-05.md is not treated as
-      // frozen just because it's named FINAL). Dropped the original opening
-      // paragraph ("Most of our collaboration now happens online...") as
-      // throat-clearing the headline question already covers. Second
-      // paragraph gains "in a digital environment" so it still reads as a
-      // complete definition on its own now that the first paragraph's
-      // "these environments" framing is gone. Third paragraph tightened:
-      // "the 5Ds of active bystander intervention," "workplace situations"
-      // (not "familiar"), "you can choose actions to help" (not "you have
-      // an opportunity to"). DBI-Learner-Copy-FINAL-2026-09-05.md and
-      // DBI-HTML-Storyboard-v2.0.md swept to match in the same edit.
       body: [
         "Online bystander intervention is the act of safely supporting someone who may be experiencing harm and responding in ways that maintain respect and inclusion in a digital environment.",
         "In this 10-minute learning experience, you’ll practice applying the 5Ds of active bystander intervention. You’ll encounter workplace situations where colleagues are mistreated and you can choose actions to help.",
@@ -236,27 +176,10 @@ export const screens = [
   },
 
   // ---- Screen 3 — Power Dynamics -----------------------------------------
-  // Correction 2026-09-16: hideProgressTrack (added 2026-09-15) is REMOVED.
-  // Its own rationale — "sits before the first scenario, isn't one of the
-  // five scored/assessed steps" — applies equally to Screen 2 (intro),
-  // which never got the exception and has rendered the neutral track
-  // without issue the whole time (currentDIndex() returns null for any
-  // StatementScreen, scored or not, so the track was always fully
-  // unfilled here regardless of this flag — it hid a segment state that
-  // could never have been anything but neutral). Singling out Screen 3
-  // was inconsistent and, per Johar 2026-09-16, indefensible as shipped.
-  // Screen 3 now renders the header exactly like Screen 2: back control +
-  // title + neutral track. Copy (headline/body/powerQuestions/bodyAfter)
-  // is unchanged by this correction.
-  //
-  // 2026-09-23 (Johar + Claude, discard-not-tweak): the shipped
-  // powerQuestions visual diagram (PR #16, three follow-up PRs #17-19 to
-  // fix overlap/progress-bar bugs it introduced) is replaced with a plain
-  // header illustration — same .intro-illustration pattern Screen 2 uses.
-  // Judged not meaningful enough to justify the image treatment, on a
-  // fresh QA read — not a bug fix, a scope call; three PRs of firefighting
-  // on the diagram is the data point behind it. Text content (the two
-  // power questions + closing line) is unchanged — visual-only swap.
+  // Renders the header like Screen 2: back control + title + neutral track
+  // — StatementScreen's currentDIndex() returns null for this screen, so
+  // the track is always unfilled, no special-casing needed. Uses the same
+  // .intro-illustration pattern as Screen 2's header image.
   {
     id: 3,
     component: "StatementScreen",
@@ -274,10 +197,9 @@ export const screens = [
       bodyAfter: [
         "These two questions shape whether an action could make things worse for the person being harmed or become less safe for you. It’s always a good idea to check in with the target before taking any action that involves documenting or reporting the incident.",
       ],
-      // FLAG: DBI-Learner-Copy-FINAL-2026-09-05.md's Screen 3 text doesn't
-      // show an explicit [Continue] bracket the way Screens 1/2 do — kept
-      // here as a reasonable default (every non-terminal screen needs an
-      // advance control) rather than a content decision.
+      // No explicit [Continue] bracket for this screen in the learner-copy
+      // source doc — kept as a reasonable default, since every
+      // non-terminal screen needs an advance control.
       advanceLabel: "Continue",
     },
   },
@@ -289,7 +211,7 @@ export const screens = [
     weighted: true,
     scenarioNumber: 1,
     // Escalating the target's situation to a manager without asking first —
-    // same error pattern as the old scheme's Screen 4/C (FDD A6: E4/E6).
+    // flagged per the FDD's A6 error pattern (E4/E6).
     flagOptions: ["C"],
     data: {
       illustration: "scenario-1-puzzle-piece.svg",
@@ -371,12 +293,8 @@ export const screens = [
     component: "ScenarioScreen",
     weighted: true,
     scenarioNumber: 3,
-    // NOTE: the old scheme flagged this scenario's 4th option ("forward to
-    // HR immediately") as a hard-fail instance. That option does not exist
-    // in the final copy (3 options only, A/B/C) — none of the three is an
-    // unconsented escalation-to-authority move, so this scenario carries no
-    // flagOptions now. Net flagged-scenario count is unchanged (moved to
-    // Screen 10 below) — surfaced here, not silently dropped.
+    // None of the three options here is an unconsented escalation-to-
+    // authority move, so this scenario carries no flagOptions.
     data: {
       illustration: "scenario-3-puzzle-piece.svg",
       shortTitle: "Corrected in front of everyone",
@@ -417,9 +335,8 @@ export const screens = [
     component: "ScenarioScreen",
     weighted: true,
     scenarioNumber: 4,
-    // Escalating to the target's manager without asking first — same
-    // pattern as Screen 4/C above (FDD A6: E4/E6). This is the item that
-    // carried the flag in the old scheme (there, Screen 7/D).
+    // Escalating to the target's manager without asking first — same FDD
+    // A6 pattern as Screen 4/C above.
     flagOptions: ["A"],
     data: {
       illustration: "scenario-4-puzzle-piece.svg",
@@ -483,10 +400,10 @@ export const screens = [
         },
         {
           id: "B",
-          // Not a plain miss — the final copy explicitly calls this
-          // "also defensible," distinct from C/D's outright critique.
-          // Rendered with its own signal tier (render.js), not folded into
-          // either "best-fit" or "worth a second look."
+          // Not a plain miss — the copy explicitly calls this "also
+          // defensible," distinct from C/D's outright critique. Gets its
+          // own feedback tier (render.js), not folded into "best-fit" or
+          // "worth a second look."
           defensible: true,
           text: "Redirect to the agenda, then check in with them privately.",
           feedback:
@@ -514,13 +431,9 @@ export const screens = [
 
   // ---- Screen 14 — Debrief ------------------------------------------------
   // Comparison lines are computed at mount time by appShell.js from
-  // state.selections + debriefBaselines above — not static here. The old
-  // reflection-prompt/implementation-intention/textarea block is DROPPED,
-  // not carried forward: DBI-Learner-Copy-FINAL-2026-09-05.md's own Screen
-  // 14 content doesn't include it, and its survival was explicitly flagged
-  // there as unresolved until this rebuild — Johar confirmed 2026-09-07 the
-  // drop is permanent, not pending, and the copy doc has been updated to
-  // match (no more "open" framing there).
+  // state.selections + debriefBaselines above, not static here. No
+  // reflection-prompt/textarea block — the learner-copy source doc doesn't
+  // include one for this screen.
   {
     id: 14,
     component: "StatementScreen",
