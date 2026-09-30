@@ -1,29 +1,23 @@
-/* ==========================================================================
-   Digital Bystander Intervention — styles.css
-   Design tokens per DBI-Visual-Design-Brief-v1_2.md (hex values only —
-   spacing scale is not specified upstream; established here at build time).
-   ========================================================================== */
-
 :root {
-  /* Color */
-  --color-bg: #F6F1EB;            /* warm linen — default background */
-  --color-bg-weighted: #EDE5DA;   /* deeper warm neutral — weighted sections */
-  --color-accent: #A0596A;        /* muted rose-plum — primary accent / Direct */
-  --color-text: #2A1F1A;          /* warm near-black */
-  --color-text-secondary: #6B5B52;/* warm mid-brown */
+  --color-bg: #F6F1EB;
+  --color-bg-weighted: #EDE5DA;
+  --color-accent: #A0596A;        /* also the Direct token */
+  --color-text: #2A1F1A;
+  --color-text-secondary: #6B5B52;
   --color-surface: #FFFFFF;
 
-  --color-d-distract: #916339;  /* 4.62:1 on #F6F1EB — WCAG AA text contrast */
-  --color-d-delegate: #627066;  /* 4.63:1 on #F6F1EB — WCAG AA text contrast */
-  --color-d-document: #776498;  /* 4.60:1 on #F6F1EB — WCAG AA text contrast */
-  --color-d-delay: #796A5B;  /* 4.63:1 on #F6F1EB — WCAG AA text contrast */
-  --color-d-direct: #A0596A;  /* 4.53:1 on #F6F1EB — WCAG AA text contrast */
+  /* D tokens must stay at 4.5:1 or better as text on --color-bg;
+     --color-d-direct is 4.53:1, with almost no margin. */
+  --color-d-distract: #916339;
+  --color-d-delegate: #627066;
+  --color-d-document: #776498;
+  --color-d-delay: #796A5B;
+  --color-d-direct: #A0596A;
 
-  /* Type */
   --font-heading: "Fraunces", Georgia, serif;
   --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
 
-  /* Spacing scale — not specified upstream; 8px base establishing our own */
+  /* 8px-based spacing scale */
   --space-1: 0.5rem;
   --space-2: 0.75rem;
   --space-3: 1rem;
@@ -65,7 +59,6 @@ h2 { font-size: 1.25rem; }
 
 p { margin: 0 0 var(--space-3); }
 
-/* Skip link */
 .skip-link {
   position: absolute;
   left: -999px;
@@ -80,15 +73,10 @@ p { margin: 0 0 var(--space-3); }
   left: 0;
 }
 
-/* Persistent header (#progress): a back arrow (when there's somewhere to
-   go back to) sharing a row with a static module title, plus the
-   five-part practice track below. A weighted background band
-   (--color-bg-weighted, same token .screen--weighted uses) separates the
-   header from the white screen card beneath it. Stays decorative/
-   aria-hidden on the container — see appShell.js's updateProgress()
-   comment on why a screen-reader-facing progress affordance is a
-   deliberate follow-up, not bundled in here. Cleared to empty on the
-   splash screen. */
+/* Persistent header (#progress): back arrow and static title in one row,
+   five-part track below, on a weighted band that separates it from the
+   screen card. Title and track are aria-hidden; the back button stays
+   exposed. Screen readers get position from each screen's h1. */
 .progress-indicator {
   max-width: var(--max-width);
   margin: 0 auto var(--space-3);
@@ -97,9 +85,8 @@ p { margin: 0 0 var(--space-3); }
   padding: var(--space-2) var(--space-3) var(--space-3);
 }
 
-/* appShell.js sets textContent = "" on the splash screen — without this,
-   the empty container shows as an orphan shaded bar instead of
-   disappearing. */
+/* The container is empty on the splash screen; without this it shows as an
+   orphan shaded bar. */
 .progress-indicator:empty {
   background: none;
   padding: 0;
@@ -175,7 +162,6 @@ p { margin: 0 0 var(--space-3); }
   background: var(--part-color, var(--color-accent));
 }
 
-/* App shell / screen container */
 #app {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -195,9 +181,8 @@ p { margin: 0 0 var(--space-3); }
 
 .screen__body p { margin-bottom: var(--space-3); }
 
-/* Splash screen (Screen 1): illustration is width-driven (not a fixed
-   height cap) so it reads as a substantial image rather than a small one
-   with excess surrounding white space; headline sized to match. */
+/* Splash: the illustration is width-driven, not height-capped, so it reads
+   as a substantial image. */
 .screen--splash {
   display: flex;
   flex-direction: column;
@@ -207,12 +192,8 @@ p { margin: 0 0 var(--space-3); }
   padding-bottom: var(--space-5);
 }
 
-/* aspect-ratio: 1/1 reserves the image's box immediately from CSS alone,
-   before the image is requested — without it, width is percentage-driven
-   but height is auto, so the browser can't reserve vertical space until
-   the SVG loads, and content visibly jumps into place. Safe here only
-   because the source SVG is confirmed natively 400x400 (square
-   viewBox/width/height). */
+/* aspect-ratio reserves the image's box before the SVG loads, so content
+   doesn't jump; valid because the source SVG is square (400x400). */
 .splash-graphic {
   width: 100%;
   max-width: min(320px, 88vw);
@@ -250,13 +231,9 @@ p { margin: 0 0 var(--space-3); }
 
 .screen__body strong { font-weight: 500; color: var(--color-text); }
 
-/* Screen 2/3 header illustration: full, uncropped rendering of the 1:1
-   source art, width-driven and centered like .splash-graphic but capped
-   smaller. No background fill needed — the image is never cropped or
-   letterboxed. Screen 3 reuses this same rule for its own header
-   illustration; it needs no CSS of its own.
-   aspect-ratio: 1/1 avoids the same load-shift gap as .splash-graphic
-   above. Remote-Team's SVG is confirmed natively 400x400 square. */
+/* Header illustration: full, uncropped square art, width-driven and
+   centered like .splash-graphic but capped smaller. aspect-ratio reserves
+   its box to avoid layout shift. */
 .intro-illustration {
   display: block;
   width: 100%;
@@ -270,7 +247,6 @@ p { margin: 0 0 var(--space-3); }
   .intro-illustration { max-width: 280px; }
 }
 
-/* Buttons */
 .btn-continue,
 .btn-submit {
   font-family: var(--font-body);
@@ -300,21 +276,11 @@ summary:focus-visible {
   outline-offset: 2px;
 }
 
-/* Card grid (Screen 2) */
 .intro { color: var(--color-text-secondary); }
 
-/* No shared `.card` base class — `.phase-card` is fully self-specified
-   below. A shared `.card p` rule would outrank
-   `.phase-card__eyebrow`/`.phase-card__definition` on specificity, letting
-   text under a shared base silently pick up the wrong color; staying fully
-   self-contained avoids that. */
-
-/* PhaseCardScreen (screens 5, 7, 9, 11, 13). Colour fills a full-width
-   header band (~30% of the card) instead of a thin accent border, which is
-   what changes the card's silhouette rather than just its decoration. DOM
-   order: icon/eyebrow/title in the header band, definition/when-to-use/
-   example below in a white body (render.js). Fully self-specified root —
-   no shared `.card` base (see note above). */
+/* No shared `.card` base: a shared `.card p` rule would outrank
+   `.phase-card__eyebrow` and `.phase-card__definition` on specificity, so
+   `.phase-card` is fully self-specified. */
 /* Negative top margin cancels #app's own padding-top, then the card's own
    floating design (drop shadow) provides the visual gap — matches the
    16px header-to-content gap that .screen--weighted screens get via the
@@ -340,12 +306,8 @@ summary:focus-visible {
   padding: var(--space-4) var(--space-4) var(--space-5);
 }
 
-/* In-card progress track — echoes the shared app header's own 5-part D
-   track (.app-header__track / appShell.js's updateProgress()) inside this
-   card's header band. Intentional duplication, not pursued for
-   differentiation. Decorative: aria-hidden on the container in render.js,
-   no accessible name of its own — the screen's own <h1> (visually hidden)
-   is the real progress signal for AT users. */
+/* Decorative and aria-hidden; the screen's visually hidden <h1> is the
+   progress signal for assistive tech. */
 .phase-card__track {
   display: flex;
   gap: 6px;
@@ -390,17 +352,9 @@ summary:focus-visible {
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.12em;
-  /* Full-opacity white (not a translucent white on the D-colour band)
-     clears the 4.5:1 WCAG AA floor on all five D tokens — checked with a
-     contrast script, not by eye; a translucent white failed on all five.
-     Hierarchy comes from size/uppercase/tracking alone, so no per-token
-     recheck is needed if a D hex ever changes.
-     Content is `The Five Ds · N of 5` (render.js), rendered uppercase
-     here. Middot, not an em dash or hyphen, per the module's
-     no-em-dash-in-learner-copy rule. "Five" is spelled out rather than
-     "5Ds" — a bare digit next to the "N OF 5" position number risks a
-     digit/letter misread. The screen-reader-only <h1> below (render.js)
-     carries "Card N of 5 earned: <D>" independently. */
+  /* Opaque white: translucent white fails 4.5:1 on the D-color band. Size,
+     case and tracking carry the hierarchy, so a changed D hex needs no
+     recheck. */
   color: #fff;
   margin: 0 0 0.25rem;
 }
@@ -416,8 +370,7 @@ summary:focus-visible {
 .phase-card__body {
   background: var(--color-surface);
   padding: var(--space-4) var(--space-4) var(--space-5);
-  /* Seam where the white body meets the colour header band — spec calls
-     for this instead of a hard edge. */
+  /* Hairline seam between the header band and the white body. */
   box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.06);
 }
 
@@ -426,14 +379,10 @@ summary:focus-visible {
   font-weight: 500;
   font-size: 1.3125rem;
   line-height: 1.3;
-  /* Full-strength text colour, not the secondary tone — this is the
-     card's primary content. */
   color: var(--color-text);
   margin: 0 0 var(--space-4);
 }
 
-/* "When to use" / "Example" sections use a three-zone hairline rhythm
-   instead of plain paragraph spacing, so each zone reads as its own unit. */
 .phase-card__section {
   border-top: 1px solid rgba(42, 31, 26, 0.13);
   padding-top: var(--space-3);
@@ -478,9 +427,6 @@ summary:focus-visible {
 
 .closing { font-style: italic; color: var(--color-text-secondary); }
 
-/* Risk assessment two-question layout (Screen 3). Header uses a plain
-   illustration via .intro-illustration above — no diagram-specific CSS
-   needed for this screen. */
 .power-questions {
   display: grid;
   grid-template-columns: 1fr;
@@ -522,10 +468,8 @@ summary:focus-visible {
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 0.875rem;
-  /* axe-core's color-contrast rule doesn't reliably evaluate ::before
-     generated-content text, so this was checked by hand: --color-accent on
-     this 14% tint measures 4.24:1 (fails the 4.5:1 AA floor); #935262 on
-     the same tint measures 4.83:1. */
+  /* axe skips ::before generated text, so contrast is checked by hand:
+     --color-accent is 4.24:1 on this tint, #935262 is 4.83:1. */
   color: #935262;
   background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
 }
@@ -539,32 +483,17 @@ summary:focus-visible {
   margin-bottom: var(--space-2);
 }
 
-/* Scenario illustration + eyebrow (screens 4/6/8/10/12): a fixed square
-   sits in a row with the "Scenario N of 5" eyebrow, which doubles as the
-   screen's <h1> (render.js). Sizes: 124px illustration/22px title/13px
-   eyebrow at base width, 140px illustration at 640px+ — chosen so the
-   illustration and title compete for the same fixed-width row without
-   forcing a 3-line title wrap at mobile widths (measured against all 5
-   shortTitle strings; the container's max-width caps the row the same way
-   from 640px up, so no further step is needed past that). */
+/* The scenario illustration and eyebrow share one row of set size; the eyebrow
+   doubles as the screen's <h1>. Sizes keep the title from wrapping to three
+   lines at mobile widths. */
 .scenario-meta {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  /* var(--space-3), not --space-4 — the image/title pairing above already
-     reads as complete without the extra vertical space. */
   margin-bottom: var(--space-3);
 }
 
-/* Scenario screens use a tighter --screen-weighted padding
-   (var(--space-3)=16px top/bottom) than Power Dynamics/Debrief
-   (var(--space-5)=32px, unchanged for those two). Every scenario screen
-   still requires scroll at 390px viewport width even with this padding —
-   the dominant driver is total stacked content (illustration + title +
-   stem + option cards + Submit), not header padding. Closing that gap
-   further would mean shrinking the illustration on mobile, denser
-   option-card spacing (a touch-target trade-off), or accepting scroll as
-   normal phone UX for a 4-option question — out of scope here. */
+/* Tighter padding than other weighted screens, to limit scroll. */
 .screen--scenario.screen--weighted {
   padding: var(--space-3) var(--space-4);
 }
@@ -579,8 +508,6 @@ summary:focus-visible {
   .scenario-illustration { width: 140px; height: 140px; }
 }
 
-/* Eyebrow + short title stack together next to the illustration — see
-   render.js's comment on scenarioMeta. */
 .scenario-meta__text {
   display: flex;
   flex-direction: column;
@@ -598,10 +525,8 @@ summary:focus-visible {
   margin: 0;
 }
 
-/* --color-accent measures 4.53:1 on --color-bg (passes AA) but only 4.07:1
-   on --color-bg-weighted (fails). Darkened to #935262 for text-on-weighted
-   use only (4.64:1) — --color-accent itself is unchanged for buttons/
-   borders/.stem blockquote, which aren't text-on-weighted. */
+/* --color-accent is 4.07:1 on --color-bg-weighted; #935262 gives 4.64:1 for
+   text there. Buttons, borders and .stem blockquote keep the token. */
 .screen--weighted .scenario-eyebrow,
 .screen--weighted .validation-message {
   color: #935262;
@@ -623,10 +548,8 @@ summary:focus-visible {
   margin-bottom: var(--space-4);
 }
 
-/* Root cause of asymmetric stem padding: the global `p { margin: 0 0
-   var(--space-3) }` rule gives the stem's last paragraph a bottom margin,
-   and padding on the parent blocks margin-collapse, so that margin stacks
-   on top of the box's own padding instead of disappearing into it. */
+/* Parent padding blocks margin collapse, so the global `p` bottom margin
+   would stack on it; this zeroes the last paragraph's. */
 .stem p:last-child { margin-bottom: 0; }
 
 .stem blockquote {
@@ -673,7 +596,6 @@ summary:focus-visible {
   accent-color: var(--color-accent);
 }
 
-/* Answer-lock after first submit — see appShell.js/render.js. */
 .scenario-form input[type="radio"]:disabled { cursor: default; }
 
 .scenario-form label:has(input[type="radio"]:disabled) {
@@ -713,10 +635,7 @@ summary:focus-visible {
 
 .feedback p:last-child { margin-bottom: 0; }
 
-/* Correctness signal, three tiers not two — see render.js's comment on why
-   Screen 12/B needs "also reasonable" distinct from a plain miss. Text
-   label is the real signal; color is reinforcing only, never load-bearing
-   alone. */
+/* The text label is the signal; color only reinforces it. */
 .feedback__signal {
   font-family: var(--font-body);
   font-size: 0.8125rem;
@@ -728,26 +647,16 @@ summary:focus-visible {
 }
 
 .feedback--correct { border-left-color: var(--color-d-delegate); }
-/* --color-d-delegate is tuned for 4.5:1+ against --color-bg, but
-   .feedback's background is the darker --color-bg-weighted, where it
-   measures only 4.18:1 — darkened to #58645B for this text use only (the
-   border above stays on the token, decorative, no text-contrast rule
-   applies). */
+/* Signal text is darkened: --color-d-delegate is 4.18:1 on
+   --color-bg-weighted, and #58645B clears 4.5:1. The border keeps the
+   token. */
 .feedback--correct .feedback__signal { color: #58645B; }
 
 .feedback--defensible { border-left-color: var(--color-d-delay); }
-/* Same issue as .feedback--correct above — --color-d-delay measures
-   4.18:1 against --color-bg-weighted despite being tuned for --color-bg. */
+/* Same fix for --color-d-delay, also 4.18:1 on --color-bg-weighted. */
 .feedback--defensible .feedback__signal { color: #6C5F51; }
 
 .feedback--reconsider { border-left-color: var(--color-text-secondary); }
-/* --color-text-secondary already clears 5.19:1 against --color-bg-weighted
-   — no change needed. */
-
-/* Debrief screen: each line pairs with its scenario's puzzle-piece art and
-   picks up a left-edge colour from whichever D the pick mapped to. Retry
-   is the filled primary (keeps the learner engaged), Exit the quiet
-   outline. */
 .comparison-list {
   list-style: none;
   margin: 0 0 var(--space-3);
@@ -767,9 +676,7 @@ summary:focus-visible {
 
 .comparison-list li p { margin: 0; }
 
-/* Sized to the text column's height (the tallest element in each row, ~3
-   lines) — growing the image up to this size costs nothing in row height
-   or added scroll. */
+/* Matches the text column's ~3-line height, so it adds no row height. */
 .comparison-illustration {
   width: 104px;
   height: 104px;
@@ -833,7 +740,6 @@ summary:focus-visible {
   margin-top: var(--space-1);
 }
 
-/* Accessibility helper */
 .visually-hidden-optional {
   position: absolute;
   width: 1px;

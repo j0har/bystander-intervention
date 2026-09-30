@@ -1,7 +1,7 @@
-// render.js — component render functions. Each returns a <section> element
-// ready to mount into #app. One <h1> per mounted screen, native elements
-// first — the feedback panel's role="status" + aria-live="polite" is the
-// one deliberate custom-ARIA usage in the whole module.
+// Component render functions; each returns a <section> ready to mount into
+// #app, with one <h1> per screen. Native elements come first: custom ARIA is
+// limited to the feedback panel (role="status", aria-live="polite") and the
+// validation message (role="alert").
 
 import { phaseCards } from "./data.js";
 
@@ -20,22 +20,17 @@ export function el(tag, attrs = {}, children = []) {
   return node;
 }
 
-// Whole numbers render with no decimal (52%), everything else to one
-// decimal place (21.3%) — matches the baseline-methodology doc's own
-// display convention.
+// Whole numbers render with no decimal (52%), everything else to one decimal
+// place (21.3%).
 function formatPercent(n) {
   return Number.isInteger(n) ? `${n}%` : `${n.toFixed(1)}%`;
 }
 
-// Fixed D order (screens 4/5=Direct, 6/7=Distract, 8/9=Delegate,
-// 10/11=Document, 12/13=Delay), read from phaseCards' own key order so it
-// can't drift from appShell.js's own D_ORDER. Used only for the in-card
-// progress track's done/not-done state — see renderPhaseCardScreen below.
+// D order, read from phaseCards' key order so it can't drift from
+// appShell.js's D_ORDER. Drives the in-card track and the "N of 5" position.
 const D_ORDER = Object.keys(phaseCards);
 
-// ---------------------------------------------------------------------
-// StatementScreen — screens 1, 2, 3, and the debrief variant (14)
-// ---------------------------------------------------------------------
+// StatementScreen: splash, introduction, power dynamics and the debrief variant.
 export function renderStatementScreen(screen, ctx) {
   const { data, weighted, id } = screen;
 
@@ -65,13 +60,10 @@ export function renderStatementScreen(screen, ctx) {
   }
 
   if (screen.variant === "debrief") {
-    // comparisonLines is computed by appShell.js at mount time from
-    // state.selections + debriefBaselines (data.js), not static content.
-    // Each entry is {percent, choice, situation, color, illustration} — the
-    // puzzle-piece art anchors each line back to its scenario, and the
-    // left-edge color ties it to whichever D the pick mapped to
-    // (var(--color-text-secondary) for an off-framework pick, since no D
-    // token applies).
+    // comparisonLines is computed by appShell.js at mount time, not stored in
+    // data.js. Each entry is {percent, choice, situation, color, illustration};
+    // `color` is the left-edge D-color, or the neutral text token for an
+    // off-framework pick.
     const comparisonList = el(
       "ul",
       { class: "comparison-list" },
@@ -112,10 +104,8 @@ export function renderStatementScreen(screen, ctx) {
       ]
     );
 
-    // Exit swaps both buttons for a short closing note — a standalone page
-    // with no further screens and no save, so there's nothing else for
-    // either control to do once the learner is done. Retry resets
-    // in-memory state and restarts at Screen 1.
+    // Exit swaps both buttons for a closing note, since a standalone page has
+    // nowhere further to go.
     const actions = section.querySelector(".debrief-actions");
     ctx.onExit = () => {
       actions.innerHTML = "";
@@ -127,13 +117,6 @@ export function renderStatementScreen(screen, ctx) {
   const bodyChildren = (data.body || []).map((p) => el("p", {}, p));
 
   const children = [
-    // Header illustration, shared by Screens 2 and 3 (.intro-illustration,
-    // styles.css): the full, uncropped source art, width-driven and
-    // centered, sized down from .splash-graphic so it doesn't compete with
-    // the splash hero.
-    // Open item: Screen 3 renders this on the weighted (deeper-tone)
-    // background, unlike Screen 2's plain-linen background — confirm it
-    // reads cleanly there (visual check pending).
     data.illustration
       ? el("img", {
           src: `assets/illustrations/${data.illustration}`,
@@ -184,17 +167,12 @@ export function renderStatementScreen(screen, ctx) {
   );
 }
 
-// ---------------------------------------------------------------------
-// PhaseCardScreen — screens 5, 7, 9, 11, 13. One D per screen, earned
-// progressively after its scenario. Colour fills a full-width header band
-// (icon disc + eyebrow + D name) instead of a border, so the D identity
-// reads at a glance; definition/when-to-use/example sit below in a white
-// body, separated by hairline rules. The header's 5-part track echoes the
-// shared app-header track (appShell.js) — decorative, no accessible name
-// of its own; the screen-reader <h1> below is the real progress signal for
-// AT users. Eyebrow content is `The Five Ds · N of 5` (styles.css renders
-// it uppercase) — see that rule's comment for the middot/spelling
-// reasoning.
+// PhaseCardScreen: one D per screen, earned progressively after its scenario.
+// The header track is decorative and aria-hidden; the <h1> is the progress
+// signal for assistive tech. The eyebrow reads `The Five Ds · N of 5` and
+// styles.css uppercases it. The separator is a middot, since learner copy
+// takes no em dashes, and "Five" is spelled out because "5Ds" beside "N of 5"
+// risks a digit/letter misread.
 export function renderPhaseCardScreen(screen, ctx) {
   const { data, id } = screen;
   const card = phaseCards[data.d];
@@ -254,9 +232,6 @@ export function renderPhaseCardScreen(screen, ctx) {
   );
 }
 
-// ---------------------------------------------------------------------
-// ScenarioScreen — screens 4, 6, 8, 10, 12
-// ---------------------------------------------------------------------
 export function renderScenarioScreen(screen, ctx) {
   const { data, id, scenarioNumber, weighted } = screen;
 
@@ -311,21 +286,18 @@ export function renderScenarioScreen(screen, ctx) {
     ctx.onSubmit(id, scenarioNumber, optionId);
 
     // Locks the answer after first submit: radios disable and Submit hides
-    // once feedback renders, so trackAnswered() fires once per screen and
-    // the debrief's recorded selection can't be overwritten by a retry.
+    // once feedback renders, so the selection can't change until the screen
+    // remounts.
     fieldset.querySelectorAll('input[type="radio"]').forEach((input) => {
       input.disabled = true;
     });
     submitBtn.hidden = true;
 
-    // Three feedback tiers, not two: `correct` (best-fit), `defensible`
-    // (the copy calls out an alternate as also legitimate, e.g. Screen
-    // 12/B — a build-time read of that copy, not new wording), and the
-    // default for everything else. Text label is the real signal; color is
-    // reinforcing only. Labels are phrased as the learner's own judgment
-    // ("A good call" / "A reasonable trade-off" / "A missed opportunity"),
-    // not a process quality, since more than one option can be legitimate
-    // on a given screen.
+    // Three feedback tiers: `correct` (best-fit), `defensible` (a legitimate
+    // alternative), and the default for everything else. The text label is
+    // the signal; color only reinforces. Labels are the learner's own
+    // judgment ("A good call" / "A reasonable trade-off" / "A missed
+    // opportunity"), since more than one option can be legitimate.
     const tierClass = option.correct ? "correct" : option.defensible ? "defensible" : "reconsider";
     const tierLabel = option.correct
       ? "A good call"
@@ -345,13 +317,10 @@ export function renderScenarioScreen(screen, ctx) {
     }
   });
 
-  // Illustration + eyebrow sit side by side in a fixed-size row instead of
-  // stacking full-width, so the question is visible without scrolling
-  // first. The eyebrow doubles as the screen's accessible name — no
-  // separate hidden heading needed. Eyebrow and title are wrapped together
-  // so they stack under one flex item next to the illustration; the
-  // section's aria-labelledby below points at both ids so the accessible
-  // name reads "Scenario N of 5, <title>" for AT users.
+  // Illustration and eyebrow share one row of set size so the question is
+  // visible without scrolling. The eyebrow is the screen's accessible name;
+  // aria-labelledby points at eyebrow and title so it reads "Scenario N of 5,
+  // <title>".
   const scenarioMeta = el("div", { class: "scenario-meta" }, [
     data.illustration
       ? el("img", {
@@ -388,8 +357,8 @@ export function renderScenarioScreen(screen, ctx) {
     children
   );
 
-  // Continue appears the moment feedback renders — not gated on the keyed
-  // option, since retries are unlimited and the module is formative.
+  // Continue appears as soon as feedback renders, whichever option the learner picks;
+  // the module is formative.
   const continueHolder = section.querySelector(".continue-holder");
   ctx.continueShown = false;
   ctx.showContinue = () => {

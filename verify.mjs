@@ -1,10 +1,7 @@
-// Scripted walkthrough — mirrors the original Row 7 verification method
-// (jsdom, no real browser available in this sandbox). Mounts the app,
-// walks all 14 screens end to end, submits every scenario, and asserts the
-// rebuild's core claims: screen count/order, correctness-signal tiers,
-// flagOptions/dPathwayMap resolve for every scenario id, and the debrief
-// renders exactly 5 real-percentage comparison lines built from what was
-// actually picked.
+// jsdom walkthrough of all 14 screens: submits every scenario and asserts
+// screen count and order, correctness-signal tiers, that flagOptions and
+// dPathwayMap resolve for every scenario id, and that the debrief renders
+// exactly 5 real-percentage lines built from the learner's picks.
 import { JSDOM } from "jsdom";
 import { readFileSync } from "node:fs";
 
@@ -20,7 +17,6 @@ const dom = new JSDOM(
 global.window = dom.window;
 global.document = dom.window.document;
 global.requestAnimationFrame = (cb) => setTimeout(cb, 0);
-// Node 22 already has global.crypto (randomUUID) — nothing to shim.
 const origConsoleError = console.error;
 console.error = (...args) => {
   errors.push(args.map(String).join(" "));
@@ -30,7 +26,6 @@ console.error = (...args) => {
 const { screens, totalScreens, dPathwayMap, debriefBaselines } = await import("./src/data.js");
 const { init } = await import("./src/appShell.js?v=20260907a");
 
-// --- Structural assertions on data.js, before even mounting -------------
 const assert = (cond, msg) => {
   if (!cond) throw new Error("ASSERTION FAILED: " + msg);
   console.log("  ok — " + msg);
@@ -59,7 +54,6 @@ for (const sid of scenarioIds) {
   assert(keyOptions.length === 1, `screen ${sid} has exactly one option marked correct (got ${keyOptions.length})`);
 }
 
-// --- Full mounted walkthrough --------------------------------------------
 console.log("\nMounting app...");
 init();
 
@@ -73,16 +67,13 @@ function clickButton(selector) {
   btn.dispatchEvent(new dom.window.Event("click", { bubbles: true }));
 }
 
-// Screen 1 — splash
 assert(currentSection().className.includes("screen--splash"), "Screen 1 mounts as splash");
 assert(document.getElementById("progress").textContent === "", "no progress indicator on splash");
 clickButton(".btn-continue");
 
-// Screen 2 — Introduction
 assert(currentSection().querySelector("h1").textContent.includes("What is Online Bystander"), "Screen 2 is Introduction");
 clickButton(".btn-continue");
 
-// Screen 3 — Power Dynamics
 assert(currentSection().querySelector("h1").textContent === "Power Dynamics", "Screen 3 is Power Dynamics");
 assert(currentSection().querySelectorAll(".power-question").length === 2, "Screen 3 has 2 power questions");
 clickButton(".btn-continue");
@@ -112,25 +103,24 @@ function checkPhaseCard(screenId, expectedD) {
   clickButton(".btn-continue");
 }
 
-// Screen 4 — pick the BEST-FIT option (Direct)
+// Best-fit pick (Direct)
 submitScenario(4, "A");
 checkPhaseCard(5, "Direct");
 
-// Screen 6 — pick a NON-best-fit option (Distract) — exercises the
-// "A missed opportunity" tier and confirms the debrief still reflects
-// whatever was actually picked, not always the key.
+// A non-best-fit pick (Distract) exercises the "A missed opportunity" tier
+// and shows the debrief reflects the pick, not the key.
 submitScenario(6, "A");
 checkPhaseCard(7, "Distract");
 
-// Screen 8 — best fit (Delegate)
+// Best-fit pick (Delegate)
 submitScenario(8, "C");
 checkPhaseCard(9, "Delegate");
 
-// Screen 10 — best fit (Document)
+// Best-fit pick (Document)
 submitScenario(10, "B");
 checkPhaseCard(11, "Document");
 
-// Screen 12 — the "defensible" tier (B), not the outright best-fit (A)
+// The "defensible" tier (B), not the outright best-fit (A)
 {
   const section = currentSection();
   assert(section.className.includes("screen--scenario"), "screen 12 mounts as ScenarioScreen");
@@ -144,7 +134,6 @@ checkPhaseCard(11, "Document");
 }
 checkPhaseCard(13, "Delay");
 
-// Screen 14 — Debrief
 {
   const section = currentSection();
   assert(section.className.includes("screen--debrief"), "screen 14 mounts as debrief");
@@ -159,7 +148,6 @@ checkPhaseCard(13, "Delay");
   console.log("  Debrief lines:");
   lines.forEach((l) => console.log("   - " + l));
 
-  // Retry resets and goes back to Screen 1
   clickButton(".debrief-actions .debrief-retry");
   assert(currentSection().className.includes("screen--splash"), "Retry returns to Screen 1 splash");
   assert(document.getElementById("progress").textContent === "", "progress indicator clears again after Retry");

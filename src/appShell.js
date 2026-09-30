@@ -1,5 +1,5 @@
-// appShell.js — AppShell (C0). Single-screen-visible container, linear
-// advance, tracking-init-before-first-render, owns app-level state.
+// One screen visible at a time, linear advance, owns app-level state.
+// Tracking initializes before the first render.
 
 import { screens, totalScreens, dPathwayMap, debriefBaselines, phaseCards } from "./data.js?v=20260915d";
 import { renderScreen, formatPercent, el } from "./render.js?v=20260915d";
@@ -12,35 +12,28 @@ import {
 } from "./xapi.js?v=20260909c";
 import { scormInit, scormSetIncomplete, scormSetCompleted, scormTerminate } from "./scorm.js?v=20260907a";
 
-// Dev navigation shortcut — gated at runtime, never shippable by default.
-// Structurally absent on the deployed GitHub Pages domain; no build step
-// needed to strip it.
+// Dev navigation is enabled only on localhost, so the deployed domain never
+// shows it and no build step has to strip it.
 const DEV_NAV_ENABLED = ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
-// Fixed D order (screens 4/5=Direct, 6/7=Distract, 8/9=Delegate,
-// 10/11=Document, 12/13=Delay), read from phaseCards' own key order so it
-// can't drift from render.js's own D_ORDER.
+// D order, read from phaseCards' key order so it can't drift from
+// render.js's D_ORDER.
 const D_ORDER = Object.keys(phaseCards);
 
 function initialState() {
   return {
     currentScreenIndex: 0,
     completedScreens: new Set(),
-    // flagHistory: whether a flagged option (escalating without the
-    // affected person's consent, per FDD A6) was ever selected, on any
-    // submission not just first — a signal meant to surface a risk pattern
-    // shouldn't disappear because a later retry got it right. Internal/
-    // xAPI-only, never learner-visible.
+    // Set when a flagged option (escalating without the affected person's
+    // consent) is selected on any submission, not only the first. Written on
+    // every submit; nothing reads it or sends it to xAPI.
     flagHistory: {}, // screenId -> bool
-    answeredOnce: new Set(), // screenIds that have fired their F3 `completed` statement
-    // selections: the learner's first-submitted option per scenario screen,
-    // needed for the debrief's per-scenario "You and X%..." line. First
-    // submission only, same rationale as answeredOnce — reaching a screen
-    // again via Back shouldn't silently overwrite what the debrief will
-    // show.
+    answeredOnce: new Set(), // screenIds whose `completed` statement has fired
+    // First-submitted option per scenario screen, which the debrief's lines
+    // read. First submission only, so Back can't overwrite what it shows.
     selections: {}, // screenId -> optionId
     scormActive: false,
-    moduleCompleted: false, // guards F6 firing more than once per registration
+    moduleCompleted: false, // stops the module's `completed` statement firing twice per registration
   };
 }
 
@@ -60,20 +53,17 @@ function currentDIndex(screen) {
 }
 
 // Persistent header: a back arrow (when there's somewhere to go back to)
-// sharing a row with a static module title, plus the five-part practice
-// track below. Title and track are aria-hidden (decorative); the back
-// button is not, since it's a genuine control — a screen-reader-facing
-// progress affordance is a deliberate follow-up, not folded in here. Real
-// navigation context for AT users comes from each screen's own heading
-// (focus moves there on every mount — see mountScreen below).
+// beside a static module title, with the five-part track below. Title and
+// track are aria-hidden; the back button is not, since it's a real control.
+// Screen readers get their position from each screen's own heading, where
+// focus lands on every mount.
 //
-// The back control lives here, not per-screen, so there's exactly one,
-// consistently placed above the track on every non-splash screen, rather
-// than buried in scrolling content on some screens and absent from others.
+// The back control lives here rather than per screen so exactly one sits in
+// the same place on every non-splash screen.
 function updateProgress() {
   const screen = screens[state.currentScreenIndex];
-  // No progress indicator on the splash screen — "Screen 1 of 14" reads
-  // wrong above a title/Start screen.
+  // The splash screen has no header; a progress indicator above the title
+  // reads wrong.
   if (screen.variant === "splash") {
     progressEl.textContent = "";
     return;
@@ -85,8 +75,6 @@ function updateProgress() {
     state.currentScreenIndex > 0 &&
     state.completedScreens.has(screens[state.currentScreenIndex - 1]?.id);
   const headerRow = el("div", { class: "app-header__row" }, [
-    // Genuine navigation control, not decorative — carries no aria-hidden,
-    // unlike the title/track around it.
     canGoBack
       ? el(
           "button",
@@ -123,20 +111,12 @@ function updateProgress() {
   progressEl.appendChild(track);
 }
 
-// Builds the debrief's five comparison lines from what the learner actually
-// picked (state.selections), not always the best-fit option — the debrief
-// validates whatever the learner chose, using real percentages with no
-// bucketing. Under the normal linear flow every scenario is answered
-// before Continue appears, so all five ids resolve; the null guard only
-// covers an edge unreachable in practice (no persistence, so a mid-way
-// reload can't happen without a fresh registration anyway).
-//
-// Returns one object per line (not a pre-joined string) so render.js can
-// pair each line with its scenario's puzzle-piece art and the D-color left
-// edge the pick mapped to. `color` falls back to the neutral
-// secondary-text token for an off-framework pick, since no D token applies
-// there.
 const SCENARIO_SCREEN_IDS = [4, 6, 8, 10, 12];
+
+// Builds the debrief's five lines from what the learner actually picked, with
+// the real baseline percentages. Returns one object per line rather than a
+// joined string so render.js can pair each with its scenario art and D-color;
+// `color` falls back to the neutral text token for an off-framework pick.
 function buildComparisonLines() {
   return SCENARIO_SCREEN_IDS.map((screenId) => {
     const chosen = state.selections[screenId];
@@ -159,9 +139,8 @@ function mountScreen(index) {
   const screen = screens[index];
   appEl.innerHTML = "";
 
-  // F6 fires once, on arrival at the debrief screen, not on a button click
-  // — decouples completion tracking from the Retry/Exit buttons below,
-  // either of which is available after the module is already complete.
+  // The module's `completed` statement fires on arrival at the debrief, not
+  // on a button click, since Retry and Exit are both available afterward.
   if (screen.variant === "debrief" && !state.moduleCompleted) {
     state.moduleCompleted = true;
     trackModuleCompleted();
@@ -227,7 +206,6 @@ function mountScreen(index) {
   appEl.appendChild(node);
   updateProgress();
 
-  // Focus moves to the new screen's heading/container on every transition.
   node.focus();
 
   if (DEV_NAV_ENABLED) mountDevNav(index);

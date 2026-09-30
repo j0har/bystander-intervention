@@ -1,13 +1,12 @@
-// axe-core pass across all 14 mounted screens — same method/caveat as the
-// original Row 7 verification (jsdom, not a real browser; a real-browser
-// contrast/axe pass is still owed, per this repo's standing note).
+// axe-core pass across all 14 mounted screens, in jsdom rather than a real
+// browser.
 import { JSDOM } from "jsdom";
 import { readFileSync } from "node:fs";
 
-// Harness mirrors the real index.html's <html>/<body> structure exactly
-// (lang, title, skip-link, aria-hidden progress indicator) so this only
-// catches violations the rebuild actually introduces, not artifacts of a
-// stripped-down test document.
+// Harness approximates index.html's <html>/<body> structure (lang, title,
+// skip-link, progress indicator) so it reports app violations, not artifacts
+// of a stripped-down document. `#progress` carries aria-hidden here but not in
+// index.html, so axe never inspects the Back button.
 const dom = new JSDOM(
   `<!doctype html><html lang="en"><head><title>Digital Bystander Intervention</title>
     <style>${readFileSync("./styles.css", "utf8")}</style></head><body>
@@ -20,7 +19,7 @@ const dom = new JSDOM(
 global.window = dom.window;
 global.document = dom.window.document;
 global.requestAnimationFrame = (cb) => setTimeout(cb, 0);
-console.error = () => {}; // xapi/scorm local-mode logging is expected noise here
+console.error = () => {}; // silences console.error for the whole run, including appShell's mount-failure log
 
 const axeSrc = readFileSync("./node_modules/axe-core/axe.min.js", "utf8");
 dom.window.eval(axeSrc);
@@ -40,9 +39,8 @@ function submit(optionId) {
 
 async function runAxe(label) {
   const results = await dom.window.axe.run(document, {
-    // jsdom doesn't compute real layout/paint, so anything relying on it
-    // (color-contrast being the main one) is unreliable here — excluded,
-    // same caveat this repo has carried since Row 7.
+    // jsdom doesn't compute layout or paint, so color-contrast is unreliable
+    // here and excluded.
     rules: { "color-contrast": { enabled: false } },
   });
   const v = results.violations;

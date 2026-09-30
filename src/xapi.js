@@ -12,7 +12,7 @@ const BASE_IRI = "https://joharsingh.com/xapi/dbi/";
 
 let registrationId = null;
 let launchContext = null; // { endpoint, authToken, actor, registration } | null when unlaunched
-let hintOpened = false; // F4 fires once per registration, first open only
+let hintOpened = false; // the hint statement fires on first open only
 
 function uuidv4() {
   if (crypto?.randomUUID) return crypto.randomUUID();
@@ -75,15 +75,13 @@ function readLaunchParams() {
   return { endpoint: endpoint.replace(/\/+$/, ""), authToken: auth, actor, registration };
 }
 
-/** Queue with capped exponential backoff. In-memory only — a reload loses
- * any un-flushed statements by design (matches the no-persistence session
- * model; see shell architecture Decision 1). */
+/** Queue with capped exponential backoff. In-memory only: a reload loses any
+ * un-flushed statements, since the module keeps no persistence. */
 const queue = [];
 let flushing = false;
 
 async function sendStatement(statement) {
   if (!launchContext) {
-    // No LMS launch context — log locally, do not fabricate an endpoint.
     console.info("[xapi:local]", statement.verb.id.split("/").pop(), statement);
     return;
   }
@@ -108,8 +106,7 @@ async function flushQueue() {
       });
       if (!res.ok) throw new Error(`xAPI send failed: ${res.status}`);
       queue.shift();
-      // Confirms a statement actually reached the LRS without needing a
-      // Network-tab inspection.
+      // Logs each accepted statement for local verification.
       console.info("[xapi:sent]", item.statement.verb.id.split("/").pop(), item.statement.object.id);
     } catch (err) {
       item.attempts += 1;
@@ -147,7 +144,7 @@ function baseStatement(verbId, verbDisplay, objectId, objectType, objectName) {
   };
 }
 
-/** F1 — module load, before first screen renders. Fires once per registration. */
+/** `initialized`: module load, before the first screen renders. */
 export function trackInitialized() {
   launchContext = readLaunchParams();
   // Use SCORM Cloud's own registration ID when we have one so statements
@@ -155,9 +152,6 @@ export function trackInitialized() {
   // to a random UUID only when there's no launch context at all (local dev
   // / unlaunched).
   registrationId = launchContext?.registration ?? uuidv4();
-  // Confirms which mode this launch is running in — check this first if
-  // something isn't sending: the bug is either in readLaunchParams()/the
-  // launch URL, or in the send logic below.
   console.info(
     "[xapi] launch context",
     launchContext ? "FOUND — sending to " + launchContext.endpoint : "NOT found — local-only mode, nothing will be sent to an LRS"
@@ -172,7 +166,7 @@ export function trackInitialized() {
   sendStatement(stmt);
 }
 
-/** F2 — every scenario Submit (every scenario screen, every retry). */
+/** `answered`: every scenario Submit. */
 export function trackAnswered(screenId, scenarioInstance, selectedOptionId) {
   const stmt = baseStatement(
     "http://adlnet.gov/expapi/verbs/answered",
@@ -187,7 +181,7 @@ export function trackAnswered(screenId, scenarioInstance, selectedOptionId) {
   sendStatement(stmt);
 }
 
-/** F3 — first submission only, per scenario instance per registration. */
+/** `completed` for a scenario: first submission per screen; Retry resets it. */
 export function trackScreenCompleted(screenId, scenarioInstance, dPathway) {
   const stmt = baseStatement(
     "http://adlnet.gov/expapi/verbs/completed",
@@ -205,11 +199,8 @@ export function trackScreenCompleted(screenId, scenarioInstance, dPathway) {
   sendStatement(stmt);
 }
 
-/** F4 — hint <details> toggled open, capstone only. Fires once, first open
- * only. Currently dead: no screen sets `data.hint` (the capstone carries no
- * hint copy), so this never fires. Kept rather than removed — cheap to
- * restore if a hint comes back, and removing an exported tracking function
- * is a separate call from a comment cleanup. */
+/** `interacted`: the capstone's hint <details> opened, first open only. No
+ * screen sets `data.hint`, so this never fires. */
 export function trackHintOpened() {
   if (hintOpened) return;
   hintOpened = true;
@@ -223,8 +214,8 @@ export function trackHintOpened() {
   sendStatement(stmt);
 }
 
-/** F6 — learner reaches the Debrief screen. Fires once per registration.
- * result.score is intentionally absent — no scoring model is defined. */
+/** `completed` for the module: the learner reaches the Debrief screen. Fires
+ * once per registration. No result.score: the module has no scoring model. */
 export function trackModuleCompleted() {
   const stmt = baseStatement(
     "http://adlnet.gov/expapi/verbs/completed",

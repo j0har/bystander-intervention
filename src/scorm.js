@@ -7,8 +7,6 @@
 
 const VERSIONS = ["1.2", "2004"];
 
-// Walk a window's parent chain looking for a SCORM API object. Stops when
-// it finds one, runs out of parents, or hits the trip limit.
 function climbParents(win, triesLeft) {
   while (
     !win.API &&
@@ -39,14 +37,12 @@ function findAPI(win, triesLeft = 500) {
 
 let handle = null;
 
-/** Call once, before first render (mirrors xAPI's F1 timing — tracking
- * initializes before the learner can interact). No-ops silently if no
- * SCORM API is found; that's the expected xAPI-only / GitHub Pages path. */
+/** Call once, before the first render, so tracking initializes before the
+ * learner can interact. No-ops silently if no SCORM API is found, the
+ * expected path on GitHub Pages. */
 export function scormInit() {
   const found = findAPI(window);
   if (!found) {
-    // Confirms which mode this launch is running in, mirroring xapi.js's
-    // launch-context log.
     console.info("[scorm] no SCORM API found — xAPI-only path, nothing will be mirrored to a SCORM runtime");
     handle = null;
     return false;
@@ -81,27 +77,25 @@ function setValue(name12, name2004, value) {
       handle.api.SetValue(name2004, value);
       handle.api.Commit("");
     }
-    // Confirms a value actually reached the SCORM API, mirroring xapi.js's
-    // [xapi:sent] log — without it, success and untested look identical
-    // from the console.
+    // Logs each value sent, so success is distinguishable from untested.
     console.info("[scorm:sent]", handle.version === "1.2" ? name12 : name2004, "=", value);
   } catch (err) {
     console.warn("[scorm] SetValue failed", name12, err);
   }
 }
 
-/** Mirror in-progress status. Call once, on first learner interaction. */
+/** Mirror in-progress status. Called on each screen's first submit. */
 export function scormSetIncomplete() {
   setValue("cmi.core.lesson_status", "cmi.completion_status", "incomplete");
 }
 
-/** Mirror completion. Call at the same point xAPI's trackModuleCompleted
- * fires (F6 — reaching the Debrief screen). */
+/** Mirror completion. Called when xAPI's trackModuleCompleted fires, on
+ * reaching the Debrief screen. */
 export function scormSetCompleted() {
   setValue("cmi.core.lesson_status", "cmi.completion_status", "completed");
 }
 
-/** Call on page unload if a SCORM session is active. */
+/** Call on page unload when a SCORM session is active. */
 export function scormTerminate() {
   if (!handle) return;
   try {

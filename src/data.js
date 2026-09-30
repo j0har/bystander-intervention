@@ -1,23 +1,14 @@
-// data.js — screen content, single ordered array. Screen numbering (1-14)
-// covers five assessed scenarios, each followed by the phase-transition
-// card for the D it tests.
+// Screen content as one ordered array: five assessed scenarios, each followed
+// by the phase-transition card for the D it tests.
 //
-// No criterion-referenced pass/fail anywhere in this module, for the
-// learner or the org. `flagOptions` records whether a flagged option (one
-// that hands a decision to authority without the affected person's
-// consent, per the FDD's A6 error patterns) was ever selected —
-// internal/xAPI-only, never learner-visible.
+// No criterion-referenced pass/fail anywhere in this module, for the learner
+// or the org. `flagOptions` marks options that hand a decision to authority
+// without the affected person's consent; the flag is never shown to learners.
 
-// Phase-transition card content — one card per D, revealed progressively as
-// the learner completes each scenario. Wording is verbatim from the
-// learner-copy source doc, not Claude's to author. Icon set uses the
-// "-white" variants: the card's icon disc is a full-colour header band
-// (--card-color), so the glyph needs to read against solid colour, not a
-// tint.
-//
-// whenToUse: every entry opens with "When [present-tense clause]," matching
-// the "When to use" field label below it, for consistency across all five
-// cards.
+// Phase-transition card content, one card per D, revealed progressively as
+// the learner completes each scenario. The approved learner copy must not
+// be reworded. Icons use the "-white" variants because the icon disc is a
+// solid --card-color header band, not a tint.
 export const phaseCards = {
   Direct: {
     icon: "icon-5d-direct-white.svg",
@@ -61,8 +52,7 @@ export const phaseCards = {
 };
 
 // Which D (or "off-framework") each option maps to, for the xAPI dPathway
-// extension (F3 / completed statements). Internal xAPI metadata only,
-// invisible to learners.
+// extension on `completed` statements. Never shown to learners.
 export const dPathwayMap = {
   4: { A: "Direct", B: "Delay", C: "off-framework" },
   6: { A: "Direct", B: "Distract", C: "Delay" },
@@ -72,9 +62,7 @@ export const dPathwayMap = {
 };
 
 // Synthetic baseline percentages for the debrief's "You and X% of people
-// chose to..." comparison line, per the baseline-methodology doc (persona
-// set + 0.8-adherence formula). `choice` text reflects the finalized copy
-// for each option.
+// chose to..." line, from a five-persona set with 0.8 adherence.
 // Formula: percentage = [k×0.8 + (5−k)×(0.2/(m−1))] / 5, k = personas
 // picking that option (of 5), m = option count on that screen.
 export const debriefBaselines = {
@@ -94,10 +82,7 @@ export const debriefBaselines = {
       C: { percent: 24.0, choice: "send a message after the meeting" },
     },
   },
-  // Votes behind the percentages above (of 5 personas): Names it→A (1),
-  // Escalates to authority→C (no authority option exists, defaults to
-  // best-fit), Keeps it private→C (1), Weighs exposure→C (defaults, F4
-  // Low), Applies framework→C (1). k(A)=1, k(B)=0, k(C)=4, m=3.
+  // k per option: A=1, B=0, C=4 (m=3).
   8: {
     situation: "a senior manager’s correction went out reply-all, CC’d to directors",
     options: {
@@ -106,11 +91,7 @@ export const debriefBaselines = {
       C: { percent: 66.0, choice: "check in with your colleague privately" },
     },
   },
-  // Votes behind the percentages above (of 5 personas): Names it→D (most
-  // direct/confrontational, even unsafe), Escalates to authority→A (routes
-  // to their manager), Keeps it private→B (stays contained, no third
-  // party), Weighs exposure→B (defaults, F4 Low here), Applies
-  // framework→B (best fit). k(A)=1, k(B)=3, k(C)=0, k(D)=1, m=4.
+  // k per option: A=1, B=3, C=0, D=1 (m=4).
   10: {
     situation: "a colleague disclosed a recurring comment about their accent",
     options: {
@@ -134,7 +115,6 @@ export const debriefBaselines = {
 // screens[] — the single ordered source of truth AppShell iterates over.
 // component: 'StatementScreen' | 'PhaseCardScreen' | 'ScenarioScreen'
 export const screens = [
-  // ---- Screen 1 — Splash / title screen --------------------------------
   {
     id: 1,
     component: "StatementScreen",
@@ -144,25 +124,17 @@ export const screens = [
       illustration: "Diverse-Team--Streamline-Brooklyn.svg",
       headline: "Online Bystander Intervention",
       subtitle: "Practicing the 5Ds Framework",
-      // No "your progress isn't saved" warning anywhere in this module, on
-      // any screen — a deliberate scope call, not a gap.
       advanceLabel: "Start",
     },
   },
 
-  // ---- Screen 2 — Introduction ------------------------------------------
   {
     id: 2,
     component: "StatementScreen",
-    // weighted: true so the header band renders consistently with the
-    // other non-splash screens — h1/.screen__body p/.btn-continue are all
-    // safe as text on the darker background here (unlike
-    // .scenario-eyebrow/.validation-message on scenario screens).
+    // Weighted so the header band matches the other non-splash screens; this
+    // screen's text is safe on the darker background.
     weighted: true,
     data: {
-      // Renders via .intro-illustration (styles.css): full, uncropped 1:1
-      // source art, width-driven and centered, sized down from the splash
-      // hero so it doesn't compete with it.
       illustration: "Remote-Team--Streamline-Brooklyn.svg",
       headline: "What is Online Bystander Intervention?",
       body: [
@@ -173,11 +145,6 @@ export const screens = [
     },
   },
 
-  // ---- Screen 3 — Power Dynamics -----------------------------------------
-  // Renders the header like Screen 2: back control + title + neutral track
-  // — StatementScreen's currentDIndex() returns null for this screen, so
-  // the track is always unfilled, no special-casing needed. Uses the same
-  // .intro-illustration pattern as Screen 2's header image.
   {
     id: 3,
     component: "StatementScreen",
@@ -195,21 +162,16 @@ export const screens = [
       bodyAfter: [
         "These two questions shape whether an action could make things worse for the person being harmed or become less safe for you. It’s always a good idea to check in with the target before taking any action that involves documenting or reporting the incident.",
       ],
-      // No explicit [Continue] bracket for this screen in the learner-copy
-      // source doc — kept as a reasonable default, since every
-      // non-terminal screen needs an advance control.
       advanceLabel: "Continue",
     },
   },
 
-  // ---- Screen 4 — Scenario 1: Slack stereotype (Direct) ------------------
   {
     id: 4,
     component: "ScenarioScreen",
     weighted: true,
     scenarioNumber: 1,
-    // Escalating the target's situation to a manager without asking first —
-    // flagged per the FDD's A6 error pattern (E4/E6).
+    // Unconsented escalation to a manager.
     flagOptions: ["C"],
     data: {
       illustration: "scenario-1-puzzle-piece.svg",
@@ -242,10 +204,8 @@ export const screens = [
     },
   },
 
-  // ---- Screen 5 — Phase-transition card: Direct --------------------------
   { id: 5, component: "PhaseCardScreen", weighted: false, data: { d: "Direct", advanceLabel: "Continue" } },
 
-  // ---- Screen 6 — Scenario 2: Meeting interruption (Distract) ------------
   {
     id: 6,
     component: "ScenarioScreen",
@@ -282,17 +242,13 @@ export const screens = [
     },
   },
 
-  // ---- Screen 7 — Phase-transition card: Distract ------------------------
   { id: 7, component: "PhaseCardScreen", weighted: false, data: { d: "Distract", advanceLabel: "Continue" } },
 
-  // ---- Screen 8 — Scenario 3: Reply-all power dynamics (Delegate) --------
   {
     id: 8,
     component: "ScenarioScreen",
     weighted: true,
     scenarioNumber: 3,
-    // None of the three options here is an unconsented escalation-to-
-    // authority move, so this scenario carries no flagOptions.
     data: {
       illustration: "scenario-3-puzzle-piece.svg",
       shortTitle: "Corrected in front of everyone",
@@ -324,17 +280,14 @@ export const screens = [
     },
   },
 
-  // ---- Screen 9 — Phase-transition card: Delegate ------------------------
   { id: 9, component: "PhaseCardScreen", weighted: false, data: { d: "Delegate", advanceLabel: "Continue" } },
 
-  // ---- Screen 10 — Scenario 4: Responder risk → Document -----------------
   {
     id: 10,
     component: "ScenarioScreen",
     weighted: true,
     scenarioNumber: 4,
-    // Escalating to the target's manager without asking first — same FDD
-    // A6 pattern as Screen 4/C above.
+    // Unconsented escalation to the target's manager.
     flagOptions: ["A"],
     data: {
       illustration: "scenario-4-puzzle-piece.svg",
@@ -373,10 +326,8 @@ export const screens = [
     },
   },
 
-  // ---- Screen 11 — Phase-transition card: Document -----------------------
   { id: 11, component: "PhaseCardScreen", weighted: false, data: { d: "Document", advanceLabel: "Continue" } },
 
-  // ---- Screen 12 — Scenario 5: Appearance comment (capstone) -------------
   {
     id: 12,
     component: "ScenarioScreen",
@@ -398,10 +349,7 @@ export const screens = [
         },
         {
           id: "B",
-          // Not a plain miss — the copy explicitly calls this "also
-          // defensible," distinct from C/D's outright critique. Gets its
-          // own feedback tier (render.js), not folded into "best-fit" or
-          // "worth a second look."
+          // A legitimate alternative; renders the defensible feedback tier.
           defensible: true,
           text: "Redirect to the agenda, then check in with them privately.",
           feedback:
@@ -424,14 +372,10 @@ export const screens = [
     },
   },
 
-  // ---- Screen 13 — Phase-transition card: Delay --------------------------
   { id: 13, component: "PhaseCardScreen", weighted: false, data: { d: "Delay", advanceLabel: "Continue" } },
 
-  // ---- Screen 14 — Debrief ------------------------------------------------
   // Comparison lines are computed at mount time by appShell.js from
-  // state.selections + debriefBaselines above, not static here. No
-  // reflection-prompt/textarea block — the learner-copy source doc doesn't
-  // include one for this screen.
+  // state.selections and debriefBaselines, not stored here.
   {
     id: 14,
     component: "StatementScreen",

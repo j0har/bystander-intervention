@@ -1,5 +1,4 @@
-// app.js — entry point. Vanilla ES modules, no bundler, no build step
-// (per DBI-Shell-Architecture-Session-v1.1.md Decision 2).
+// No bundler or build step: the ES modules load directly.
 import { init } from "./src/appShell.js?v=20260915d";
 
 init();
