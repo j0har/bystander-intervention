@@ -3,7 +3,7 @@
 // dPathwayMap resolve for every scenario id, and that the debrief renders
 // exactly 5 real-percentage lines built from the learner's picks.
 import { JSDOM } from "jsdom";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 
 const errors = [];
 const dom = new JSDOM(
@@ -58,6 +58,38 @@ for (const sid of scenarioIds) {
   assert(Math.abs(sum - 100) < 0.2, `screen ${sid} baseline percentages sum to ~100 (got ${sum})`);
   const keyOptions = screen.data.options.filter((o) => o.correct);
   assert(keyOptions.length === 1, `screen ${sid} has exactly one option marked correct (got ${keyOptions.length})`);
+}
+
+// Files the SCO loads: the import graph from app.js, the entry page and
+// stylesheet, and every icon and illustration data.js names. The manifest
+// lists exactly these, and each module is imported under one specifier.
+{
+  const importRe = /from\s+"(\.[^"]+)"/g;
+  const specifiersByModule = {};
+  const modules = new Set(["app.js"]);
+  const queue = ["app.js"];
+  while (queue.length) {
+    const file = queue.shift();
+    const dir = file.includes("/") ? file.slice(0, file.lastIndexOf("/") + 1) : "";
+    for (const [, specifier] of readFileSync(file, "utf8").matchAll(importRe)) {
+      const target = new URL(specifier.split("?")[0], "file:///" + dir).pathname.slice(1);
+      (specifiersByModule[target] ??= new Set()).add(specifier);
+      if (!modules.has(target)) { modules.add(target); queue.push(target); }
+    }
+  }
+  for (const [target, specifiers] of Object.entries(specifiersByModule)) {
+    assert(specifiers.size === 1, `${target} is imported under one specifier (got ${[...specifiers].join(", ")})`);
+    assert([...specifiers][0].includes("?v="), `${target} import carries a ?v= token`);
+  }
+  const dataSource = readFileSync("src/data.js", "utf8");
+  const named = (field, dir) => [...dataSource.matchAll(new RegExp(`${field}: "([^"]+)"`, "g"))].map((m) => `${dir}${m[1]}`);
+  const expected = ["index.html", "styles.css", ...modules, ...named("icon", "assets/icons/"), ...named("illustration", "assets/illustrations/")];
+  const listed = [...readFileSync("imsmanifest.xml", "utf8").matchAll(/<file href="([^"]+)"/g)].map((m) => m[1]);
+  const missing = [...new Set(expected)].filter((f) => !listed.includes(f)).sort();
+  const extra = listed.filter((f) => !expected.includes(f)).sort();
+  assert(missing.length === 0, `manifest lists every file the SCO loads (missing: ${missing.join(", ") || "none"})`);
+  assert(extra.length === 0, `manifest lists nothing the SCO does not load (extra: ${extra.join(", ") || "none"})`);
+  assert(listed.every((f) => existsSync(f)), "every manifest file exists on disk");
 }
 
 // Stub SCORM 1.2 API so scorm.js takes its active path and the run records

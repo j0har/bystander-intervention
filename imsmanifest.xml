@@ -30,12 +30,19 @@
       <file href="src/render.js"/>
       <file href="src/scorm.js"/>
       <file href="src/xapi.js"/>
-      <file href="assets/icons/icon-5d-delay.svg"/>
-      <file href="assets/icons/icon-5d-delegate.svg"/>
-      <file href="assets/icons/icon-5d-direct.svg"/>
-      <file href="assets/icons/icon-5d-distract.svg"/>
-      <file href="assets/icons/icon-5d-document.svg"/>
-      <file href="assets/icons/icon-risk-assessment.svg"/>
+      <file href="assets/icons/icon-5d-delay-white.svg"/>
+      <file href="assets/icons/icon-5d-delegate-white.svg"/>
+      <file href="assets/icons/icon-5d-direct-white.svg"/>
+      <file href="assets/icons/icon-5d-distract-white.svg"/>
+      <file href="assets/icons/icon-5d-document-white.svg"/>
+      <file href="assets/illustrations/Diverse-Team--Streamline-Brooklyn.svg"/>
+      <file href="assets/illustrations/Remote-Team--Streamline-Brooklyn.svg"/>
+      <file href="assets/illustrations/Video-Conference-4--Streamline-Brooklyn.svg"/>
+      <file href="assets/illustrations/scenario-1-puzzle-piece.svg"/>
+      <file href="assets/illustrations/scenario-2-puzzle-piece.svg"/>
+      <file href="assets/illustrations/scenario-3-puzzle-piece.svg"/>
+      <file href="assets/illustrations/scenario-4-puzzle-piece.svg"/>
+      <file href="assets/illustrations/scenario-5-puzzle-piece.svg"/>
     </resource>
   </resources>
 

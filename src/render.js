@@ -3,7 +3,7 @@
 // limited to the feedback panel (role="status", aria-live="polite") and the
 // validation message (role="alert").
 
-import { phaseCards } from "./data.js";
+import { phaseCards } from "./data.js?v=20260915d";
 
 export function el(tag, attrs = {}, children = []) {
   const node = document.createElement(tag);
