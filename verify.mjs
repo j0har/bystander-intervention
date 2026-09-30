@@ -1,7 +1,8 @@
-// jsdom walkthrough of all 14 screens: submits every scenario and asserts
-// screen count and order, correctness-signal tiers, that flagOptions and
-// dPathwayMap resolve for every scenario id, and that the debrief renders
-// exactly 5 real-percentage lines built from the learner's picks.
+// jsdom walkthrough of all 14 screens against a stub SCORM 1.2 API. Asserts
+// screen order, correctness-signal tiers, that dPathwayMap and debriefBaselines
+// resolve every scenario option, the debrief's five comparison lines, the
+// `flagged` extension, the SCORM status sequence across Retry and a replay,
+// and that the manifest and module imports match the files the SCO loads.
 import { JSDOM } from "jsdom";
 import { readFileSync, existsSync } from "node:fs";
 
