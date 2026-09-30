@@ -17,6 +17,12 @@ const dom = new JSDOM(
 global.window = dom.window;
 global.document = dom.window.document;
 global.requestAnimationFrame = (cb) => setTimeout(cb, 0);
+const answeredStatements = [];
+const origConsoleInfo = console.info;
+console.info = (...args) => {
+  if (args[0] === "[xapi:local]" && args[1] === "answered") answeredStatements.push(args[2]);
+  origConsoleInfo(...args);
+};
 const origConsoleError = console.error;
 console.error = (...args) => {
   errors.push(args.map(String).join(" "));
@@ -145,12 +151,29 @@ checkPhaseCard(13, "Delay");
     assert(!!matching, `debrief line reflects the actual pick for screen ${screenId} (${optionId}: "${baseline.choice}")`);
     assert(matching.includes(String(baseline.percent).replace(/\.0$/, "")) || matching.includes(baseline.percent.toFixed(1)), `debrief line for screen ${screenId} shows its real percentage`);
   }
+  const flaggedKey = (st) => Object.keys(st.context.extensions).find((k) => k.endsWith("/extensions/flagged"));
+  assert(answeredStatements.length === 5, `5 answered statements sent (got ${answeredStatements.length})`);
+  assert(answeredStatements.every((st) => !flaggedKey(st)), "answered statements for unflagged picks carry no flagged extension");
   console.log("  Debrief lines:");
   lines.forEach((l) => console.log("   - " + l));
 
   clickButton(".debrief-actions .debrief-retry");
   assert(currentSection().className.includes("screen--splash"), "Retry returns to Screen 1 splash");
   assert(document.getElementById("progress").textContent === "", "progress indicator clears again after Retry");
+}
+
+// A flagOptions pick (screen 4, option C) marks its answered statement.
+clickButton(".btn-continue");
+clickButton(".btn-continue");
+clickButton(".btn-continue");
+{
+  const section = currentSection();
+  const radio = section.querySelector('input[value="C"]');
+  radio.checked = true;
+  section.querySelector("form").dispatchEvent(new dom.window.Event("submit", { bubbles: true, cancelable: true }));
+  const st = answeredStatements[answeredStatements.length - 1];
+  const key = Object.keys(st.context.extensions).find((k) => k.endsWith("/extensions/flagged"));
+  assert(st.result.response === "C" && key && st.context.extensions[key] === true, "answered statement for a flagOptions pick carries flagged: true");
 }
 
 console.log(`\n${errors.length === 0 ? "PASS" : "FAIL"} — ${errors.length} console.error call(s) during the walkthrough.`);

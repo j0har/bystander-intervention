@@ -24,10 +24,6 @@ function initialState() {
   return {
     currentScreenIndex: 0,
     completedScreens: new Set(),
-    // Set when a flagged option (escalating without the affected person's
-    // consent) is selected on any submission, not only the first. Written on
-    // every submit; nothing reads it or sends it to xAPI.
-    flagHistory: {}, // screenId -> bool
     answeredOnce: new Set(), // screenIds whose `completed` statement has fired
     // First-submitted option per scenario screen, which the debrief's lines
     // read. First submission only, so Back can't overwrite what it shows.
@@ -166,12 +162,8 @@ function mountScreen(index) {
       goTo(0);
     },
     onSubmit: (screenId, scenarioInstance, optionId) => {
-      trackAnswered(screenId, scenarioInstance, optionId);
-
-      const flagOptions = screen.flagOptions || [];
-      if (flagOptions.includes(optionId)) {
-        state.flagHistory[screenId] = true;
-      }
+      const flagged = (screen.flagOptions || []).includes(optionId);
+      trackAnswered(screenId, scenarioInstance, optionId, flagged);
 
       if (!(screenId in state.selections)) {
         state.selections[screenId] = optionId;

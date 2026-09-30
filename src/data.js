@@ -3,7 +3,8 @@
 //
 // No criterion-referenced pass/fail anywhere in this module, for the learner
 // or the org. `flagOptions` marks options that hand a decision to authority
-// without the affected person's consent; the flag is never shown to learners.
+// without the affected person's consent; the flag goes out on the `answered`
+// statement and is never shown to learners.
 
 // Phase-transition card content, one card per D, revealed progressively as
 // the learner completes each scenario. The approved learner copy must not

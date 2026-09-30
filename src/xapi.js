@@ -166,8 +166,9 @@ export function trackInitialized() {
   sendStatement(stmt);
 }
 
-/** `answered`: every scenario Submit. */
-export function trackAnswered(screenId, scenarioInstance, selectedOptionId) {
+/** `answered`: every scenario Submit. `flagged` marks a pick from the screen's
+ * `flagOptions`; the extension is present only when true. */
+export function trackAnswered(screenId, scenarioInstance, selectedOptionId, flagged) {
   const stmt = baseStatement(
     "http://adlnet.gov/expapi/verbs/answered",
     "answered",
@@ -178,6 +179,9 @@ export function trackAnswered(screenId, scenarioInstance, selectedOptionId) {
   stmt.object.definition.interactionType = "choice";
   stmt.result = { response: selectedOptionId };
   stmt.context.extensions[`${BASE_IRI}extensions/scenario-instance`] = scenarioInstance;
+  if (flagged) {
+    stmt.context.extensions[`${BASE_IRI}extensions/flagged`] = true;
+  }
   sendStatement(stmt);
 }
 
