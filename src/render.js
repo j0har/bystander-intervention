@@ -125,9 +125,6 @@ export function renderStatementScreen(screen, ctx) {
           class: "intro-illustration",
         })
       : null,
-    data.icon
-      ? el("img", { src: `assets/icons/${data.icon}`, alt: "", "aria-hidden": "true", class: "icon-risk" })
-      : null,
     el("h1", { id: `s${id}-title` }, data.headline),
     el("div", { class: "screen__body" }, bodyChildren),
   ];
