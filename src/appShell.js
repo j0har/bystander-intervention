@@ -2,14 +2,14 @@
 // Tracking initializes before the first render.
 
 import { screens, totalScreens, dPathwayMap, debriefBaselines, phaseCards } from "./data.js?v=20260915d";
-import { renderScreen, formatPercent, el } from "./render.js?v=20260915d";
+import { renderScreen, formatPercent, el } from "./render.js?v=20260930a";
 import {
   trackInitialized,
   trackAnswered,
   trackScreenCompleted,
   trackHintOpened,
   trackModuleCompleted,
-} from "./xapi.js?v=20260909c";
+} from "./xapi.js?v=20260930a";
 import { scormInit, scormSetIncomplete, scormSetCompleted, scormTerminate } from "./scorm.js?v=20260907a";
 
 // Dev navigation is enabled only on localhost, so the deployed domain never
