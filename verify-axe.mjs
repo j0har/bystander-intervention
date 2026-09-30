@@ -5,13 +5,14 @@ import { readFileSync } from "node:fs";
 
 // Harness approximates index.html's <html>/<body> structure (lang, title,
 // skip-link, progress indicator) so it reports app violations, not artifacts
-// of a stripped-down document. `#progress` carries aria-hidden here but not in
-// index.html, so axe never inspects the Back button.
+// of a stripped-down document. `#progress` is left without aria-hidden, as in
+// index.html: appShell.js hides only the title and track, so axe inspects the
+// Back button.
 const dom = new JSDOM(
   `<!doctype html><html lang="en"><head><title>Digital Bystander Intervention</title>
     <style>${readFileSync("./styles.css", "utf8")}</style></head><body>
     <a class="skip-link" href="#app">Skip to content</a>
-    <div class="progress-indicator" id="progress" aria-hidden="true"></div>
+    <div class="progress-indicator" id="progress"></div>
     <main id="app" aria-live="off"></main>
   </body></html>`,
   { url: "http://localhost/index.html", runScripts: "outside-only", pretendToBeVisual: true }
