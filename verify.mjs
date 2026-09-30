@@ -60,6 +60,17 @@ for (const sid of scenarioIds) {
   assert(keyOptions.length === 1, `screen ${sid} has exactly one option marked correct (got ${keyOptions.length})`);
 }
 
+// Stub SCORM 1.2 API so scorm.js takes its active path and the run records
+// every status the module sends and whether it finishes the session.
+const scormCalls = [];
+dom.window.API = {
+  LMSInitialize: () => "true",
+  LMSSetValue: (key, value) => { scormCalls.push(["set", key, value]); return "true"; },
+  LMSCommit: () => "true",
+  LMSFinish: () => { scormCalls.push(["finish"]); return "true"; },
+};
+const lessonStatuses = () => scormCalls.filter((c) => c[0] === "set" && c[1] === "cmi.core.lesson_status").map((c) => c[2]);
+
 console.log("\nMounting app...");
 init();
 
@@ -162,19 +173,32 @@ checkPhaseCard(13, "Delay");
   assert(document.getElementById("progress").textContent === "", "progress indicator clears again after Retry");
 }
 
-// A flagOptions pick (screen 4, option C) marks its answered statement.
+// Second run after Retry, starting with a flagOptions pick (screen 4, option C).
+const statusesAfterFirstRun = lessonStatuses();
+assert(statusesAfterFirstRun.at(-1) === "completed", `first run ends with lesson_status "completed" (got ${statusesAfterFirstRun})`);
 clickButton(".btn-continue");
 clickButton(".btn-continue");
 clickButton(".btn-continue");
+submitScenario(4, "C");
 {
-  const section = currentSection();
-  const radio = section.querySelector('input[value="C"]');
-  radio.checked = true;
-  section.querySelector("form").dispatchEvent(new dom.window.Event("submit", { bubbles: true, cancelable: true }));
   const st = answeredStatements[answeredStatements.length - 1];
   const key = Object.keys(st.context.extensions).find((k) => k.endsWith("/extensions/flagged"));
   assert(st.result.response === "C" && key && st.context.extensions[key] === true, "answered statement for a flagOptions pick carries flagged: true");
 }
+checkPhaseCard(5, "Direct");
+submitScenario(6, "A");
+checkPhaseCard(7, "Distract");
+submitScenario(8, "C");
+checkPhaseCard(9, "Delegate");
+submitScenario(10, "B");
+checkPhaseCard(11, "Document");
+submitScenario(12, "B");
+checkPhaseCard(13, "Delay");
+assert(currentSection().className.includes("screen--debrief"), "second run reaches the debrief");
+assert(!lessonStatuses().slice(statusesAfterFirstRun.length).includes("incomplete"), "replay after Retry sends no lesson_status \"incomplete\"");
+assert(lessonStatuses().at(-1) === "completed", `lesson_status still ends \"completed\" after the replay (got ${lessonStatuses()})`);
+dom.window.dispatchEvent(new dom.window.Event("beforeunload"));
+assert(scormCalls.filter((c) => c[0] === "finish").length === 1, "unload after a Retry replay still finishes the SCORM session");
 
 console.log(`\n${errors.length === 0 ? "PASS" : "FAIL"} — ${errors.length} console.error call(s) during the walkthrough.`);
 if (errors.length) {

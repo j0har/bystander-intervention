@@ -157,7 +157,10 @@ function mountScreen(index) {
       goTo(index + 1);
     },
     onRetry: () => {
+      // scormActive describes the launch, not the run, so a replay keeps it.
+      const { scormActive } = state;
       state = initialState();
+      state.scormActive = scormActive;
       state.moduleCompleted = true; // already fired once this registration; don't refire on replay
       goTo(0);
     },
@@ -173,7 +176,8 @@ function mountScreen(index) {
         state.answeredOnce.add(screenId);
         const dPathway = dPathwayMap[screenId]?.[optionId];
         trackScreenCompleted(screenId, scenarioInstance, dPathway);
-        if (state.scormActive) scormSetIncomplete();
+        // A replay after completion must not move the LMS back to incomplete.
+        if (state.scormActive && !state.moduleCompleted) scormSetIncomplete();
       }
     },
     onHintOpen: () => trackHintOpened(),
