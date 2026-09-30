@@ -33,8 +33,8 @@ const assert = (cond, msg) => {
 
 assert(totalScreens === 14, `totalScreens is 14 (got ${totalScreens})`);
 assert(screens.map((s) => s.id).every((id, i) => id === i + 1), "screen ids are sequential 1-14");
-assert(!screens.some((s) => "scored" in s), "no screen carries the old `scored` field");
-assert(!screens.some((s) => "hardFailOptions" in s), "no screen carries the old `hardFailOptions` name");
+assert(!screens.some((s) => "scored" in s), "no screen carries a `scored` field");
+assert(!screens.some((s) => "hardFailOptions" in s), "no screen carries a `hardFailOptions` key");
 const scenarioIds = screens.filter((s) => s.component === "ScenarioScreen").map((s) => s.id);
 assert(JSON.stringify(scenarioIds) === JSON.stringify([4, 6, 8, 10, 12]), `scenario screens are 4,6,8,10,12 (got ${scenarioIds})`);
 const phaseCardIds = screens.filter((s) => s.component === "PhaseCardScreen").map((s) => s.id);
