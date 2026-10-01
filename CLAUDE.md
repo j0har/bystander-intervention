@@ -8,6 +8,8 @@ A comment earns its place by giving a reader something the code can't. First try
 ## Before you push
 - `node verify.mjs` and `node verify-axe.mjs` pass (they need `jsdom` and `axe-core` installed locally).
 - If you only edited comments, the code with comments stripped is identical before and after.
+- The comment lint (`vault_check.py comments <path>`) reads 0 flagged lines on the files you touched. A hit means change narrative went into a comment instead of the commit message.
+- After a comment sweep, a fresh-context reviewer who did not do the sweep reads the diff for what the lint cannot see: a live constraint rewritten away or deleted as "X, not Y", a restatement phrased as a contract, a versioned filename or provenance pointer carried into a rewrite, dead code kept beside a comment defending it, a rewrite that states a fact the code does not show. Hits are reported before the sweep closes.
 
 ## Leave alone
 `?v=` cache-bust tokens on imports are functional.
@@ -16,3 +18,4 @@ A comment earns its place by giving a reader something the code can't. First try
 - Name length scales with scope: short in a 2-3 line scope, explicit for module-level names.
 - Extract a block when a name can carry its intent. Stop when the extract only delegates.
 - One change at a time: no refactor inside a feature commit.
+- Change narrative goes in the commit message, never in a comment.
