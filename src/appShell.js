@@ -1,8 +1,8 @@
 // One screen visible at a time, linear advance, owns app-level state.
 // Tracking initializes before the first render.
 
-import { screens, totalScreens, dPathwayMap, debriefBaselines, phaseCards } from "./data.js?v=20260915d";
-import { renderScreen, formatPercent, el } from "./render.js?v=20260930a";
+import { screens, totalScreens, dPathwayMap, debriefBaselines, phaseCards } from "./data.js?v=20261005a";
+import { renderScreen, formatPercent, el } from "./render.js?v=20261005a";
 import {
   trackInitialized,
   trackAnswered,

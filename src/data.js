@@ -25,7 +25,7 @@ export const phaseCards = {
     definition:
       "Subtly redirecting a conversation to ease tension or interrupt harm when something feels unsafe.",
     whenToUse: "When there are early signs of exclusion, tension, or questionable comments in a chat or channel.",
-    example: "“Let’s refocus on the project details. I think we were talking about the next steps?”",
+    example: "“Where were we?”",
   },
   Delegate: {
     icon: "icon-5d-delegate-white.svg",
@@ -33,7 +33,7 @@ export const phaseCards = {
     definition:
       "Bringing someone in to help address the issue appropriately, but only if the person affected wants that support brought in.",
     whenToUse: "When the behaviour involves power imbalances, repeat issues, or affects someone’s ability to participate.",
-    example: "“Would it help if I brought this to our team lead, or would you rather handle it your own way for now?”",
+    example: "“Would it help if I brought this to a manager, or would you rather handle it your own way for now?”",
   },
   Document: {
     icon: "icon-5d-document-white.svg",
@@ -254,7 +254,7 @@ export const screens = [
       illustration: "scenario-3-puzzle-piece.svg",
       shortTitle: "Corrected in front of everyone",
       stem:
-        "A senior manager sends a reply-all email correcting a junior staff member's work. The tone is sharp, the email is CC'd to directors, and the junior staff member stops responding in the thread.",
+        "A senior manager sends a reply-all email correcting a junior staff member's work. The tone is sharp and the email is CC'd to directors.",
       question: "Given what's safe for you to do here, what's the best action?",
       options: [
         {
@@ -294,7 +294,7 @@ export const screens = [
       illustration: "scenario-4-puzzle-piece.svg",
       shortTitle: "Mimicking an accent",
       stem:
-        "At the end of a virtual 1:1 video call, your colleague discloses that someone else on the team has been subtly mocking and mimicking their pronunciation of certain terminology because of their accent. It's occurred on a few occasions, but you haven't witnessed it yet yourself.",
+        "At the end of a virtual call, your colleague discloses that someone else on the team has been subtly mocking and mimicking their pronunciation of certain terminology because of their accent. It's occurred on a few occasions, but you haven't witnessed it yet yourself.",
       question: "What's the most useful way to respond?",
       options: [
         {
