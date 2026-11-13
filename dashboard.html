@@ -35,11 +35,13 @@ body { margin: 0; background: var(--color-bg); color: var(--color-text); font-fa
 h1 { font-family: var(--font-heading); font-weight: 500; font-size: 1.75rem; line-height: 1.25; margin: 0.25rem 0 0; text-wrap: balance; }
 .synthetic { margin: var(--space-1) 0 0; font-size: 0.9375rem; color: var(--color-text-secondary); }
 
-.stats { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); margin: 0; padding: var(--space-3) 0; border-block: 1px solid var(--color-border); }
-.stats div { display: grid; }
-.stats dt { font-size: 0.875rem; color: var(--color-text-secondary); }
-.stats dd { margin: 0; font-family: var(--font-heading); font-size: 1.5rem; font-weight: 500; font-variant-numeric: tabular-nums; }
-.stats dd small { font-family: var(--font-body); font-size: 0.9375rem; color: var(--color-text-secondary); margin-left: 0.25rem; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); margin: 0; padding: var(--space-3); background: var(--color-bg-weighted); border-radius: var(--radius); }
+@media (max-width: 680px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { background: var(--color-surface); border-radius: var(--radius); padding: var(--space-3); display: flex; flex-direction: column; gap: 0.25rem; }
+.stat dt { font-size: 0.875rem; color: var(--color-text-secondary); }
+.stat dd { margin: 0; font-family: var(--font-heading); font-size: 2rem; line-height: 1.1; font-weight: 500; font-variant-numeric: tabular-nums; }
+.stat dd small { font-family: var(--font-body); font-size: 0.9375rem; color: var(--color-text-secondary); margin-left: 0.375rem; }
+.stat .track { margin-top: 0.625rem; }
 
 
 .grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-4); }
@@ -89,8 +91,8 @@ h1 { font-family: var(--font-heading); font-weight: 500; font-size: 1.75rem; lin
 <main class="page">
   <header>
     <p class="eyebrow">Online Bystander Intervention</p>
-    <h1>How learners chose to step in</h1>
-    <p class="synthetic">Illustrative dashboard with synthetic data, built on the module's real tracking. Percentages show each learner's first answer in each scenario, from the module's xAPI statements.</p>
+    <h1>How your people chose to support others online</h1>
+    <p class="synthetic">This dashboard is illustrative and uses synthetic data. When the module is launched from an LMS or LRS, it records each learner's choice in every scenario as an xAPI statement, the data a dashboard like this would report.</p>
   </header>
 
   <dl class="stats" id="stats"></dl>
@@ -151,12 +153,15 @@ for (const sc of scenarios) {
 const fmt = (v, d = 0) => v.toLocaleString("en-CA", { minimumFractionDigits: d, maximumFractionDigits: d });
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+const completionRate = 100 * completed / started;
 document.getElementById("stats").innerHTML = [
-  ["Started", fmt(started), ""],
-  ["Completed", fmt(completed), ""],
-  ["Completion rate", fmt(100 * completed / started) + "%", ""],
+  ["Started", fmt(started), "learners"],
+  ["Completed", fmt(completed), `of ${fmt(started)}`],
+  ["Completion rate", fmt(completionRate) + "%", "",
+    `<div class="track" role="img" aria-label="${fmt(completionRate)}% completed"><div class="bar" style="width:${completionRate}%"></div></div>`],
   ["Median time", fmt(medianMinutes, 1), "min"],
-].map(([label, value, small]) => `<div><dt>${label}</dt><dd>${value}${small ? `<small>${small}</small>` : ""}</dd></div>`).join("");
+].map(([label, value, small, extra = ""]) =>
+  `<div class="stat"><dt>${label}</dt><dd>${value}${small ? `<small>${small}</small>` : ""}${extra}</dd></div>`).join("");
 
 document.getElementById("scenarios").innerHTML = scenarios.map(sc => {
   return `
@@ -191,18 +196,18 @@ const totalAnswers = scenarios.reduce((sum, sc) => sum + sc.reached, 0);
 const dismissed = answer(3, "B").count + answer(4, "C").count;
 const takeaways = [
   {
-    title: "People are willing to act",
-    body: `Only ${fmt(100 * dismissed / totalAnswers)}% of answers let the moment pass or played the harm down. Most people want to help; their choices differ in how.`,
+    title: "Most people want to help",
+    body: `Only ${fmt(100 * dismissed / totalAnswers)}% of answers let the moment pass or played the harm down. Most people made choices to help but differed in how they chose to support a colleague.`,
     seen: "All five scenarios",
   },
   {
-    title: "Speaking up in shared spaces is the hardest part",
-    body: `When the harm happened in a channel or meeting, many responded only in private: ${pct(1, "B")} in scenario 1, ${pct(5, "C")} in scenario 5. Seeing leaders respond in the moment makes it easier for others to do the same.`,
+    title: "Reluctance to respond publicly",
+    body: `When the harm happened in a public channel or meeting, many chose to respond only in private: ${pct(1, "B")} in scenario 1, ${pct(5, "C")} in scenario 5. Seeing leaders respond in the moment can make it easier for others to do the same.`,
     seen: "Scenarios 1 and 5",
   },
   {
-    title: "Many go to a manager first",
-    body: `${pct(4, "A")} in scenario 4 and ${pct(1, "C")} in scenario 1 chose to bring in a manager. Managers need to be ready for that conversation, and your policy should be clear on when to involve the person affected and when a report is required.`,
+    title: "Leadership support",
+    body: `${pct(4, "A")} in scenario 4 and ${pct(1, "C")} in scenario 1 chose to bring in a manager. Leaders need to be ready for that conversation, and your policy should be clear on when to involve the person affected and when a report is required.`,
     seen: "Scenarios 1 and 4",
   },
 ];
